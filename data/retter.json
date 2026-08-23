@@ -12,7 +12,14 @@
     "kokosmaelk": 400,
     "ris": 300,
     "gulerodder": 200
-   }
+   },
+   "opskrift": [
+    "Skær kyllingen i tern og løget i både.",
+    "Brun kyllingen i gryden ved høj varme og tag den op igen.",
+    "Sveds løg og karrypasta i samme gryde til det dufter.",
+    "Hæld kokosmælken i, kom kylling og gulerødder tilbage, og lad det simre 15 minutter.",
+    "Kog risene imens, og smag karryen til med salt."
+   ]
   },
   {
    "id": "bolognese",
@@ -26,7 +33,14 @@
     "hvidlog": 1,
     "tomatpure": 70,
     "pasta": 400
-   }
+   },
+   "opskrift": [
+    "Hak løg, hvidløg og gulerødder fint.",
+    "Brun kødet godt igennem, og tag det fra.",
+    "Sveds grøntsagerne bløde, og rist tomatpuréen med et minut.",
+    "Kom kød og hakkede tomater i, og lad det simre mindst 40 minutter.",
+    "Kog pastaen, og smag saucen til med salt og peber."
+   ]
   },
   {
    "id": "tortilla",
@@ -40,7 +54,8 @@
     "revet_ost": 100,
     "salat": 100,
     "cremefraiche": 150
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "ovnlaks",
@@ -52,7 +67,13 @@
     "broccoli": 400,
     "citron": 1,
     "smor": 40
-   }
+   },
+   "opskrift": [
+    "Tænd ovnen på 200 grader.",
+    "Skær kartoflerne i både, vend dem i olie og salt, og giv dem 20 minutter.",
+    "Læg laksen ved siden af med smør og citron, og giv det 12-15 minutter mere.",
+    "Damp broccolien de sidste fem minutter."
+   ]
   },
   {
    "id": "frikadeller",
@@ -65,7 +86,8 @@
     "rasp": 60,
     "kartofler": 800,
     "maelk": 100
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "wok",
@@ -78,7 +100,8 @@
     "gulerodder": 200,
     "ris": 300,
     "hvidlog": 1
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "lasagne",
@@ -92,7 +115,8 @@
     "smor": 50,
     "revet_ost": 150,
     "log": 100
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "chili",
@@ -105,7 +129,8 @@
     "log": 150,
     "peberfrugt": 1,
     "ris": 300
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "carbonara",
@@ -117,7 +142,14 @@
     "pasta": 400,
     "revet_ost": 80,
     "piskeflode": 100
-   }
+   },
+   "opskrift": [
+    "Sæt pastavandet over, og salt det godt.",
+    "Steg baconterningerne sprøde på panden.",
+    "Pisk æg, revet ost og fløde sammen i en skål.",
+    "Vend den kogte pasta i baconfedtet, tag panden af varmen, og rør æggeblandingen i.",
+    "Spæd med lidt pastavand til det bliver cremet."
+   ]
   },
   {
    "id": "suppe",
@@ -129,7 +161,8 @@
     "piskeflode": 250,
     "bouillon": 2,
     "smor": 30
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "aeggekage",
@@ -140,7 +173,8 @@
     "bacon_tern": 150,
     "maelk": 150,
     "persille": 10
-   }
+   },
+   "opskrift": null
   },
   {
    "id": "gryde",
@@ -153,7 +187,8 @@
     "piskeflode": 250,
     "porre": 1,
     "kartofler": 600
-   }
+   },
+   "opskrift": null
   }
  ]
 }

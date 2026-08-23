@@ -56,10 +56,12 @@ Det er meningen.
 | `est` | `true` = holdbarheden er et skøn. Nemlig oplyser den ikke for frugt og grønt |
 
 **Ret** — `ing` er råvare-id → mængde **for hele retten**, ikke pr. portion.
+`opskrift` er en liste af trin (eller `null`).
 
 ```json
 { "id": "karry", "navn": "Kylling i karry m. ris", "portioner": 4,
-  "ing": { "kyllingebryst": 600, "log": 200, "karrypasta": 50 } }
+  "ing": { "kyllingebryst": 600, "log": 200, "karrypasta": 50 },
+  "opskrift": ["Skær kyllingen i tern og løget i både.", "..."] }
 ```
 
 ## Fælder der allerede har bidt
@@ -73,8 +75,9 @@ Det er meningen.
 
 ## Data ligger i browseren
 
-Alt hvad man vælger og retter, ligger under nøglen `mtech_madplan_v1` i den
-enkelte browser — ikke på serveren. Hver enhed har altså sin egen plan.
+Alt hvad man vælger og retter — inklusive hvilken ret der ligger på hvilken
+dag, og adressen til Home Assistant — ligger under nøglen `mtech_madplan_v1`
+i den enkelte browser, ikke på serveren. Hver enhed har altså sin egen plan.
 Fælles familiedata kommer først med backenden på Raspberry Pi'en.
 
 Brug **Gem data** / **Indlæs data** i appen til at flytte eller sikkerhedskopiere.
