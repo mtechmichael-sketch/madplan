@@ -244,6 +244,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
     <label class="f">Pris pr. pakke (kr)<input id="rPris" type="number" min="0" step="any"></label>
     <label class="f">Holdbar (dage)<input id="rHold" type="number" min="1" step="1"></label>
     <label class="f">Kan fryses<select id="rFrys"><option value="0">Nej</option><option value="1">Ja</option></select></label>
+    <label class="f">Haves altid<select id="rAltid"><option value="0">Nej — skal købes</option><option value="1">Ja — står i skabet</option></select></label>
   </div>
   <p class="note">Holdbarheden er hvor mange dage varen er god efter du har købt den. Den styrer hvor hårdt systemet presser på for at få resten brugt.</p></div>
   <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Gem</button></footer>
@@ -273,8 +274,12 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.4.0";
-const DATA_VERSION = 1;
+const VERSION = "0.5.0";
+const DATA_VERSION = 2;
+/* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
+   men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
+const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
+                   "lasagne","chili","carbonara","suppe","aeggekage","gryde"];
 
 /* ============================================================
    SEED-DATA — hentet fra nemlig.com 23. august 2026.
@@ -318,9 +323,39 @@ const SEED_RAAVARER = [
   ["karrypasta","Frisk rød karrypasta","g",25,"25 g / Thailand",10.00,7,0,"Kolonial","5033347",0],
   ["bouillon","Hønsebouillon","stk",10,"10 stk. / Knorr",19.95,90,0,"Kolonial","911003",0],
   ["rasp","Hvederasp","g",500,"500 g / Struer",23.75,90,0,"Kolonial","5006584",0],
-  ["olivenolie","Ekstra jomfru olivenolie","ml",500,"0,50 l / Casaneo",41.30,90,0,"Kolonial","5049714",0]
+  ["olivenolie","Ekstra jomfru olivenolie","ml",500,"0,50 l / Casaneo",41.30,90,0,"Kolonial","5049714",0],
+
+  // Tilføjet til Madbanditten-opskrifterne, hentet 23. august 2026
+  ["hakket_kylling","Hakket kyllingekød 3-7%","g",400,"400 g / Gårdkylling",42.95,2,1,"Kød & fisk","5055317",0],
+  ["bacon_skiver","Bacon i skiver","g",150,"150 g / First Price",9.97,7,1,"Kød & fisk","5605284",0],
+  ["parmesan","Parmigiano Reggiano øko.","g",150,"150 g / Sant'Anna",39.00,30,1,"Mejeri","5032429",1],
+  ["cheddar","Rød cheddar 30% (revet)","g",150,"150 g / nemlig basic",14.95,14,1,"Mejeri","5043661",0],
+  ["graesk_yoghurt","Græskinspireret yoghurt 10% øko.","g",500,"500 g / Salakis",23.69,7,0,"Mejeri","5046258",0],
+  ["avokado","Avocado formodnet","stk",2,"2 stk. / Colombia",20.00,4,0,"Grønt","5004143",1],
+  ["rodlog","Rødløg","g",1000,"1 kg / Danmark",16.00,45,0,"Grønt","2301108",1],
+  ["tomat","Tomater","g",500,"500 g / Danmark",18.00,7,0,"Grønt","5006443",1],
+  ["ingefaer","Ingefær øko.","g",200,"200 g / Kina",14.00,21,0,"Grønt","5016560",1],
+  ["blomkaalsris","Blomkålsris øko. (frost)","g",350,"350 g / frost / Frigodan",11.16,30,1,"Grønt","5042997",0],
+  ["cornichoner","Cornichoner","g",190,"330 g glas / 190 g drænet",9.91,365,0,"Kolonial","5602898",1],
+  ["mayonnaise","Ægte mayonnaise","ml",250,"0,25 l / K-Salat",15.00,60,0,"Kolonial","5009601",1],
+
+  // Haves altid — krydderier og basisvarer der aldrig skal på indkøbslisten
+  ["karrykrydderi","Karry (krydderi)","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["garam_masala","Garam masala","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["gurkemeje","Gurkemeje","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["paprika","Sød paprika","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["spidskommen","Spidskommen","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["chiliflager","Chiliflager","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["timian","Tørret timian","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["rosmarin","Tørret rosmarin","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["hvidlogspulver","Hvidløgspulver","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["loppefro","Loppefrøskaller","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["eddike","Eddike (æblecider / rødvin)","ml",1,"",0,365,0,"Krydderier","",0,1],
+  ["soja","Soja eller tamari","ml",1,"",0,365,0,"Krydderier","",0,1],
+  ["worcestershire","Worcestershiresauce","ml",1,"",0,365,0,"Krydderier","",0,1],
+  ["kokosolie","Kokosolie","ml",1,"",0,365,0,"Krydderier","",0,1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
-             holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10]}));
+             holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11]}));
 
 const SEED_RETTER = [
   ["karry","Kylling i karry m. ris",4,{kyllingebryst:600,log:200,karrypasta:50,kokosmaelk:400,ris:300,gulerodder:200},
@@ -353,8 +388,48 @@ const SEED_RETTER = [
      "Spæd med lidt pastavand til det bliver cremet."]],
   ["suppe","Champignonsuppe",4,{champignon:500,log:100,piskeflode:250,bouillon:2,smor:30},null],
   ["aeggekage","Æggekage m. bacon",4,{aeg:8,bacon_tern:150,maelk:150,persille:10},null],
-  ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,kartofler:600},null]
-].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4]}));
+  ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,kartofler:600},null],
+
+  /* Fra Madbanditten, august 2026. Mængderne er skaleret til 4 portioner.
+     Trinnene er skrevet kort i egne ord — den fulde opskrift står hos kilden. */
+  ["sliders","Parmesan sliders",4,
+    {parmesan:60,hakket_okse:600,avokado:2,rodlog:150,cornichoner:50,mayonnaise:60,persille:20,smor:20,eddike:2,hvidlogspulver:2},
+    ["Rist parmesanen i små bunker på bagepapir til sprøde chips, og lad dem køle.",
+     "Form kødet til små bøffer og steg dem i smør.",
+     "Mos avokado med mayonnaise, eddike og hvidløgspulver til en dressing.",
+     "Hak rødløg, cornichoner og persille fint og rør det i.",
+     "Byg sliderne med parmesanchips som bund og låg."],
+    "https://www.madbanditten.dk/sproede-parmesan-sliders/"],
+
+  ["koedboller","Kødboller i svampesauce",4,
+    {hakket_blandet:500,log:75,hvidlog:1,aeg:1,loppefro:3,champignon:450,piskeflode:250,bouillon:1,parmesan:10,persille:10,timian:2,rosmarin:2,soja:15,eddike:15},
+    ["Rør farsen med revet løg, hvidløg, æg, loppefrøskaller og krydderier, og lad den hvile.",
+     "Form kødboller og brun dem hele vejen rundt.",
+     "Steg svampene gyldne i samme pande sammen med løg og hvidløg.",
+     "Kom fløde og bouillon i, og lad saucen koge lidt ind.",
+     "Smag til med parmesan, soja og eddike, og vend kødbollerne i."],
+    "https://www.madbanditten.dk/koedboller-i-svampesauce/"],
+
+  ["butterchicken","Nem butter chicken",4,
+    {hakket_kylling:600,smor:50,log:100,hvidlog:1,ingefaer:20,tomatpure:15,bouillon:2,graesk_yoghurt:200,citron:1,blomkaalsris:600,persille:10,garam_masala:8,gurkemeje:4,paprika:4,spidskommen:2,chiliflager:1},
+    ["Sveds løg, hvidløg og ingefær i smørret.",
+     "Kom krydderierne i og rist dem med et halvt minut, til de dufter.",
+     "Brun kyllingefarsen med, og rist tomatpuréen med til sidst.",
+     "Spæd med bouillon og lad det simre til det tykner.",
+     "Tag gryden af varmen og rør yoghurten i, så den ikke skiller. Smag til med citron.",
+     "Servér med blomkålsris — eller almindelige ris til dem der vil have det."],
+    "https://www.madbanditten.dk/nem-butter-chicken/"],
+
+  ["ketoburger","Keto-burger m. bacon-løgringe",4,
+    {hakket_okse:600,bacon_skiver:200,log:50,tomat:200,salat:100,cheddar:40,mayonnaise:90,tomatpure:20,worcestershire:4,eddike:8,kokosolie:10},
+    ["Skær løget i tykke ringe og rul en baconskive om hver ring.",
+     "Steg eller bag løgringene sprøde.",
+     "Bland kødet med worcestershiresauce og form fire bøffer.",
+     "Steg bøfferne og læg cheddar på de sidste minutter.",
+     "Rør dressing af mayonnaise, tomatpuré og eddike.",
+     "Byg burgeren på salatblade med tomat, bøf og en bacon-løgring på toppen."],
+    "https://www.madbanditten.dk/keto-burger-med-loegringe/"]
+].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
 
 /* ============================================================
    STATE
@@ -371,13 +446,14 @@ function load(){
     }
   }catch(e){ /* korrupt data — start forfra frem for at gå i stå */ }
   return {v:VERSION, dataVersion:DATA_VERSION, raavarer:SEED_RAAVARER, retter:SEED_RETTER,
-          valgt:{}, uge:{}, haUrl:"", tomgangMin:3};
+          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, haUrl:"", tomgangMin:3, tema:"auto"};
 }
 
 /* Opdaterer gemte data uden at røre det du selv har lavet. */
 function migrer(d){
   d.uge = d.uge || {};
   d.haUrl = d.haUrl || "";
+  d.tema = d.tema || "auto";
   if(d.tomgangMin == null) d.tomgangMin = 3;
   if(d.dataVersion == null) d.dataVersion = DATA_VERSION;
   if(d.v === VERSION) return d;
@@ -391,10 +467,25 @@ function migrer(d){
     if(ret2[x.id]) Object.assign(x.ing, ret2[x.id]);
     if(!x.opskrift && opsk[x.id]) x.opskrift = opsk[x.id];
   });
+  // nye seed-retter lægges ind én gang; slettede kommer ikke igen
+  const set = new Set(d.seedSet || RETTER_V4);
+  SEED_RETTER.forEach(x => {
+    if(set.has(x.id)) return;
+    if(!d.retter.some(r => r.id === x.id)) d.retter.push(x);
+    set.add(x.id);
+  });
+  d.seedSet = [...set];
   d.v = VERSION;
   return d;
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* Tema pr. enhed: køkkentabletten kan stå mørk, mens laptoppen følger systemet */
+function temaPaa(){
+  const t = S.tema || "auto";
+  if(t === "auto") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = (t === "moerk" ? "dark" : "light");
+}
 
 /* Henter fælles data fra data/*.json når appen ligger på en server.
    Råvarer overskrives; retter tilføjes kun. */
@@ -447,7 +538,8 @@ function behov(valgt){
 function indkoeb(b){
   const rows = [];
   for(const [vid, kraevet] of Object.entries(b)){
-    const r = raa(vid); if(!r) continue;
+    const r = raa(vid);
+    if(!r || r.altid) continue;   // krydderier og basisvarer købes ikke pr. ret
     const pakker = Math.ceil(kraevet / r.pakke - 1e-9);
     const koebt = pakker * r.pakke;
     rows.push({r, kraevet, pakker, koebt, over: koebt - kraevet, pris: pakker * (r.pris || 0)});
@@ -686,6 +778,10 @@ function sRet(){
     const row = el("div","ing");
     row.append(el("span","n", r.navn), el("span","num", maengde(m, r.enhed)));
     row.lastChild.style.fontSize = "17px";
+    if(r.altid){
+      row.style.opacity = ".62";
+      row.insertBefore(el("span","mrk m-ok","haves altid"), row.lastChild);
+    }
     ic.append(row);
   });
   const eft = [];
@@ -711,6 +807,16 @@ function sRet(){
     oc.append(el("p","tom","Der er ikke skrevet nogen fremgangsmåde til den her ret endnu."));
     const b = el("button","btn ghost","Skriv fremgangsmåde");
     b.onclick = () => editRet(d); oc.append(b);
+  }
+  if(d.kilde){
+    const a = el("a",null,"Se den fulde opskrift hos kilden →");
+    a.href = d.kilde; a.target = "_blank"; a.rel = "noopener";
+    a.style.cssText = "display:inline-block;margin-top:12px;font-size:15px;font-weight:600;color:var(--accent)";
+    oc.append(a);
+    try{
+      oc.append(Object.assign(el("p","note", new URL(d.kilde).hostname.replace(/^www\./,"")),
+        {style:"margin:6px 0 0"}));
+    }catch(e){}
   }
   wrap.append(oc);
   V.append(wrap);
@@ -832,6 +938,18 @@ function sMere(){
   });
   V.append(nav);
 
+  const tk = el("div","kort"); tk.style.maxWidth = "620px"; tk.style.marginBottom = "18px";
+  tk.append(el("div","eyebrow","Udseende"),
+    Object.assign(el("p","note","Gælder kun denne enhed. Køkkentabletten kan stå mørk, mens laptoppen følger systemet."),{style:"margin:8px 0 12px"}));
+  const ts = el("div","seg"); ts.style.display = "inline-flex";
+  [["auto","Følg systemet"],["lys","Lyst"],["moerk","Mørkt"]].forEach(([v,t]) => {
+    const b = el("button",null,t);
+    b.setAttribute("aria-current", String((S.tema||"auto") === v));
+    b.onclick = () => { S.tema = v; temaPaa(); tegn(); };
+    ts.append(b);
+  });
+  tk.append(ts); V.append(tk);
+
   const c = el("div","kort"); c.style.maxWidth = "620px";
   c.append(el("div","eyebrow","Tomgangsskærm"),
     Object.assign(el("p","note","Efter et stykke tid uden berøring viser skærmen klokken, ugens mad og — når Home Assistant er koblet til — vejr og aftaler. Sæt til 0 for at slå det fra. Virker kun på store skærme."),{style:"margin:8px 0 12px"}));
@@ -888,8 +1006,10 @@ function sRaavarer(){
    .forEach(r => {
     const row = el("div","raekke");
     row.append(el("span","n", r.navn),
-      el("span","d", (r.pakkenavn || maengde(r.pakke,r.enhed)) + " · " + kr(r.pris) +
-        " · holder " + (r.holdbar >= 90 ? "længe" : r.holdbar + " dage") + (r.est ? " (skøn)" : "") + (r.frys ? " · kan fryses" : "")));
+      el("span","d", r.altid ? "Haves altid — kommer aldrig på indkøbslisten"
+        : (r.pakkenavn || maengde(r.pakke,r.enhed)) + " · " + kr(r.pris) +
+          " · holder " + (r.holdbar >= 90 ? "længe" : r.holdbar + " dage") + (r.est ? " (skøn)" : "") + (r.frys ? " · kan fryses" : "")));
+    if(r.altid) row.style.opacity = ".62";
     if(r.nid){
       const a = el("a","mrk m-ok","Nemlig " + r.nid);
       a.href = "https://www.nemlig.com/" + r.nid; a.target = "_blank"; a.rel = "noopener";
@@ -1011,6 +1131,7 @@ function editRaa(r){
   rEnhed.value = r ? r.enhed : "g"; rPakke.value = r ? r.pakke : "";
   rPakkenavn.value = r ? (r.pakkenavn||"") : ""; rPris.value = r ? r.pris : "";
   rHold.value = r ? r.holdbar : 7; rFrys.value = r && r.frys ? "1" : "0";
+  rAltid.value = r && r.altid ? "1" : "0";
   dlgRaa.showModal();
 }
 dlgRaa.addEventListener("close", () => {
@@ -1018,7 +1139,7 @@ dlgRaa.addEventListener("close", () => {
   const o = {id: raaEdit ? raaEdit.id : "r" + Date.now().toString(36),
     navn: rNavn.value.trim(), kategori: rKat.value.trim() || "Andet", enhed: rEnhed.value,
     pakke: +rPakke.value, pakkenavn: rPakkenavn.value.trim(), pris: +rPris.value || 0,
-    holdbar: +rHold.value || 7, frys: rFrys.value === "1"};
+    holdbar: +rHold.value || 7, frys: rFrys.value === "1", altid: rAltid.value === "1"};
   if(raaEdit) Object.assign(raaEdit, o); else S.raavarer.push(o);
   tegn();
 });
@@ -1093,6 +1214,7 @@ document.getElementById("fHjem").onclick = () => vis("hjem");
 document.getElementById("bMere").onclick = () => vis("mere");
 addEventListener("resize", nulstilIdle);
 
+temaPaa();
 vis("plan");
 nulstilIdle();
 hentFaelles();

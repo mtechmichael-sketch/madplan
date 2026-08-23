@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "retter": [
   {
    "id": "karry",
@@ -19,7 +19,8 @@
     "Sveds løg og karrypasta i samme gryde til det dufter.",
     "Hæld kokosmælken i, kom kylling og gulerødder tilbage, og lad det simre 15 minutter.",
     "Kog risene imens, og smag karryen til med salt."
-   ]
+   ],
+   "kilde": null
   },
   {
    "id": "bolognese",
@@ -40,7 +41,8 @@
     "Sveds grøntsagerne bløde, og rist tomatpuréen med et minut.",
     "Kom kød og hakkede tomater i, og lad det simre mindst 40 minutter.",
     "Kog pastaen, og smag saucen til med salt og peber."
-   ]
+   ],
+   "kilde": null
   },
   {
    "id": "tortilla",
@@ -55,7 +57,8 @@
     "salat": 100,
     "cremefraiche": 150
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "ovnlaks",
@@ -73,7 +76,8 @@
     "Skær kartoflerne i både, vend dem i olie og salt, og giv dem 20 minutter.",
     "Læg laksen ved siden af med smør og citron, og giv det 12-15 minutter mere.",
     "Damp broccolien de sidste fem minutter."
-   ]
+   ],
+   "kilde": null
   },
   {
    "id": "frikadeller",
@@ -87,7 +91,8 @@
     "kartofler": 800,
     "maelk": 100
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "wok",
@@ -101,7 +106,8 @@
     "ris": 300,
     "hvidlog": 1
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "lasagne",
@@ -116,7 +122,8 @@
     "revet_ost": 150,
     "log": 100
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "chili",
@@ -130,7 +137,8 @@
     "peberfrugt": 1,
     "ris": 300
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "carbonara",
@@ -149,7 +157,8 @@
     "Pisk æg, revet ost og fløde sammen i en skål.",
     "Vend den kogte pasta i baconfedtet, tag panden af varmen, og rør æggeblandingen i.",
     "Spæd med lidt pastavand til det bliver cremet."
-   ]
+   ],
+   "kilde": null
   },
   {
    "id": "suppe",
@@ -162,7 +171,8 @@
     "bouillon": 2,
     "smor": 30
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "aeggekage",
@@ -174,7 +184,8 @@
     "maelk": 150,
     "persille": 10
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
   },
   {
    "id": "gryde",
@@ -188,7 +199,121 @@
     "porre": 1,
     "kartofler": 600
    },
-   "opskrift": null
+   "opskrift": null,
+   "kilde": null
+  },
+  {
+   "id": "sliders",
+   "navn": "Parmesan sliders",
+   "portioner": 4,
+   "ing": {
+    "parmesan": 60,
+    "hakket_okse": 600,
+    "avokado": 2,
+    "rodlog": 150,
+    "cornichoner": 50,
+    "mayonnaise": 60,
+    "persille": 20,
+    "smor": 20,
+    "eddike": 2,
+    "hvidlogspulver": 2
+   },
+   "opskrift": [
+    "Rist parmesanen i små bunker på bagepapir til sprøde chips, og lad dem køle.",
+    "Form kødet til små bøffer og steg dem i smør.",
+    "Mos avokado med mayonnaise, eddike og hvidløgspulver til en dressing.",
+    "Hak rødløg, cornichoner og persille fint og rør det i.",
+    "Byg sliderne med parmesanchips som bund og låg."
+   ],
+   "kilde": "https://www.madbanditten.dk/sproede-parmesan-sliders/"
+  },
+  {
+   "id": "koedboller",
+   "navn": "Kødboller i svampesauce",
+   "portioner": 4,
+   "ing": {
+    "hakket_blandet": 500,
+    "log": 75,
+    "hvidlog": 1,
+    "aeg": 1,
+    "loppefro": 3,
+    "champignon": 450,
+    "piskeflode": 250,
+    "bouillon": 1,
+    "parmesan": 10,
+    "persille": 10,
+    "timian": 2,
+    "rosmarin": 2,
+    "soja": 15,
+    "eddike": 15
+   },
+   "opskrift": [
+    "Rør farsen med revet løg, hvidløg, æg, loppefrøskaller og krydderier, og lad den hvile.",
+    "Form kødboller og brun dem hele vejen rundt.",
+    "Steg svampene gyldne i samme pande sammen med løg og hvidløg.",
+    "Kom fløde og bouillon i, og lad saucen koge lidt ind.",
+    "Smag til med parmesan, soja og eddike, og vend kødbollerne i."
+   ],
+   "kilde": "https://www.madbanditten.dk/koedboller-i-svampesauce/"
+  },
+  {
+   "id": "butterchicken",
+   "navn": "Nem butter chicken",
+   "portioner": 4,
+   "ing": {
+    "hakket_kylling": 600,
+    "smor": 50,
+    "log": 100,
+    "hvidlog": 1,
+    "ingefaer": 20,
+    "tomatpure": 15,
+    "bouillon": 2,
+    "graesk_yoghurt": 200,
+    "citron": 1,
+    "blomkaalsris": 600,
+    "persille": 10,
+    "garam_masala": 8,
+    "gurkemeje": 4,
+    "paprika": 4,
+    "spidskommen": 2,
+    "chiliflager": 1
+   },
+   "opskrift": [
+    "Sveds løg, hvidløg og ingefær i smørret.",
+    "Kom krydderierne i og rist dem med et halvt minut, til de dufter.",
+    "Brun kyllingefarsen med, og rist tomatpuréen med til sidst.",
+    "Spæd med bouillon og lad det simre til det tykner.",
+    "Tag gryden af varmen og rør yoghurten i, så den ikke skiller. Smag til med citron.",
+    "Servér med blomkålsris — eller almindelige ris til dem der vil have det."
+   ],
+   "kilde": "https://www.madbanditten.dk/nem-butter-chicken/"
+  },
+  {
+   "id": "ketoburger",
+   "navn": "Keto-burger m. bacon-løgringe",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 600,
+    "bacon_skiver": 200,
+    "log": 50,
+    "tomat": 200,
+    "salat": 100,
+    "cheddar": 40,
+    "mayonnaise": 90,
+    "tomatpure": 20,
+    "worcestershire": 4,
+    "eddike": 8,
+    "kokosolie": 10
+   },
+   "opskrift": [
+    "Skær løget i tykke ringe og rul en baconskive om hver ring.",
+    "Steg eller bag løgringene sprøde.",
+    "Bland kødet med worcestershiresauce og form fire bøffer.",
+    "Steg bøfferne og læg cheddar på de sidste minutter.",
+    "Rør dressing af mayonnaise, tomatpuré og eddike.",
+    "Byg burgeren på salatblade med tomat, bøf og en bacon-løgring på toppen."
+   ],
+   "kilde": "https://www.madbanditten.dk/keto-burger-med-loegringe/"
   }
  ]
 }
