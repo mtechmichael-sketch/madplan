@@ -1,5 +1,5 @@
 {
- "version": 3,
+ "version": 6,
  "retter": [
   {
    "id": "karry",
@@ -80,21 +80,6 @@
    "kilde": null
   },
   {
-   "id": "frikadeller",
-   "navn": "Frikadeller m. kartofler",
-   "portioner": 4,
-   "ing": {
-    "hakket_blandet": 600,
-    "aeg": 1,
-    "log": 100,
-    "rasp": 60,
-    "kartofler": 800,
-    "maelk": 100
-   },
-   "opskrift": null,
-   "kilde": null
-  },
-  {
    "id": "wok",
    "navn": "Kyllingewok m. ris",
    "portioner": 4,
@@ -136,53 +121,6 @@
     "log": 150,
     "peberfrugt": 1,
     "ris": 300
-   },
-   "opskrift": null,
-   "kilde": null
-  },
-  {
-   "id": "carbonara",
-   "navn": "Pasta carbonara",
-   "portioner": 4,
-   "ing": {
-    "bacon_tern": 200,
-    "aeg": 4,
-    "pasta": 400,
-    "revet_ost": 80,
-    "piskeflode": 100
-   },
-   "opskrift": [
-    "Sæt pastavandet over, og salt det godt.",
-    "Steg baconterningerne sprøde på panden.",
-    "Pisk æg, revet ost og fløde sammen i en skål.",
-    "Vend den kogte pasta i baconfedtet, tag panden af varmen, og rør æggeblandingen i.",
-    "Spæd med lidt pastavand til det bliver cremet."
-   ],
-   "kilde": null
-  },
-  {
-   "id": "suppe",
-   "navn": "Champignonsuppe",
-   "portioner": 4,
-   "ing": {
-    "champignon": 500,
-    "log": 100,
-    "piskeflode": 250,
-    "bouillon": 2,
-    "smor": 30
-   },
-   "opskrift": null,
-   "kilde": null
-  },
-  {
-   "id": "aeggekage",
-   "navn": "Æggekage m. bacon",
-   "portioner": 4,
-   "ing": {
-    "aeg": 8,
-    "bacon_tern": 150,
-    "maelk": 150,
-    "persille": 10
    },
    "opskrift": null,
    "kilde": null
@@ -237,7 +175,8 @@
     "hvidlog": 1,
     "aeg": 1,
     "loppefro": 3,
-    "champignon": 450,
+    "champignon": 500,
+    "svampemix": 200,
     "piskeflode": 250,
     "bouillon": 1,
     "parmesan": 10,

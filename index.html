@@ -274,10 +274,13 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.6.1";
-const DATA_VERSION = 3;
+const VERSION = "0.6.3";
+const DATA_VERSION = 6;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
+/* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
+   allerede ligger på enheden — retter overskrives ellers aldrig af data/. */
+const FJERNEDE = ["suppe","aeggekage","frikadeller","carbonara"];
 const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
                    "lasagne","chili","carbonara","suppe","aeggekage","gryde"];
 
@@ -305,6 +308,7 @@ const SEED_RAAVARER = [
   ["kartofler","Kartofler vaskede","g",1000,"1 kg / Danmark",12.00,25,0,"Grønt","5037675",1],
   ["broccoli","Broccoli","g",450,"1 stk. / min. 450 g",15.00,6,1,"Grønt","5002549",1],
   ["champignon","Champignon","g",500,"500 g / Polen",23.75,5,0,"Grønt","5010800",1],
+  ["svampemix","Svampemix","g",200,"200 g / Polen",28.00,5,0,"Grønt","5018690",1],
   ["squash","Courgette / squash øko.","stk",1,"1 stk. / Danmark",9.00,8,0,"Grønt","5002546",1],
   ["peberfrugt","Peberfrugt orange","stk",1,"1 stk. / Holland",9.00,9,0,"Grønt","5001713",1],
   ["porre","Porrer","stk",3,"1 bdt. / 3 stk.",19.50,10,0,"Grønt","5012283",1],
@@ -349,7 +353,7 @@ const SEED_RAAVARER = [
   ["timian","Tørret timian","g",1,"",0,365,0,"Krydderier","",0,1],
   ["rosmarin","Tørret rosmarin","g",1,"",0,365,0,"Krydderier","",0,1],
   ["hvidlogspulver","Hvidløgspulver","g",1,"",0,365,0,"Krydderier","",0,1],
-  ["loppefro","Loppefrøskaller","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["loppefro","Loppefrøskaller","g",200,"200 g / Urtekram øko.",73.50,365,0,"Krydderier","5603230",0,1],
   ["eddike","Eddike (æblecider / rødvin)","ml",1,"",0,365,0,"Krydderier","",0,1],
   ["soja","Soja eller tamari","ml",1,"",0,365,0,"Krydderier","",0,1],
   ["worcestershire","Worcestershiresauce","ml",1,"",0,365,0,"Krydderier","",0,1],
@@ -383,14 +387,14 @@ const SEED_RAAVARER = [
   ["pizzasauce","Pizzasauce","g",390,"390 g / Cirio",16.25,90,0,"Kolonial","5066097",0],
   ["chokolade","Mørk chokolade 70% øko.","g",100,"100 g / Grøn Balance",26.95,365,0,"Kolonial","5059453",1],
 
-  ["pofiber","Pofiber / kartoffelfiber","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["pofiber","Pofiber / kartoffelfiber","g",500,"500 g / føres ikke hos Nemlig",99.95,365,0,"Krydderier","",1,1],
   ["muskatnod","Muskatnød","g",1,"",0,365,0,"Krydderier","",0,1],
   ["allehaande","Allehånde","g",1,"",0,365,0,"Krydderier","",0,1],
   ["graesk_krydderi","Græsk krydderiblanding","g",1,"",0,365,0,"Krydderier","",0,1],
   ["roeget_paprika","Røget paprika","g",1,"",0,365,0,"Krydderier","",0,1],
   ["oregano","Oregano","g",1,"",0,365,0,"Krydderier","",0,1],
   ["tabasco","Tabasco","ml",1,"",0,365,0,"Krydderier","",0,1],
-  ["bagepulver","Bagepulver","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["bagepulver","Bagepulver","g",140,"140 g / Dava",5.95,365,0,"Krydderier","",0,1],
   ["sesam","Sesamfrø","g",1,"",0,365,0,"Krydderier","",0,1],
   ["sukrin","Sukrin / sødemiddel","g",1,"",0,365,0,"Krydderier","",0,1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
@@ -415,18 +419,9 @@ const SEED_RETTER = [
      "Skær kartoflerne i både, vend dem i olie og salt, og giv dem 20 minutter.",
      "Læg laksen ved siden af med smør og citron, og giv det 12-15 minutter mere.",
      "Damp broccolien de sidste fem minutter."]],
-  ["frikadeller","Frikadeller m. kartofler",4,{hakket_blandet:600,aeg:1,log:100,rasp:60,kartofler:800,maelk:100},null],
   ["wok","Kyllingewok m. ris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,ris:300,hvidlog:1},null],
   ["lasagne","Lasagne",4,{hakket_okse:500,hakkede_tomater:800,lasagneplader:250,maelk:500,smor:50,revet_ost:150,log:100},null],
   ["chili","Chili con carne",4,{hakket_okse:500,kidneybonner:500,hakkede_tomater:400,log:150,peberfrugt:1,ris:300},null],
-  ["carbonara","Pasta carbonara",4,{bacon_tern:200,aeg:4,pasta:400,revet_ost:80,piskeflode:100},
-    ["Sæt pastavandet over, og salt det godt.",
-     "Steg baconterningerne sprøde på panden.",
-     "Pisk æg, revet ost og fløde sammen i en skål.",
-     "Vend den kogte pasta i baconfedtet, tag panden af varmen, og rør æggeblandingen i.",
-     "Spæd med lidt pastavand til det bliver cremet."]],
-  ["suppe","Champignonsuppe",4,{champignon:500,log:100,piskeflode:250,bouillon:2,smor:30},null],
-  ["aeggekage","Æggekage m. bacon",4,{aeg:8,bacon_tern:150,maelk:150,persille:10},null],
   ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,kartofler:600},null],
 
   /* Fra Madbanditten, august 2026. Mængderne er skaleret til 4 portioner.
@@ -441,7 +436,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/sproede-parmesan-sliders/"],
 
   ["koedboller","Kødboller i svampesauce",4,
-    {hakket_blandet:500,log:75,hvidlog:1,aeg:1,loppefro:3,champignon:450,piskeflode:250,bouillon:1,parmesan:10,persille:10,timian:2,rosmarin:2,soja:15,eddike:15},
+    {hakket_blandet:500,log:75,hvidlog:1,aeg:1,loppefro:3,champignon:500,svampemix:200,piskeflode:250,bouillon:1,parmesan:10,persille:10,timian:2,rosmarin:2,soja:15,eddike:15},
     ["Rør farsen med revet løg, hvidløg, æg, loppefrøskaller og krydderier, og lad den hvile.",
      "Form kødboller og brun dem hele vejen rundt.",
      "Steg svampene gyldne i samme pande sammen med løg og hvidløg.",
@@ -595,7 +590,13 @@ function migrer(d){
   d.raavarer = d.raavarer.map(r => nye[r.id] ? Object.assign({}, r, nye[r.id]) : r);
   const haves = new Set(d.raavarer.map(r => r.id));
   SEED_RAAVARER.forEach(r => { if(!haves.has(r.id)) d.raavarer.push(r); });
-  const ret2 = {karry:{karrypasta:50}, chili:{kidneybonner:500}, wok:{squash:1}};
+  // retter der er taget ud af kataloget — fjernes også på enheder der har dem
+  const vaek = new Set(FJERNEDE);
+  d.retter = d.retter.filter(x => !vaek.has(x.id));
+  vaek.forEach(id => { delete d.valgt[id];
+    Object.keys(d.uge).forEach(dag => { if(d.uge[dag] === id) delete d.uge[dag]; }); });
+  const ret2 = {karry:{karrypasta:50}, chili:{kidneybonner:500}, wok:{squash:1},
+               koedboller:{champignon:500, svampemix:200}};
   const opsk = Object.fromEntries(SEED_RETTER.filter(x => x.opskrift).map(x => [x.id, x.opskrift]));
   d.retter.forEach(x => {
     if(ret2[x.id]) Object.assign(x.ing, ret2[x.id]);
