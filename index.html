@@ -274,8 +274,8 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.5.0";
-const DATA_VERSION = 2;
+const VERSION = "0.6.0";
+const DATA_VERSION = 3;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
@@ -353,7 +353,46 @@ const SEED_RAAVARER = [
   ["eddike","Eddike (æblecider / rødvin)","ml",1,"",0,365,0,"Krydderier","",0,1],
   ["soja","Soja eller tamari","ml",1,"",0,365,0,"Krydderier","",0,1],
   ["worcestershire","Worcestershiresauce","ml",1,"",0,365,0,"Krydderier","",0,1],
-  ["kokosolie","Kokosolie","ml",1,"",0,365,0,"Krydderier","",0,1]
+  ["kokosolie","Kokosolie","ml",1,"",0,365,0,"Krydderier","",0,1],
+
+  // Tilføjet til resten af Madbanditten-opskrifterne, hentet 23. august 2026
+  ["grisekod_tern","Grisekød i tern øko.","g",400,"400 g / Jyske gårde",74.50,4,1,"Kød & fisk","5063650",0],
+  ["ribbensteg","Ribbensteg øko.","g",1000,"0,80–1,20 kg / Jyske gårde",137.95,6,1,"Kød & fisk","5063956",0],
+  ["chorizo","Chorizo extra","g",75,"75 g / Valent",10.59,7,1,"Kød & fisk","5028974",0],
+  ["flodeost","Flødeost naturel øko.","g",150,"150 g / Buko",19.00,14,0,"Mejeri","5020050",0],
+  ["pikantost","Flødeost pikant","g",200,"200 g / Buko",14.95,14,0,"Mejeri","707011",0],
+  ["feta","Fetaost","g",150,"150 g / Salakis",30.25,14,0,"Mejeri","5047128",0],
+  ["mascarpone","Mascarpone","g",250,"250 g / Galbani",32.95,14,0,"Mejeri","5009663",0],
+  ["hytteost","Hytteost 4%","g",450,"450 g / Mammen",16.00,6,0,"Mejeri","5068992",0],
+  ["tzatziki","Tzatziki","g",140,"140 g / So Delicate",25.63,7,0,"Mejeri","5045080",0],
+  ["blomkaal","Blomkål øko.","stk",1,"1 stk. / ca. 800 g",20.00,8,0,"Grønt","5002551",1],
+  ["hvidkaal","Hvidkål","stk",1,"1 stk. / ca. 1–2 kg",18.00,21,0,"Grønt","5012293",1],
+  ["spinat","Babyspinat øko.","g",100,"100 g / skyllet",18.00,2,0,"Grønt","5021833",0],
+  ["gronne_bonner","Bønner grønne øko.","g",300,"300 g / Danmark",25.00,6,1,"Grønt","5007512",1],
+  ["iceberg","Iceberg salat","stk",1,"1 stk. / ca. 400 g",12.00,7,0,"Grønt","2301084",1],
+  ["agurk","Agurk øko.","stk",1,"1 stk. / Spanien",13.00,8,0,"Grønt","106593",1],
+  ["cherrytomat","Cherrytomater øko.","g",250,"250 g / Spanien",15.00,7,0,"Grønt","106499",1],
+  ["aeble","Æbler Gala øko.","g",1000,"1 kg / Italien",22.00,21,0,"Grønt","5012282",1],
+  ["chili","Chili rød øko.","stk",1,"1 stk. / Spanien",6.00,10,0,"Grønt","5004946",1],
+  ["basilikum","Basilikum øko.","g",25,"1 potte",15.00,6,0,"Grønt","5027931",1],
+  ["rodkaal","Rødkål (syltet)","g",580,"580 g / Samsø Syltefabrik",20.95,365,0,"Kolonial","5042137",1],
+  ["agurkesalat","Agurkesalat (syltet)","g",405,"710 g glas / 405 g drænet",16.61,365,0,"Kolonial","5047370",1],
+  ["ketchup","Ketchup","g",700,"700 g / Heinz",36.45,365,0,"Kolonial","5060954",1],
+  ["dijon","Dijon sennep","g",250,"250 g / Bähncke",20.00,365,0,"Kolonial","101491",1],
+  ["gr_bouillon","Grøntsagsbouillon","stk",10,"10 stk. / Knorr",19.95,90,0,"Kolonial","911002",0],
+  ["pizzasauce","Pizzasauce","g",390,"390 g / Cirio",16.25,90,0,"Kolonial","5066097",0],
+  ["chokolade","Mørk chokolade 70% øko.","g",100,"100 g / Grøn Balance",26.95,365,0,"Kolonial","5059453",1],
+
+  ["pofiber","Pofiber / kartoffelfiber","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["muskatnod","Muskatnød","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["allehaande","Allehånde","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["graesk_krydderi","Græsk krydderiblanding","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["roeget_paprika","Røget paprika","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["oregano","Oregano","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["tabasco","Tabasco","ml",1,"",0,365,0,"Krydderier","",0,1],
+  ["bagepulver","Bagepulver","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["sesam","Sesamfrø","g",1,"",0,365,0,"Krydderier","",0,1],
+  ["sukrin","Sukrin / sødemiddel","g",1,"",0,365,0,"Krydderier","",0,1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
              holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11]}));
 
@@ -428,7 +467,102 @@ const SEED_RETTER = [
      "Steg bøfferne og læg cheddar på de sidste minutter.",
      "Rør dressing af mayonnaise, tomatpuré og eddike.",
      "Byg burgeren på salatblade med tomat, bøf og en bacon-løgring på toppen."],
-    "https://www.madbanditten.dk/keto-burger-med-loegringe/"]
+    "https://www.madbanditten.dk/keto-burger-med-loegringe/"],
+
+  ["hakkeboeffer","Hakkebøffer i fad",4,
+    {hakket_okse:500,bacon_tern:100,log:100,champignon:200,porre:2,hvidlog:1,peberfrugt:1,pikantost:100,piskeflode:100,hakkede_tomater:400,smor:25,paprika:8,timian:2},
+    ["Brun bøfferne og læg dem i et fad.","Steg bacon, løg, porre og champignon møre.","Rør tomater, fløde og pikantost i, og smag til.","Hæld saucen over bøfferne og bag ca. 20 minutter."],
+    "https://www.madbanditten.dk/hakkeboeffer-i-fad/"],
+
+  ["boller_karry","Boller i karry (keto)",4,
+    {hakket_blandet:530,log:65,squash:1,aeg:1,gr_bouillon:3,aeble:55,piskeflode:330,flodeost:65,blomkaal:1,broccoli:170,loppefro:4,karrykrydderi:8},
+    ["Rør farsen med revet løg, squash, æg og loppefrøskaller, og lad den hvile.","Form boller og pocher dem i bouillonen.","Sveds løg, æble og karry, og spæd med kogelagen og fløde.","Rør flødeost i saucen og læg bollerne tilbage.","Servér med blomkålsris og dampet broccoli."],
+    "https://www.madbanditten.dk/boller-i-karry/"],
+
+  ["vikingegryde","Vikingegryde",4,
+    {grisekod_tern:400,bacon_tern:100,champignon:200,porre:1,log:50,hvidlog:1,tomatpure:40,piskeflode:250,cremefraiche:100,smor:10,blomkaal:1,karrykrydderi:8,paprika:8},
+    ["Brun kødtern og bacon i gryden.","Sveds løg, porre, hvidløg og champignon med.","Rist karry, paprika og tomatpuré med et minut.","Kom fløde i og lad det simre til det tykner.","Rør cremefraiche i til sidst og servér med blomkålsris."],
+    "https://www.madbanditten.dk/vikingegryde/"],
+
+  ["frikadellefad","Frikadellefad m. flødekål",4,
+    {hakket_blandet:600,aeg:1,log:300,piskeflode:250,flodeost:100,gr_bouillon:1,hvidkaal:1,pofiber:5,muskatnod:2,allehaande:1},
+    ["Rør farsen med revet løg, æg og pofiber, og form frikadeller.","Brun dem på panden.","Snit hvidkålen fint og sveds den blød med resten af løget.","Kom fløde, flødeost og bouillon i, og smag til med muskatnød.","Læg frikadellerne i fadet og bag det færdigt."],
+    "https://www.madbanditten.dk/frikadellefad/"],
+
+  ["shepherds","Shepherd's pie (keto)",4,
+    {hakket_okse:640,log:80,hvidlog:1,gr_bouillon:2,tomatpure:30,blomkaal:2,smor:40,flodeost:40,revet_ost:80,worcestershire:25,timian:3},
+    ["Brun kødet og sveds løg og hvidløg med.","Kom tomatpuré, bouillon, worcestershire og timian i, og lad det koge ind.","Kog blomkålen mør og mos den med smør og flødeost.","Fordel mosen over kødet, drys med revet ost og bag til gyldent."],
+    "https://www.madbanditten.dk/shepherds-pie/"],
+
+  ["hvidloegssovs","Kylling i hvidløgssovs",4,
+    {kyllingebryst:600,hvidlog:1,log:100,piskeflode:200,parmesan:100,citron:1,dijon:10,gr_bouillon:2,spinat:200,gronne_bonner:800,persille:10},
+    ["Steg kyllingen gylden og tag den op.","Sveds hvidløg og løg i panden.","Spæd med bouillon og fløde, og rør parmesan og dijon i.","Vend spinaten i saucen og læg kyllingen tilbage.","Servér med dampede grønne bønner."],
+    "https://www.madbanditten.dk/kylling-i-hvidloegssovs/"],
+
+  ["ketoburger2","Keto-burger m. chorizo og guacamole",4,
+    {hakket_okse:600,chorizo:100,cheddar:80,avokado:2,rodlog:50,salat:100,mayonnaise:60,worcestershire:4,spidskommen:1,chiliflager:1},
+    ["Bland kødet med worcestershiresauce og form fire bøffer.","Steg chorizoen sprød og tag den fra.","Steg bøfferne og læg cheddar på til sidst.","Mos avokado med rødløg, spidskommen og chili til guacamole.","Byg burgeren på salatblade med guacamole og chorizo."],
+    "https://www.madbanditten.dk/keto-burger/"],
+
+  ["bearnaiseburger","Bearnaiseburger",4,
+    {hakket_okse:600,cheddar:50,bacon_skiver:60,agurkesalat:20,salat:80,blomkaal:1,smor:50},
+    ["Steg baconskiverne sprøde.","Form og steg bøfferne, og læg cheddar på de sidste minutter.","Kog blomkålen mør og blend den med smør til en bearnaise-agtig creme.","Byg burgeren på salatblade med bacon, agurk og creme."],
+    "https://www.madbanditten.dk/bearnaiseburger/"],
+
+  ["graeske_burgere","Græske burgere",4,
+    {hakket_okse:600,feta:100,persille:25,tzatziki:300,tomat:200,salat:100,rodlog:100,smor:20,graesk_krydderi:10},
+    ["Bland kødet med smuldret feta, hakket persille og græsk krydderi.","Form fire bøffer og steg dem i smør.","Skær tomat og rødløg i skiver.","Servér på salatblade med rigeligt tzatziki."],
+    "https://www.madbanditten.dk/graeske-burgere/"],
+
+  ["bigmac","Big Mac tacos",4,
+    {blomkaal:1,revet_ost:50,aeg:1,hakket_okse:200,cheddar:80,iceberg:1,cornichoner:50,mayonnaise:45,ketchup:30,dijon:5,smor:20,pofiber:8,worcestershire:5,hvidlogspulver:2,eddike:10,paprika:2},
+    ["Riv blomkålen, damp den og pres alt vandet fra.","Bland den med revet ost, æg og pofiber, og bag små taco-skaller sprøde.","Brun kødet og smelt cheddar over.","Rør dressing af mayonnaise, ketchup, dijon, eddike og krydderier.","Fyld skallerne med kød, salat, cornichoner og dressing."],
+    "https://www.madbanditten.dk/big-mac-tacos/"],
+
+  ["cheeseburgersalat","Cheeseburgersalat",4,
+    {hakket_okse:500,bacon_tern:100,log:50,iceberg:1,agurk:1,cherrytomat:150,cheddar:130,agurkesalat:30,cremefraiche:120,mayonnaise:30,tomatpure:40,hvidlog:1,dijon:10,sukrin:8,paprika:2,eddike:10},
+    ["Brun kødet med løg og krydr det godt.","Steg baconet sprødt.","Snit salat, agurk og tomater og fordel dem i en stor skål.","Rør dressing af cremefraiche, mayonnaise, tomatpuré, dijon, hvidløg og eddike.","Top med kød, bacon, revet cheddar og dressing."],
+    "https://www.madbanditten.dk/cheeseburgersalat-laekker-lchf-salat-med-smag-af-burger/"],
+
+  ["frikadellesandwich","Frikadellesandwich",4,
+    {hytteost:150,smor:30,aeg:5,hakket_blandet:400,log:50,rodkaal:350,agurkesalat:100,mayonnaise:60,loppefro:60,bagepulver:4,sesam:10},
+    ["Rør bollerdejen af hytteost, smeltet smør, æg, loppefrøskaller og bagepulver.","Form boller, drys med sesam og bag dem.","Rør farsen med revet løg og et æg, og steg frikadellerne.","Flæk bollerne og byg sandwichen med rødkål, agurkesalat og mayonnaise."],
+    "https://www.madbanditten.dk/frikadellesandwich/"],
+
+  ["flaeskestegssandwich","Flæskestegssandwich",4,
+    {aeg:4,hytteost:150,smor:30,ribbensteg:500,rodkaal:300,agurkesalat:100,mayonnaise:100,dijon:15,pofiber:60,sesam:10},
+    ["Rør bollerdejen af æg, hytteost, smeltet smør og pofiber.","Form boller, drys med sesam og bag dem.","Skær den stegte flæskesteg i skiver og varm sværen sprød.","Byg sandwichen med rødkål, agurkesalat og en dressing af mayonnaise og dijon."],
+    "https://www.madbanditten.dk/flaeskestegssandwich/"],
+
+  ["kyllingepizza","Kyllingepizza",4,
+    {hakket_kylling:500,revet_ost:370,aeg:2,pizzasauce:200,basilikum:10,pofiber:16},
+    ["Rør kyllingefarsen med æg, lidt revet ost og pofiber.","Tryk den ud som en tynd bund på bagepapir og forbag den.","Smør pizzasauce på og drys resten af osten over.","Bag færdig til osten bobler, og top med frisk basilikum."],
+    "https://www.madbanditten.dk/kyllingepizza/"],
+
+  ["fyldte_peber","Fyldte peberfrugter",4,
+    {hakket_okse:400,log:50,tomatpure:15,ketchup:15,dijon:10,bacon_tern:60,cheddar:120,peberfrugt:4,iceberg:1,tomat:200,rodlog:25,agurkesalat:60,smor:20,hvidlogspulver:2},
+    ["Halvér peberfrugterne og fjern kernerne.","Brun kødet med løg, bacon, tomatpuré, ketchup og dijon.","Fyld halvdelene og drys cheddar over.","Bag ca. 20 minutter, og servér med salat, tomat og rødløg."],
+    "https://www.madbanditten.dk/fyldte-peberfrugter/"],
+
+  ["chili_mb","Chili con carne (keto)",4,
+    {hakket_okse:560,log:80,hvidlog:1,hakkede_tomater:640,gr_bouillon:3,chokolade:25,smor:20,chiliflager:1,spidskommen:6,oregano:3,roeget_paprika:3},
+    ["Brun kødet grundigt i smørret.","Sveds løg og hvidløg med, og rist krydderierne til de dufter.","Kom tomater og bouillon i, og lad det simre mindst en time.","Rør den mørke chokolade i til sidst og smag til."],
+    "https://www.madbanditten.dk/chili-con-carne/"],
+
+  ["pikant_ostesovs","Kylling i pikant ostesovs",4,
+    {kyllingebryst:400,log:25,hvidlog:1,cherrytomat:150,spinat:150,pikantost:200,piskeflode:150,citron:1,revet_ost:150,smor:20},
+    ["Steg kyllingen gylden i smørret.","Sveds løg og hvidløg, og kom cherrytomaterne i.","Rør pikantost og fløde i til en sauce.","Vend spinaten i, drys revet ost over og bag det færdigt."],
+    "https://www.madbanditten.dk/kylling-i-pikant-ostesovs/"],
+
+  ["tomatsovs","Kylling i tomatsovs",4,
+    {kyllingebryst:600,log:200,chili:1,hvidlog:1,hakkede_tomater:800,tomatpure:30,basilikum:10,mascarpone:250,smor:20,timian:3,rosmarin:2,sukrin:10},
+    ["Brun kyllingen og tag den op.","Sveds løg, hvidløg og chili, og rist tomatpuréen med.","Kom tomater og krydderurter i, og lad saucen koge ind.","Rør mascarpone i og læg kyllingen tilbage.","Top med frisk basilikum."],
+    "https://www.madbanditten.dk/kylling-i-tomatsovs/"],
+
+  ["karry_mb","Kylling i karry (keto)",4,
+    {kyllingebryst:530,log:55,gr_bouillon:2,piskeflode:265,flodeost:65,blomkaalsris:530,karrykrydderi:8},
+    ["Skær kyllingen i tern og brun den i smør.","Sveds løget og rist karryen med, til den dufter.","Spæd med bouillon og fløde, og lad saucen koge ind.","Rør flødeosten i og smag til.","Servér med blomkålsris."],
+    "https://www.madbanditten.dk/kylling-i-karry/"]
 ].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
 
 /* ============================================================

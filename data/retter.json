@@ -1,5 +1,5 @@
 {
- "version": 2,
+ "version": 3,
  "retter": [
   {
    "id": "karry",
@@ -314,6 +314,490 @@
     "Byg burgeren på salatblade med tomat, bøf og en bacon-løgring på toppen."
    ],
    "kilde": "https://www.madbanditten.dk/keto-burger-med-loegringe/"
+  },
+  {
+   "id": "hakkeboeffer",
+   "navn": "Hakkebøffer i fad",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 500,
+    "bacon_tern": 100,
+    "log": 100,
+    "champignon": 200,
+    "porre": 2,
+    "hvidlog": 1,
+    "peberfrugt": 1,
+    "pikantost": 100,
+    "piskeflode": 100,
+    "hakkede_tomater": 400,
+    "smor": 25,
+    "paprika": 8,
+    "timian": 2
+   },
+   "opskrift": [
+    "Brun bøfferne og læg dem i et fad.",
+    "Steg bacon, løg, porre og champignon møre.",
+    "Rør tomater, fløde og pikantost i, og smag til.",
+    "Hæld saucen over bøfferne og bag ca. 20 minutter."
+   ],
+   "kilde": "https://www.madbanditten.dk/hakkeboeffer-i-fad/"
+  },
+  {
+   "id": "boller_karry",
+   "navn": "Boller i karry (keto)",
+   "portioner": 4,
+   "ing": {
+    "hakket_blandet": 530,
+    "log": 65,
+    "squash": 1,
+    "aeg": 1,
+    "gr_bouillon": 3,
+    "aeble": 55,
+    "piskeflode": 330,
+    "flodeost": 65,
+    "blomkaal": 1,
+    "broccoli": 170,
+    "loppefro": 4,
+    "karrykrydderi": 8
+   },
+   "opskrift": [
+    "Rør farsen med revet løg, squash, æg og loppefrøskaller, og lad den hvile.",
+    "Form boller og pocher dem i bouillonen.",
+    "Sveds løg, æble og karry, og spæd med kogelagen og fløde.",
+    "Rør flødeost i saucen og læg bollerne tilbage.",
+    "Servér med blomkålsris og dampet broccoli."
+   ],
+   "kilde": "https://www.madbanditten.dk/boller-i-karry/"
+  },
+  {
+   "id": "vikingegryde",
+   "navn": "Vikingegryde",
+   "portioner": 4,
+   "ing": {
+    "grisekod_tern": 400,
+    "bacon_tern": 100,
+    "champignon": 200,
+    "porre": 1,
+    "log": 50,
+    "hvidlog": 1,
+    "tomatpure": 40,
+    "piskeflode": 250,
+    "cremefraiche": 100,
+    "smor": 10,
+    "blomkaal": 1,
+    "karrykrydderi": 8,
+    "paprika": 8
+   },
+   "opskrift": [
+    "Brun kødtern og bacon i gryden.",
+    "Sveds løg, porre, hvidløg og champignon med.",
+    "Rist karry, paprika og tomatpuré med et minut.",
+    "Kom fløde i og lad det simre til det tykner.",
+    "Rør cremefraiche i til sidst og servér med blomkålsris."
+   ],
+   "kilde": "https://www.madbanditten.dk/vikingegryde/"
+  },
+  {
+   "id": "frikadellefad",
+   "navn": "Frikadellefad m. flødekål",
+   "portioner": 4,
+   "ing": {
+    "hakket_blandet": 600,
+    "aeg": 1,
+    "log": 300,
+    "piskeflode": 250,
+    "flodeost": 100,
+    "gr_bouillon": 1,
+    "hvidkaal": 1,
+    "pofiber": 5,
+    "muskatnod": 2,
+    "allehaande": 1
+   },
+   "opskrift": [
+    "Rør farsen med revet løg, æg og pofiber, og form frikadeller.",
+    "Brun dem på panden.",
+    "Snit hvidkålen fint og sveds den blød med resten af løget.",
+    "Kom fløde, flødeost og bouillon i, og smag til med muskatnød.",
+    "Læg frikadellerne i fadet og bag det færdigt."
+   ],
+   "kilde": "https://www.madbanditten.dk/frikadellefad/"
+  },
+  {
+   "id": "shepherds",
+   "navn": "Shepherd's pie (keto)",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 640,
+    "log": 80,
+    "hvidlog": 1,
+    "gr_bouillon": 2,
+    "tomatpure": 30,
+    "blomkaal": 2,
+    "smor": 40,
+    "flodeost": 40,
+    "revet_ost": 80,
+    "worcestershire": 25,
+    "timian": 3
+   },
+   "opskrift": [
+    "Brun kødet og sveds løg og hvidløg med.",
+    "Kom tomatpuré, bouillon, worcestershire og timian i, og lad det koge ind.",
+    "Kog blomkålen mør og mos den med smør og flødeost.",
+    "Fordel mosen over kødet, drys med revet ost og bag til gyldent."
+   ],
+   "kilde": "https://www.madbanditten.dk/shepherds-pie/"
+  },
+  {
+   "id": "hvidloegssovs",
+   "navn": "Kylling i hvidløgssovs",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 600,
+    "hvidlog": 1,
+    "log": 100,
+    "piskeflode": 200,
+    "parmesan": 100,
+    "citron": 1,
+    "dijon": 10,
+    "gr_bouillon": 2,
+    "spinat": 200,
+    "gronne_bonner": 800,
+    "persille": 10
+   },
+   "opskrift": [
+    "Steg kyllingen gylden og tag den op.",
+    "Sveds hvidløg og løg i panden.",
+    "Spæd med bouillon og fløde, og rør parmesan og dijon i.",
+    "Vend spinaten i saucen og læg kyllingen tilbage.",
+    "Servér med dampede grønne bønner."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-hvidloegssovs/"
+  },
+  {
+   "id": "ketoburger2",
+   "navn": "Keto-burger m. chorizo og guacamole",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 600,
+    "chorizo": 100,
+    "cheddar": 80,
+    "avokado": 2,
+    "rodlog": 50,
+    "salat": 100,
+    "mayonnaise": 60,
+    "worcestershire": 4,
+    "spidskommen": 1,
+    "chiliflager": 1
+   },
+   "opskrift": [
+    "Bland kødet med worcestershiresauce og form fire bøffer.",
+    "Steg chorizoen sprød og tag den fra.",
+    "Steg bøfferne og læg cheddar på til sidst.",
+    "Mos avokado med rødløg, spidskommen og chili til guacamole.",
+    "Byg burgeren på salatblade med guacamole og chorizo."
+   ],
+   "kilde": "https://www.madbanditten.dk/keto-burger/"
+  },
+  {
+   "id": "bearnaiseburger",
+   "navn": "Bearnaiseburger",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 600,
+    "cheddar": 50,
+    "bacon_skiver": 60,
+    "agurkesalat": 20,
+    "salat": 80,
+    "blomkaal": 1,
+    "smor": 50
+   },
+   "opskrift": [
+    "Steg baconskiverne sprøde.",
+    "Form og steg bøfferne, og læg cheddar på de sidste minutter.",
+    "Kog blomkålen mør og blend den med smør til en bearnaise-agtig creme.",
+    "Byg burgeren på salatblade med bacon, agurk og creme."
+   ],
+   "kilde": "https://www.madbanditten.dk/bearnaiseburger/"
+  },
+  {
+   "id": "graeske_burgere",
+   "navn": "Græske burgere",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 600,
+    "feta": 100,
+    "persille": 25,
+    "tzatziki": 300,
+    "tomat": 200,
+    "salat": 100,
+    "rodlog": 100,
+    "smor": 20,
+    "graesk_krydderi": 10
+   },
+   "opskrift": [
+    "Bland kødet med smuldret feta, hakket persille og græsk krydderi.",
+    "Form fire bøffer og steg dem i smør.",
+    "Skær tomat og rødløg i skiver.",
+    "Servér på salatblade med rigeligt tzatziki."
+   ],
+   "kilde": "https://www.madbanditten.dk/graeske-burgere/"
+  },
+  {
+   "id": "bigmac",
+   "navn": "Big Mac tacos",
+   "portioner": 4,
+   "ing": {
+    "blomkaal": 1,
+    "revet_ost": 50,
+    "aeg": 1,
+    "hakket_okse": 200,
+    "cheddar": 80,
+    "iceberg": 1,
+    "cornichoner": 50,
+    "mayonnaise": 45,
+    "ketchup": 30,
+    "dijon": 5,
+    "smor": 20,
+    "pofiber": 8,
+    "worcestershire": 5,
+    "hvidlogspulver": 2,
+    "eddike": 10,
+    "paprika": 2
+   },
+   "opskrift": [
+    "Riv blomkålen, damp den og pres alt vandet fra.",
+    "Bland den med revet ost, æg og pofiber, og bag små taco-skaller sprøde.",
+    "Brun kødet og smelt cheddar over.",
+    "Rør dressing af mayonnaise, ketchup, dijon, eddike og krydderier.",
+    "Fyld skallerne med kød, salat, cornichoner og dressing."
+   ],
+   "kilde": "https://www.madbanditten.dk/big-mac-tacos/"
+  },
+  {
+   "id": "cheeseburgersalat",
+   "navn": "Cheeseburgersalat",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 500,
+    "bacon_tern": 100,
+    "log": 50,
+    "iceberg": 1,
+    "agurk": 1,
+    "cherrytomat": 150,
+    "cheddar": 130,
+    "agurkesalat": 30,
+    "cremefraiche": 120,
+    "mayonnaise": 30,
+    "tomatpure": 40,
+    "hvidlog": 1,
+    "dijon": 10,
+    "sukrin": 8,
+    "paprika": 2,
+    "eddike": 10
+   },
+   "opskrift": [
+    "Brun kødet med løg og krydr det godt.",
+    "Steg baconet sprødt.",
+    "Snit salat, agurk og tomater og fordel dem i en stor skål.",
+    "Rør dressing af cremefraiche, mayonnaise, tomatpuré, dijon, hvidløg og eddike.",
+    "Top med kød, bacon, revet cheddar og dressing."
+   ],
+   "kilde": "https://www.madbanditten.dk/cheeseburgersalat-laekker-lchf-salat-med-smag-af-burger/"
+  },
+  {
+   "id": "frikadellesandwich",
+   "navn": "Frikadellesandwich",
+   "portioner": 4,
+   "ing": {
+    "hytteost": 150,
+    "smor": 30,
+    "aeg": 5,
+    "hakket_blandet": 400,
+    "log": 50,
+    "rodkaal": 350,
+    "agurkesalat": 100,
+    "mayonnaise": 60,
+    "loppefro": 60,
+    "bagepulver": 4,
+    "sesam": 10
+   },
+   "opskrift": [
+    "Rør bollerdejen af hytteost, smeltet smør, æg, loppefrøskaller og bagepulver.",
+    "Form boller, drys med sesam og bag dem.",
+    "Rør farsen med revet løg og et æg, og steg frikadellerne.",
+    "Flæk bollerne og byg sandwichen med rødkål, agurkesalat og mayonnaise."
+   ],
+   "kilde": "https://www.madbanditten.dk/frikadellesandwich/"
+  },
+  {
+   "id": "flaeskestegssandwich",
+   "navn": "Flæskestegssandwich",
+   "portioner": 4,
+   "ing": {
+    "aeg": 4,
+    "hytteost": 150,
+    "smor": 30,
+    "ribbensteg": 500,
+    "rodkaal": 300,
+    "agurkesalat": 100,
+    "mayonnaise": 100,
+    "dijon": 15,
+    "pofiber": 60,
+    "sesam": 10
+   },
+   "opskrift": [
+    "Rør bollerdejen af æg, hytteost, smeltet smør og pofiber.",
+    "Form boller, drys med sesam og bag dem.",
+    "Skær den stegte flæskesteg i skiver og varm sværen sprød.",
+    "Byg sandwichen med rødkål, agurkesalat og en dressing af mayonnaise og dijon."
+   ],
+   "kilde": "https://www.madbanditten.dk/flaeskestegssandwich/"
+  },
+  {
+   "id": "kyllingepizza",
+   "navn": "Kyllingepizza",
+   "portioner": 4,
+   "ing": {
+    "hakket_kylling": 500,
+    "revet_ost": 370,
+    "aeg": 2,
+    "pizzasauce": 200,
+    "basilikum": 10,
+    "pofiber": 16
+   },
+   "opskrift": [
+    "Rør kyllingefarsen med æg, lidt revet ost og pofiber.",
+    "Tryk den ud som en tynd bund på bagepapir og forbag den.",
+    "Smør pizzasauce på og drys resten af osten over.",
+    "Bag færdig til osten bobler, og top med frisk basilikum."
+   ],
+   "kilde": "https://www.madbanditten.dk/kyllingepizza/"
+  },
+  {
+   "id": "fyldte_peber",
+   "navn": "Fyldte peberfrugter",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 400,
+    "log": 50,
+    "tomatpure": 15,
+    "ketchup": 15,
+    "dijon": 10,
+    "bacon_tern": 60,
+    "cheddar": 120,
+    "peberfrugt": 4,
+    "iceberg": 1,
+    "tomat": 200,
+    "rodlog": 25,
+    "agurkesalat": 60,
+    "smor": 20,
+    "hvidlogspulver": 2
+   },
+   "opskrift": [
+    "Halvér peberfrugterne og fjern kernerne.",
+    "Brun kødet med løg, bacon, tomatpuré, ketchup og dijon.",
+    "Fyld halvdelene og drys cheddar over.",
+    "Bag ca. 20 minutter, og servér med salat, tomat og rødløg."
+   ],
+   "kilde": "https://www.madbanditten.dk/fyldte-peberfrugter/"
+  },
+  {
+   "id": "chili_mb",
+   "navn": "Chili con carne (keto)",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 560,
+    "log": 80,
+    "hvidlog": 1,
+    "hakkede_tomater": 640,
+    "gr_bouillon": 3,
+    "chokolade": 25,
+    "smor": 20,
+    "chiliflager": 1,
+    "spidskommen": 6,
+    "oregano": 3,
+    "roeget_paprika": 3
+   },
+   "opskrift": [
+    "Brun kødet grundigt i smørret.",
+    "Sveds løg og hvidløg med, og rist krydderierne til de dufter.",
+    "Kom tomater og bouillon i, og lad det simre mindst en time.",
+    "Rør den mørke chokolade i til sidst og smag til."
+   ],
+   "kilde": "https://www.madbanditten.dk/chili-con-carne/"
+  },
+  {
+   "id": "pikant_ostesovs",
+   "navn": "Kylling i pikant ostesovs",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 400,
+    "log": 25,
+    "hvidlog": 1,
+    "cherrytomat": 150,
+    "spinat": 150,
+    "pikantost": 200,
+    "piskeflode": 150,
+    "citron": 1,
+    "revet_ost": 150,
+    "smor": 20
+   },
+   "opskrift": [
+    "Steg kyllingen gylden i smørret.",
+    "Sveds løg og hvidløg, og kom cherrytomaterne i.",
+    "Rør pikantost og fløde i til en sauce.",
+    "Vend spinaten i, drys revet ost over og bag det færdigt."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-pikant-ostesovs/"
+  },
+  {
+   "id": "tomatsovs",
+   "navn": "Kylling i tomatsovs",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 600,
+    "log": 200,
+    "chili": 1,
+    "hvidlog": 1,
+    "hakkede_tomater": 800,
+    "tomatpure": 30,
+    "basilikum": 10,
+    "mascarpone": 250,
+    "smor": 20,
+    "timian": 3,
+    "rosmarin": 2,
+    "sukrin": 10
+   },
+   "opskrift": [
+    "Brun kyllingen og tag den op.",
+    "Sveds løg, hvidløg og chili, og rist tomatpuréen med.",
+    "Kom tomater og krydderurter i, og lad saucen koge ind.",
+    "Rør mascarpone i og læg kyllingen tilbage.",
+    "Top med frisk basilikum."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-tomatsovs/"
+  },
+  {
+   "id": "karry_mb",
+   "navn": "Kylling i karry (keto)",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 530,
+    "log": 55,
+    "gr_bouillon": 2,
+    "piskeflode": 265,
+    "flodeost": 65,
+    "blomkaalsris": 530,
+    "karrykrydderi": 8
+   },
+   "opskrift": [
+    "Skær kyllingen i tern og brun den i smør.",
+    "Sveds løget og rist karryen med, til den dufter.",
+    "Spæd med bouillon og fløde, og lad saucen koge ind.",
+    "Rør flødeosten i og smag til.",
+    "Servér med blomkålsris."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-karry/"
   }
  ]
 }
