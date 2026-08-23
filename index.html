@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="app-version" content="0.3.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FBF8F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17150F" media="(prefers-color-scheme: dark)">
+<title>Madplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* ---------- tokens: light is the base, both dark paths redefine only these ---------- */
+:root{
+  --paper:#FBF8F2; --surface:#FFFFFF; --surface-2:#F4F0E6;
+  --ink:#232019; --muted:#7A7264; --line:#E4DCCE; --line-strong:#CFC4B1;
+  --accent:#16495C; --accent-ink:#FFFFFF; --accent-soft:#E2EDF1;
+  --ok:#2E6B4F; --ok-soft:#E3EFE7;
+  --warn:#8F6408; --warn-soft:#F7EEDA;
+  --crit:#A33B27; --crit-soft:#F8E6E1;
+  --shadow:0 1px 2px rgba(45,38,26,.06), 0 6px 18px -10px rgba(45,38,26,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#17150F; --surface:#211E18; --surface-2:#2A261F;
+    --ink:#F1ECE0; --muted:#A09683; --line:#332E26; --line-strong:#4A4237;
+    --accent:#7FC0D8; --accent-ink:#10222A; --accent-soft:#1D3540;
+    --ok:#7FC79E; --ok-soft:#1C2F26;
+    --warn:#DFB25A; --warn-soft:#332A16;
+    --crit:#E8907C; --crit-soft:#38211C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#17150F; --surface:#211E18; --surface-2:#2A261F;
+  --ink:#F1ECE0; --muted:#A09683; --line:#332E26; --line-strong:#4A4237;
+  --accent:#7FC0D8; --accent-ink:#10222A; --accent-soft:#1D3540;
+  --ok:#7FC79E; --ok-soft:#1C2F26;
+  --warn:#DFB25A; --warn-soft:#332A16;
+  --crit:#E8907C; --crit-soft:#38211C;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Familjen Grotesk","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:16px; line-height:1.45;
+  -webkit-text-size-adjust:100%;
+}
+.num{font-family:"DM Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- chrome ---------- */
+.top{
+  position:sticky;top:0;z-index:20;
+  background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:12px clamp(14px,3vw,32px);
+}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand h1{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:0}
+.brand .v{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:10px}
+.tabs button{
+  border:0;background:transparent;padding:9px 16px;border-radius:7px;
+  font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;min-height:40px;
+}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.total-chip{
+  display:flex;flex-direction:column;align-items:flex-end;
+  padding:6px 14px;border-left:1px solid var(--line);
+}
+.total-chip .lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.total-chip .val{font-size:20px;font-weight:500}
+
+main{padding:clamp(16px,3vw,32px);max-width:1500px;margin:0 auto}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+@media (min-width:1000px){.cols{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.card + .card{margin-top:22px}
+.card > header{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding:16px 18px 12px;border-bottom:1px solid var(--line);
+}
+.card > header h2{margin:0;font-size:15px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.card > header .sub{font-size:13px;color:var(--muted);margin-left:auto;text-align:right}
+.card .body{padding:16px 18px}
+
+/* ---------- dish picker ---------- */
+.dishgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.dish{
+  position:relative;text-align:left;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--surface);border-radius:11px;
+  padding:12px 13px;min-height:74px;display:flex;flex-direction:column;gap:5px;
+  transition:border-color .12s, background .12s;
+}
+.dish:hover{border-color:var(--accent)}
+.dish .n{font-weight:600;font-size:15px;line-height:1.25}
+.dish[data-on="1"] .n{padding-right:38px}
+.dish .m{font-size:12px;color:var(--muted)}
+.dish[data-on="1"]{background:var(--accent-soft);border-color:var(--accent)}
+.dish[data-on="1"] .m{color:var(--ink);opacity:.75}
+.dish .pill{
+  position:absolute;top:9px;right:9px;background:var(--accent);color:var(--accent-ink);
+  border-radius:20px;font-size:12px;font-weight:700;padding:2px 9px;
+}
+.stepper{display:flex;gap:6px;margin-top:4px}
+.stepper span{
+  border:1px solid var(--line-strong);border-radius:7px;min-width:34px;height:32px;
+  display:grid;place-items:center;font-weight:600;font-size:15px;background:var(--surface);
+}
+
+/* ---------- ledger ---------- */
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{
+  text-align:right;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;padding:0 10px 8px;white-space:nowrap;
+}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+th:last-child,td:last-child{padding-right:0}
+td{text-align:right;padding:8px 10px;border-top:1px solid var(--line);vertical-align:baseline}
+tbody tr:first-child td{border-top:1px solid var(--line-strong)}
+.vare{font-weight:600}
+.vare small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+tfoot td{border-top:2px solid var(--line-strong);font-weight:700;padding-top:12px;font-size:15px}
+.over-0{color:var(--muted)}
+.over-1{color:var(--warn);font-weight:500}
+.cat{
+  font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  font-weight:600;padding:16px 0 4px;
+}
+
+/* ---------- rester + forslag ---------- */
+.rest{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.rest:first-child{border-top:0}
+.rest .n{font-weight:600;flex:1;min-width:0}
+.rest .q{font-size:14px}
+.tag{
+  font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:20px;white-space:nowrap;
+}
+.t-crit{background:var(--crit-soft);color:var(--crit)}
+.t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-ok{background:var(--ok-soft);color:var(--ok)}
+
+.sug{
+  display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--line);
+}
+.sug:first-child{border-top:0}
+.sug .rank{
+  font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);
+  border-radius:8px;width:30px;height:30px;display:grid;place-items:center;flex:none;
+}
+.sug .txt{flex:1;min-width:0}
+.sug .n{font-weight:600;font-size:15px;display:block}
+.sug .why{font-size:13px;color:var(--muted);margin-top:3px;display:block}
+.sug .why b{color:var(--ok);font-weight:600}
+.sug .why i{font-style:normal;color:var(--ink)}
+.add{
+  border:1px solid var(--accent);background:transparent;color:var(--accent);
+  border-radius:9px;padding:8px 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;flex:none;
+}
+.add:hover{background:var(--accent);color:var(--accent-ink)}
+
+.empty{color:var(--muted);font-size:14px;padding:8px 0 4px}
+
+/* ---------- editors ---------- */
+.rowlist{display:flex;flex-direction:column}
+.erow{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.erow:first-child{border-top:0}
+.erow .n{font-weight:600;flex:1;min-width:160px}
+.erow .d{font-size:13px;color:var(--muted)}
+.ghost{
+  border:1px solid var(--line-strong);background:var(--surface);border-radius:9px;
+  padding:8px 14px;font-weight:600;font-size:14px;cursor:pointer;min-height:40px;
+}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+label.f input,label.f select{
+  font:inherit;padding:9px 11px;border:1px solid var(--line-strong);border-radius:8px;
+  background:var(--surface);color:var(--ink);min-height:40px;
+}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+dialog{
+  border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);
+  padding:0;max-width:640px;width:calc(100vw - 32px);box-shadow:var(--shadow);
+}
+dialog::backdrop{background:rgba(20,16,10,.55)}
+dialog header{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:700}
+dialog .body{padding:18px}
+dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+.ing{display:grid;grid-template-columns:1fr 90px 40px;gap:8px;align-items:center;margin-bottom:8px}
+.hint{font-size:13px;color:var(--muted);line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand"><h1>Madplan</h1><span class="v" id="ver">v0.1.0</span></div>
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="plan">Ugens plan</button>
+    <button role="tab" aria-selected="false" data-tab="retter">Retter</button>
+    <button role="tab" aria-selected="false" data-tab="raavarer">Råvarer</button>
+  </div>
+  <div class="total-chip"><span class="lab">Indkøb i alt</span><span class="val num" id="topTotal">0 kr</span></div>
+</div>
+
+<main>
+  <!-- ============ PLAN ============ -->
+  <div id="tab-plan">
+    <div class="cols">
+      <div>
+        <section class="card">
+          <header>
+            <h2>Vælg ugens retter</h2>
+            <span class="sub" id="valgtSub">Ingen retter valgt</span>
+          </header>
+          <div class="body">
+            <div class="dishgrid" id="dishgrid"></div>
+            <div class="bar">
+              <button class="ghost" id="ryd">Ryd ugen</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <header>
+            <h2>Det bliver til overs</h2>
+            <span class="sub" id="spildSub"></span>
+          </header>
+          <div class="body" id="rester"></div>
+        </section>
+
+        <section class="card">
+          <header>
+            <h2>Retter der bruger resterne</h2>
+            <span class="sub">Sorteret efter hvor meget de redder</span>
+          </header>
+          <div class="body" id="forslag"></div>
+        </section>
+      </div>
+
+      <div>
+        <section class="card">
+          <header>
+            <h2>Indkøbsliste</h2>
+            <span class="sub" id="listSub"></span>
+          </header>
+          <div class="body">
+            <div class="scroll">
+              <table id="liste">
+                <thead>
+                  <tr>
+                    <th>Vare</th><th>Behov</th><th>Køb</th><th>Til overs</th><th>Pris</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                  <tr><td colspan="4">I alt</td><td class="num" id="sum">0 kr</td></tr>
+                </tfoot>
+              </table>
+            </div>
+            <div class="bar">
+              <button class="ghost" id="kopier">Kopiér liste</button>
+              <button class="ghost" id="eksport">Gem data</button>
+              <button class="ghost" id="importBtn">Indlæs data</button>
+              <input type="file" id="importFile" accept="application/json" hidden>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RETTER ============ -->
+  <div id="tab-retter" hidden>
+    <section class="card">
+      <header><h2>Retter</h2><span class="sub" id="retterSub"></span></header>
+      <div class="body">
+        <div class="rowlist" id="retterList"></div>
+        <div class="bar"><button class="ghost" id="nyRet">Tilføj ret</button></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ RÅVARER ============ -->
+  <div id="tab-raavarer" hidden>
+    <section class="card">
+      <header>
+        <h2>Råvarer</h2>
+        <span class="sub">Pakkestørrelsen er det hele hviler på — ret den til så den passer med det du faktisk køber</span>
+      </header>
+      <div class="body">
+        <div class="rowlist" id="raaList"></div>
+        <div class="bar"><button class="ghost" id="nyRaa">Tilføj råvare</button></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="dlgRaa">
+  <form method="dialog">
+    <header id="dlgRaaTitle">Råvare</header>
+    <div class="body">
+      <div class="grid2">
+        <label class="f">Navn<input id="rNavn" required></label>
+        <label class="f">Kategori<input id="rKat" list="kats"></label>
+        <label class="f">Enhed<select id="rEnhed"><option value="g">g</option><option value="ml">ml</option><option value="stk">stk</option></select></label>
+        <label class="f">Pakkestørrelse<input id="rPakke" type="number" min="1" step="any" required></label>
+        <label class="f">Pakkens navn<input id="rPakkenavn" placeholder="fx 500 g bakke"></label>
+        <label class="f">Pris pr. pakke (kr)<input id="rPris" type="number" min="0" step="any"></label>
+        <label class="f">Holdbar (dage)<input id="rHold" type="number" min="1" step="1"></label>
+        <label class="f">Kan fryses<select id="rFrys"><option value="0">Nej</option><option value="1">Ja</option></select></label>
+      </div>
+      <p class="hint">Holdbarheden er hvor mange dage varen er god efter du har købt den. Den styrer hvor hårdt systemet presser på for at få resten brugt.</p>
+    </div>
+    <footer>
+      <button class="ghost" value="cancel">Annullér</button>
+      <button class="add" value="ok" id="rGem">Gem</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog id="dlgRet">
+  <form method="dialog">
+    <header id="dlgRetTitle">Ret</header>
+    <div class="body">
+      <div class="grid2" style="margin-bottom:16px">
+        <label class="f">Navn<input id="dNavn" required></label>
+        <label class="f">Antal portioner<input id="dPort" type="number" min="1" step="1" value="4"></label>
+      </div>
+      <div id="ingList"></div>
+      <button type="button" class="ghost" id="nyIng" style="margin-top:8px">Tilføj råvare</button>
+      <p class="hint" style="margin-bottom:0">Mængderne er for hele retten, ikke pr. portion.</p>
+    </div>
+    <footer>
+      <button class="ghost" value="cancel">Annullér</button>
+      <button class="add" value="ok" id="dGem">Gem</button>
+    </footer>
+  </form>
+</dialog>
+
+<datalist id="kats"></datalist>
+
+<script>
+"use strict";
+const KEY = "mtech_madplan_v1";
+const VERSION = "0.3.0";
+/* Versionen på de data der ligger indbygget i denne fil.
+   Filerne i data/ har samme nummer — hæves det dér, henter appen dem ned. */
+const DATA_VERSION = 1;
+
+/* ============================================================
+   SEED-DATA — realistiske danske pakkestørrelser og priser.
+   Ret dem til så de passer med det du faktisk køber.
+   ============================================================ */
+/* Hentet fra nemlig.com 23. august 2026.
+   nid = Nemligs produkt-ID (varen ligger på nemlig.com/<slug>-<nid>).
+   holdbar: Nemligs egen friskhedsgaranti hvor den oplyses. For frugt og grønt
+   oplyser Nemlig den ikke — de tal er stadig skøn og er markeret med est:1. */
+const SEED_RAAVARER = [
+  // id, navn, enhed, pakke, pakkenavn, pris, holdbar, frys, kategori, nid, est
+  ["kyllingebryst","Kyllingebrystfilet","g",1100,"1,10 kg / Danpo",85.00,3,1,"Kød & fisk","5602318",0],
+  ["hakket_okse","Hakket oksekød 8-12%","g",500,"500 g / Danish Crown",49.94,3,1,"Kød & fisk","5063170",0],
+  ["hakket_blandet","Hakket grise- og kalvekød 8-12%","g",500,"500 g / Danish Crown",29.95,3,1,"Kød & fisk","5026536",0],
+  ["bacon_tern","Bacon i tern (røget)","g",200,"200 g / Gestus",12.95,7,1,"Kød & fisk","5071453",0],
+  ["laksefilet","Lakseportioner m. skind","g",225,"225 g / Glyngøre",43.95,2,1,"Kød & fisk","5046333",0],
+
+  ["aeg","Skrabeæg str. M/L","stk",10,"10 stk. / Danæg",31.95,8,0,"Mejeri","5003310",0],
+  ["maelk","Sødmælk 3,5%","ml",1000,"1 l / Arla",13.50,7,0,"Mejeri","701016",0],
+  ["piskeflode","Piskefløde 36%","ml",500,"0,50 l / First Price",14.95,5,0,"Mejeri","5064869",0],
+  ["cremefraiche","Creme fraiche 18%","g",250,"250 g / Arla Karolines Køkken",12.95,8,0,"Mejeri","2301048",0],
+  ["revet_ost","Revet ost m. mozzarella","g",150,"150 g / Cheasy",18.95,14,1,"Mejeri","5062991",0],
+  ["smor","Smør øko.","g",200,"200 g / Arla ØKO",14.95,14,1,"Mejeri","702004",0],
+
+  ["log","Løg Zittauer","g",1000,"1 kg / Danmark",12.00,45,0,"Grønt","2301096",1],
+  ["hvidlog","Hvidløg øko.","stk",1,"1 stk. / ca. 50 g",5.50,40,0,"Grønt","100160",1],
+  ["gulerodder","Gulerødder øko.","g",1000,"1 kg / Danmark",18.00,21,0,"Grønt","5016873",1],
+  ["kartofler","Kartofler vaskede","g",1000,"1 kg / Danmark",12.00,25,0,"Grønt","5037675",1],
+  ["broccoli","Broccoli","g",450,"1 stk. / min. 450 g",15.00,6,1,"Grønt","5002549",1],
+  ["champignon","Champignon","g",500,"500 g / Polen",23.75,5,0,"Grønt","5010800",1],
+  ["squash","Courgette / squash øko.","stk",1,"1 stk. / Danmark",9.00,8,0,"Grønt","5002546",1],
+  ["peberfrugt","Peberfrugt orange","stk",1,"1 stk. / Holland",9.00,9,0,"Grønt","5001713",1],
+  ["porre","Porrer","stk",3,"1 bdt. / 3 stk.",19.50,10,0,"Grønt","5012283",1],
+  ["salat","Baby salatmix øko.","g",100,"100 g / skyllet",18.00,2,0,"Grønt","5021832",0],
+  ["citron","Citron øko.","stk",1,"1 stk. / Spanien",6.00,20,0,"Grønt","5012344",1],
+  ["persille","Persille bredbladet øko.","g",25,"1 potte",15.00,6,0,"Grønt","5016781",1],
+
+  ["hakkede_tomater","Hakkede tomater","g",400,"400 g / Taste of Nature",6.37,90,0,"Kolonial","5602151",0],
+  ["tomatpure","Tomatpuré","g",140,"140 g / Taste of Nature",6.10,90,0,"Kolonial","5602312",0],
+  ["kokosmaelk","Kokosmælk 17-19%","ml",400,"0,40 l / Panda Expressen",8.95,90,0,"Kolonial","5603735",0],
+  ["kidneybonner","Kidneybønner","g",250,"410 g dåse / 250 g drænet / Meyers",23.25,90,0,"Kolonial","5600738",0],
+  ["ris","Jasminris","g",1000,"1 kg",15.02,90,0,"Kolonial","5603865",0],
+  ["pasta","Spaghetti øko.","g",500,"500 g / De Cecco",31.50,90,0,"Kolonial","5049578",0],
+  ["lasagneplader","Lasagneplader","g",500,"500 g / Garofalo",31.50,90,0,"Kolonial","5065117",0],
+  ["tortillas","Tortilla wraps","stk",6,"6 stk. / Taste of Nature",10.70,30,0,"Kolonial","5068766",0],
+  ["karrypasta","Frisk rød karrypasta","g",25,"25 g / Thailand",10.00,7,0,"Kolonial","5033347",0],
+  ["bouillon","Hønsebouillon","stk",10,"10 stk. / Knorr",19.95,90,0,"Kolonial","911003",0],
+  ["rasp","Hvederasp","g",500,"500 g / Struer",23.75,90,0,"Kolonial","5006584",0],
+  ["olivenolie","Ekstra jomfru olivenolie","ml",500,"0,50 l / Casaneo",41.30,90,0,"Kolonial","5049714",0]
+].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
+             holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10]}));
+
+const SEED_RETTER = [
+  ["karry","Kylling i karry m. ris",4,{kyllingebryst:600,log:200,karrypasta:50,kokosmaelk:400,ris:300,gulerodder:200}],
+  ["bolognese","Spaghetti bolognese",4,{hakket_okse:500,hakkede_tomater:800,log:150,gulerodder:150,hvidlog:1,tomatpure:70,pasta:400}],
+  ["tortilla","Tortillas m. oksekød",4,{hakket_okse:400,tortillas:8,peberfrugt:2,log:100,revet_ost:100,salat:100,cremefraiche:150}],
+  ["ovnlaks","Ovnlaks m. kartofler og broccoli",4,{laksefilet:500,kartofler:800,broccoli:400,citron:1,smor:40}],
+  ["frikadeller","Frikadeller m. kartofler",4,{hakket_blandet:600,aeg:1,log:100,rasp:60,kartofler:800,maelk:100}],
+  ["wok","Kyllingewok m. ris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,ris:300,hvidlog:1}],
+  ["lasagne","Lasagne",4,{hakket_okse:500,hakkede_tomater:800,lasagneplader:250,maelk:500,smor:50,revet_ost:150,log:100}],
+  ["chili","Chili con carne",4,{hakket_okse:500,kidneybonner:500,hakkede_tomater:400,log:150,peberfrugt:1,ris:300}],
+  ["carbonara","Pasta carbonara",4,{bacon_tern:200,aeg:4,pasta:400,revet_ost:80,piskeflode:100}],
+  ["suppe","Champignonsuppe",4,{champignon:500,log:100,piskeflode:250,bouillon:2,smor:30}],
+  ["aeggekage","Æggekage m. bacon",4,{aeg:8,bacon_tern:150,maelk:150,persille:10}],
+  ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,kartofler:600}]
+].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3]}));
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let S = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      if(d && Array.isArray(d.raavarer) && Array.isArray(d.retter)) return migrer(d);
+    }
+  }catch(e){ /* korrupt data — start forfra frem for at gå i stå */ }
+  return {v:VERSION, dataVersion:DATA_VERSION, raavarer:SEED_RAAVARER, retter:SEED_RETTER, valgt:{}};
+}
+
+/* Henter fælles data fra data/*.json hvis appen ligger på en server (GitHub Pages).
+   Åbnes filen lokalt som file://, blokerer browseren hentningen — så kører appen
+   bare videre på det indbyggede data. Det er med vilje.
+
+   Råvarer OVERSKRIVES, så priser og pakkestørrelser følger med.
+   Retter TILFØJES kun — dine egne rettelser bliver aldrig kørt over. */
+async function hentFaelles(){
+  let aendret = false;
+  const hent = p => fetch(p, {cache:"no-store"})
+    .then(r => r.ok ? r.json() : null).catch(() => null);
+  try{
+    const [raa, ret] = await Promise.all([hent("data/raavarer.json"), hent("data/retter.json")]);
+    const nu = S.dataVersion || 0;
+
+    if(raa && Array.isArray(raa.raavarer) && (raa.version || 0) > nu){
+      const nye = Object.fromEntries(raa.raavarer.map(r => [r.id, r]));
+      S.raavarer = S.raavarer.map(r => nye[r.id] ? Object.assign({}, r, nye[r.id]) : r);
+      const haves = new Set(S.raavarer.map(r => r.id));
+      raa.raavarer.forEach(r => { if(!haves.has(r.id)) S.raavarer.push(r); });
+      aendret = true;
+    }
+    if(ret && Array.isArray(ret.retter) && (ret.version || 0) > nu){
+      const haves = new Set(S.retter.map(d => d.id));
+      ret.retter.forEach(d => { if(!haves.has(d.id)){ S.retter.push(d); aendret = true; } });
+    }
+    const ny = Math.max((raa && raa.version) || 0, (ret && ret.version) || 0);
+    if(ny > nu){ S.dataVersion = ny; aendret = true; }
+  }catch(e){ /* offline — kør videre på det indbyggede */ }
+  if(aendret) render();
+}
+/* Opdaterer gemte data til denne version uden at røre det du selv har lavet:
+   seed-råvarerne får de nye tal fra Nemlig, nye seed-varer lægges til,
+   og dine egne råvarer og retter bliver stående som de er. */
+function migrer(d){
+  if(d.v === VERSION) return d;
+  const nye = Object.fromEntries(SEED_RAAVARER.map(r => [r.id, r]));
+  d.raavarer = d.raavarer.map(r => nye[r.id] ? Object.assign({}, r, nye[r.id]) : r);
+  const haves = new Set(d.raavarer.map(r => r.id));
+  SEED_RAAVARER.forEach(r => { if(!haves.has(r.id)) d.raavarer.push(r); });
+  // to seed-retter hvor de rigtige pakkestørrelser ændrede mængderne
+  const ret2 = {karry:{karrypasta:50}, chili:{kidneybonner:500}, wok:{squash:1}};
+  d.retter.forEach(x => { if(ret2[x.id]) Object.assign(x.ing, ret2[x.id]); });
+  d.v = VERSION;
+  if(d.dataVersion == null) d.dataVersion = DATA_VERSION;
+  return d;
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ /* fx private mode — appen kører videre, data gemmes bare ikke */ }
+}
+const raa = id => S.raavarer.find(r => r.id === id);
+const ret = id => S.retter.find(r => r.id === id);
+
+/* ============================================================
+   BEREGNING — hele kernen ligger her
+   ============================================================ */
+
+// Hvad koster én enhed (g/ml/stk) af en råvare
+const enhedspris = r => (r.pris || 0) / (r.pakke || 1);
+
+// Hvor meget haster det at få resten brugt?
+// Fryser man varen, er det ikke spild — så tæller den lavt.
+function hast(r){
+  const h = r.holdbar || 365;
+  let f = h <= 4 ? 2.0 : h <= 8 ? 1.5 : h <= 21 ? 1.0 : 0.15;
+  if(r.frys) f *= 0.5;
+  return f;
+}
+
+// Summér behovet for de valgte retter
+function behov(valgt){
+  const b = {};
+  for(const [rid, antal] of Object.entries(valgt)){
+    const d = ret(rid);
+    if(!d || !antal) continue;
+    // antal = hvor mange gange retten laves; mængderne er for hele retten
+    for(const [vid, m] of Object.entries(d.ing)){
+      b[vid] = (b[vid] || 0) + m * antal;
+    }
+  }
+  return b;
+}
+
+// Omregn behov til hele pakker, og find overskuddet
+function indkoeb(b){
+  const rows = [];
+  for(const [vid, kraevet] of Object.entries(b)){
+    const r = raa(vid);
+    if(!r) continue;
+    const pakker = Math.ceil(kraevet / r.pakke - 1e-9);
+    const koebt = pakker * r.pakke;
+    rows.push({
+      r, kraevet, pakker, koebt,
+      over: koebt - kraevet,
+      pris: pakker * (r.pris || 0)
+    });
+  }
+  rows.sort((a,b2) =>
+    a.r.kategori === b2.r.kategori
+      ? a.r.navn.localeCompare(b2.r.navn,"da")
+      : a.r.kategori.localeCompare(b2.r.kategori,"da"));
+  return rows;
+}
+
+/* Madspildsmotoren.
+   For hver ret der IKKE er valgt: hvor meget af overskuddet bruger den,
+   og hvad koster det i nye pakker? Begge tal vises, så du selv kan dømme. */
+function forslag(over, valgt){
+  const out = [];
+  for(const d of S.retter){
+    if(valgt[d.id]) continue;
+    let reddet = 0, nyt = 0, brugte = [];
+    for(const [vid, m] of Object.entries(d.ing)){
+      const r = raa(vid);
+      if(!r) continue;
+      const haves = over[vid] || 0;
+      const brugt = Math.min(m, haves);
+      if(brugt > 0){
+        reddet += brugt * enhedspris(r) * hast(r);
+        brugte.push({navn:r.navn, m:brugt, enhed:r.enhed});
+      }
+      const mangler = m - brugt;
+      if(mangler > 1e-9) nyt += Math.ceil(mangler / r.pakke - 1e-9) * (r.pris || 0);
+    }
+    if(reddet <= 0) continue;
+    brugte.sort((a,b2) => b2.m - a.m);
+    out.push({d, reddet, nyt, brugte, score: reddet - 0.25 * nyt});
+  }
+  out.sort((a,b2) => b2.score - a.score);
+  return out.slice(0,5);
+}
+
+/* ============================================================
+   FORMATERING
+   ============================================================ */
+const kr = n => Math.round(n).toLocaleString("da-DK") + " kr";
+function maengde(n, enhed){
+  if(enhed === "stk") return (Math.round(n*10)/10).toLocaleString("da-DK") + " stk";
+  if(n >= 1000) return (Math.round(n/10)/100).toLocaleString("da-DK") + (enhed === "ml" ? " l" : " kg");
+  return Math.round(n).toLocaleString("da-DK") + " " + enhed;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  document.getElementById("ver").textContent = "v" + VERSION;
+  renderDishes();
+  const b = behov(S.valgt);
+  const rows = indkoeb(b);
+  renderListe(rows);
+  const over = {};
+  rows.forEach(x => { if(x.over > 1e-9) over[x.r.id] = x.over; });
+  renderRester(rows);
+  renderForslag(over);
+  renderRetter();
+  renderRaa();
+  save();
+}
+
+function renderDishes(){
+  const g = document.getElementById("dishgrid");
+  g.innerHTML = "";
+  const sorted = [...S.retter].sort((a,b2) => a.navn.localeCompare(b2.navn,"da"));
+  for(const d of sorted){
+    const n = S.valgt[d.id] || 0;
+    const el = document.createElement("button");
+    el.className = "dish";
+    el.dataset.on = n ? "1" : "0";
+    el.innerHTML =
+      (n ? '<span class="pill">' + n + "×</span>" : "") +
+      '<span class="n"></span><span class="m">' + d.portioner + " portioner</span>";
+    el.querySelector(".n").textContent = d.navn;
+    el.onclick = () => { S.valgt[d.id] = (S.valgt[d.id] || 0) + 1; render(); };
+    el.oncontextmenu = e => {
+      e.preventDefault();
+      if(S.valgt[d.id]) { S.valgt[d.id]--; if(!S.valgt[d.id]) delete S.valgt[d.id]; render(); }
+    };
+    g.appendChild(el);
+  }
+  const antal = Object.values(S.valgt).reduce((a,b2) => a+b2, 0);
+  const port  = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id)?.portioner || 0), 0);
+  document.getElementById("valgtSub").textContent =
+    antal ? antal + " retter · " + port + " portioner  ·  højreklik/langt tryk fjerner" : "Ingen retter valgt";
+}
+
+function renderListe(rows){
+  const tb = document.querySelector("#liste tbody");
+  tb.innerHTML = "";
+  let sum = 0, kat = null;
+  for(const x of rows){
+    sum += x.pris;
+    if(x.r.kategori !== kat){
+      kat = x.r.kategori;
+      const tr = document.createElement("tr");
+      tr.innerHTML = '<td colspan="5" class="cat"></td>';
+      tr.querySelector("td").textContent = kat;
+      tr.querySelector("td").style.borderTop = "0";
+      tb.appendChild(tr);
+    }
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td class="vare"><span></span><small></small></td>' +
+      '<td class="num"></td><td class="num"></td>' +
+      '<td class="num ' + (x.over > 1e-9 ? "over-1" : "over-0") + '"></td>' +
+      '<td class="num"></td>';
+    const td = tr.children;
+    td[0].querySelector("span").textContent = x.r.navn;
+    td[0].querySelector("small").textContent = x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed));
+    td[1].textContent = maengde(x.kraevet, x.r.enhed);
+    td[2].textContent = maengde(x.koebt, x.r.enhed);
+    td[3].textContent = x.over > 1e-9 ? maengde(x.over, x.r.enhed) : "–";
+    td[4].textContent = kr(x.pris);
+    tb.appendChild(tr);
+  }
+  document.getElementById("sum").textContent = kr(sum);
+  document.getElementById("topTotal").textContent = kr(sum);
+  document.getElementById("listSub").textContent =
+    rows.length ? rows.length + " varer" : "";
+}
+
+function renderRester(rows){
+  const box = document.getElementById("rester");
+  box.innerHTML = "";
+  const rest = rows.filter(x => x.over > 1e-9)
+                   .sort((a,b2) => (a.r.holdbar||365) - (b2.r.holdbar||365));
+  if(!rest.length){
+    box.innerHTML = '<p class="empty">Ingenting går til spilde med de retter — eller også har du ikke valgt nogen endnu.</p>';
+    document.getElementById("spildSub").textContent = "";
+    return;
+  }
+  let vaerdi = 0;
+  for(const x of rest){
+    const r = x.r;
+    vaerdi += x.over * enhedspris(r) * (r.frys || (r.holdbar||365) > 21 ? 0.1 : 1);
+    const h = r.holdbar || 365;
+    const cls = r.frys ? "t-ok" : h <= 4 ? "t-crit" : h <= 8 ? "t-warn" : h <= 21 ? "t-warn" : "t-ok";
+    const txt = r.frys ? "kan fryses" : h > 21 ? "holder længe" : "brug inden " + h + " dage";
+    const el = document.createElement("div");
+    el.className = "rest";
+    el.innerHTML = '<span class="n"></span><span class="q num"></span><span class="tag ' + cls + '"></span>';
+    el.querySelector(".n").textContent = r.navn;
+    el.querySelector(".q").textContent = maengde(x.over, r.enhed);
+    el.querySelector(".tag").textContent = txt;
+    box.appendChild(el);
+  }
+  document.getElementById("spildSub").textContent =
+    "Cirka " + kr(vaerdi) + " i risiko";
+}
+
+function renderForslag(over){
+  const box = document.getElementById("forslag");
+  box.innerHTML = "";
+  if(!Object.keys(over).length){
+    box.innerHTML = '<p class="empty">Vælg nogle retter, så finder jeg dem der bruger resterne.</p>';
+    return;
+  }
+  const f = forslag(over, S.valgt);
+  if(!f.length){
+    box.innerHTML = '<p class="empty">Ingen af de andre retter bruger noget af det du har til overs.</p>';
+    return;
+  }
+  f.forEach((s,i) => {
+    const el = document.createElement("div");
+    el.className = "sug";
+    el.innerHTML =
+      '<span class="rank">' + (i+1) + '</span>' +
+      '<span class="txt"><span class="n"></span><span class="why"></span></span>' +
+      '<button class="add">Tilføj</button>';
+    el.querySelector(".n").textContent = s.d.navn;
+    const liste = s.brugte.slice(0,3)
+      .map(b2 => maengde(b2.m, b2.enhed) + " " + b2.navn.toLowerCase()).join(", ");
+    const why = el.querySelector(".why");
+    why.innerHTML = "Bruger <b></b> af dine rester · koster <i></i> nyt";
+    why.querySelector("b").textContent = liste;
+    why.querySelector("i").textContent = kr(s.nyt);
+    el.querySelector(".add").onclick = () => { S.valgt[s.d.id] = (S.valgt[s.d.id]||0)+1; render(); };
+    box.appendChild(el);
+  });
+}
+
+function renderRetter(){
+  const box = document.getElementById("retterList");
+  box.innerHTML = "";
+  const sorted = [...S.retter].sort((a,b2) => a.navn.localeCompare(b2.navn,"da"));
+  for(const d of sorted){
+    const el = document.createElement("div");
+    el.className = "erow";
+    el.innerHTML = '<span class="n"></span><span class="d"></span>' +
+      '<button class="ghost">Ret</button><button class="ghost">Slet</button>';
+    el.querySelector(".n").textContent = d.navn;
+    el.querySelector(".d").textContent =
+      d.portioner + " portioner · " + Object.keys(d.ing).length + " råvarer";
+    const btns = el.querySelectorAll("button");
+    btns[0].onclick = () => editRet(d);
+    btns[1].onclick = () => {
+      S.retter = S.retter.filter(x => x.id !== d.id);
+      delete S.valgt[d.id];
+      render();
+    };
+    box.appendChild(el);
+  }
+  document.getElementById("retterSub").textContent = S.retter.length + " retter";
+}
+
+function renderRaa(){
+  const box = document.getElementById("raaList");
+  box.innerHTML = "";
+  const dl = document.getElementById("kats");
+  dl.innerHTML = "";
+  [...new Set(S.raavarer.map(r => r.kategori))].forEach(k => {
+    const o = document.createElement("option"); o.value = k; dl.appendChild(o);
+  });
+  const sorted = [...S.raavarer].sort((a,b2) =>
+    a.kategori === b2.kategori ? a.navn.localeCompare(b2.navn,"da")
+                               : a.kategori.localeCompare(b2.kategori,"da"));
+  for(const r of sorted){
+    const el = document.createElement("div");
+    el.className = "erow";
+    el.innerHTML = '<span class="n"></span><span class="d"></span>' +
+      '<span class="nl"></span><button class="ghost">Ret</button>';
+    el.querySelector(".n").textContent = r.navn;
+    el.querySelector(".d").textContent =
+      (r.pakkenavn || maengde(r.pakke, r.enhed)) + " · " + kr(r.pris) +
+      " · holder " + (r.holdbar >= 90 ? "længe" : r.holdbar + " dage") +
+      (r.est ? " (skøn)" : "") + (r.frys ? " · kan fryses" : "");
+    const nl = el.querySelector(".nl");
+    if(r.nid){
+      const a = document.createElement("a");
+      a.href = "https://www.nemlig.com/" + r.nid;
+      a.target = "_blank"; a.rel = "noopener";
+      a.className = "tag t-ok"; a.style.textDecoration = "none";
+      a.textContent = "Nemlig " + r.nid;
+      nl.appendChild(a);
+    }
+    el.querySelector("button").onclick = () => editRaa(r);
+    box.appendChild(el);
+  }
+}
+
+/* ============================================================
+   EDITORS
+   ============================================================ */
+const dlgRaa = document.getElementById("dlgRaa");
+let raaEdit = null;
+function editRaa(r){
+  raaEdit = r;
+  document.getElementById("dlgRaaTitle").textContent = r ? r.navn : "Ny råvare";
+  rNavn.value = r ? r.navn : "";
+  rKat.value = r ? r.kategori : "Kolonial";
+  rEnhed.value = r ? r.enhed : "g";
+  rPakke.value = r ? r.pakke : "";
+  rPakkenavn.value = r ? (r.pakkenavn||"") : "";
+  rPris.value = r ? r.pris : "";
+  rHold.value = r ? r.holdbar : 7;
+  rFrys.value = r && r.frys ? "1" : "0";
+  dlgRaa.showModal();
+}
+dlgRaa.addEventListener("close", () => {
+  if(dlgRaa.returnValue !== "ok") return;
+  if(!rNavn.value.trim() || !(+rPakke.value > 0)) return;
+  const o = {
+    id: raaEdit ? raaEdit.id : "r" + Date.now().toString(36),
+    navn: rNavn.value.trim(), kategori: rKat.value.trim() || "Andet",
+    enhed: rEnhed.value, pakke: +rPakke.value, pakkenavn: rPakkenavn.value.trim(),
+    pris: +rPris.value || 0, holdbar: +rHold.value || 7, frys: rFrys.value === "1"
+  };
+  if(raaEdit) Object.assign(raaEdit, o); else S.raavarer.push(o);
+  render();
+});
+
+const dlgRet = document.getElementById("dlgRet");
+let retEdit = null;
+function ingRow(vid, m){
+  const row = document.createElement("div");
+  row.className = "ing";
+  const sel = document.createElement("select");
+  [...S.raavarer].sort((a,b2)=>a.navn.localeCompare(b2.navn,"da")).forEach(r => {
+    const o = document.createElement("option");
+    o.value = r.id; o.textContent = r.navn + " (" + r.enhed + ")";
+    sel.appendChild(o);
+  });
+  if(vid) sel.value = vid;
+  const inp = document.createElement("input");
+  inp.type = "number"; inp.min = "0"; inp.step = "any"; inp.value = m || "";
+  const del = document.createElement("button");
+  del.type = "button"; del.className = "ghost"; del.textContent = "×";
+  del.style.padding = "8px"; del.onclick = () => row.remove();
+  row.append(sel, inp, del);
+  return row;
+}
+function editRet(d){
+  retEdit = d;
+  document.getElementById("dlgRetTitle").textContent = d ? d.navn : "Ny ret";
+  dNavn.value = d ? d.navn : "";
+  dPort.value = d ? d.portioner : 4;
+  const box = document.getElementById("ingList");
+  box.innerHTML = "";
+  if(d) for(const [vid,m] of Object.entries(d.ing)) box.appendChild(ingRow(vid,m));
+  else box.appendChild(ingRow(null,null));
+  dlgRet.showModal();
+}
+document.getElementById("nyIng").onclick = () =>
+  document.getElementById("ingList").appendChild(ingRow(null,null));
+dlgRet.addEventListener("close", () => {
+  if(dlgRet.returnValue !== "ok") return;
+  if(!dNavn.value.trim()) return;
+  const ing = {};
+  document.querySelectorAll("#ingList .ing").forEach(row => {
+    const vid = row.querySelector("select").value;
+    const m = +row.querySelector("input").value;
+    if(vid && m > 0) ing[vid] = (ing[vid] || 0) + m;
+  });
+  const o = {
+    id: retEdit ? retEdit.id : "d" + Date.now().toString(36),
+    navn: dNavn.value.trim(), portioner: +dPort.value || 4, ing
+  };
+  if(retEdit) Object.assign(retEdit, o); else S.retter.push(o);
+  render();
+});
+
+/* ============================================================
+   KNAPPER
+   ============================================================ */
+document.getElementById("nyRaa").onclick = () => editRaa(null);
+document.getElementById("nyRet").onclick = () => editRet(null);
+document.getElementById("ryd").onclick = () => { S.valgt = {}; render(); };
+
+document.getElementById("kopier").onclick = async e => {
+  const rows = indkoeb(behov(S.valgt));
+  const txt = rows.map(x =>
+    x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed)) + " " + x.r.navn
+  ).join("\n");
+  const btn = e.currentTarget;
+  try{
+    await navigator.clipboard.writeText(txt);
+    btn.textContent = "Kopieret";
+  }catch(err){
+    btn.textContent = "Kunne ikke kopiere";
+  }
+  setTimeout(() => btn.textContent = "Kopiér liste", 1800);
+};
+
+document.getElementById("eksport").onclick = () => {
+  const blob = new Blob([JSON.stringify(S,null,1)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "madplan-data.json";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+document.getElementById("importBtn").onclick = () => importFile.click();
+importFile.onchange = () => {
+  const f = importFile.files[0];
+  if(!f) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const d = JSON.parse(fr.result);
+      if(!Array.isArray(d.raavarer) || !Array.isArray(d.retter))
+        throw new Error("Filen indeholder ikke råvarer og retter");
+      S = d; S.valgt = S.valgt || {}; render();
+    }catch(err){
+      alert("Kunne ikke læse filen: " + err.message);
+    }
+    importFile.value = "";
+  };
+  fr.readAsText(f);
+};
+
+document.querySelectorAll('[role="tab"]').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('[role="tab"]').forEach(x =>
+      x.setAttribute("aria-selected", String(x === t)));
+    ["plan","retter","raavarer"].forEach(n =>
+      document.getElementById("tab-" + n).hidden = (n !== t.dataset.tab));
+  };
+});
+
+render();
+hentFaelles();
+</script>
+</body>
+</html>
