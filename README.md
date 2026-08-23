@@ -9,7 +9,7 @@ Live: `https://mtechmichael-sketch.github.io/madplan/`
 ## Filer
 
 ```
-index.html          Hele appen. Én selvstændig fil, virker offline.
+index.html          Hele  appen. Én selvstændig fil, virker offline.
 manifest.json       Så den kan lægges på hjemmeskærmen
 icon-192.png
 icon-512.png
