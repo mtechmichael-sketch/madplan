@@ -274,7 +274,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.6.0";
+const VERSION = "0.6.1";
 const DATA_VERSION = 3;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1220,9 +1220,13 @@ function tegnTomgang(){
 
   const h = el("div","tg-h");
   const hh = el("div","hint");
-  hh.append(el("span","eyebrow acc","Ugen"),
+  hh.append(el("span","eyebrow acc", S.haUrl ? "Ugen" : "Ugens aftensmad"),
     Object.assign(el("span","sub", dage[0].getDate() + ".–" + dage[6].toLocaleDateString("da-DK",{day:"numeric",month:"long"})),{style:"margin-left:auto"}));
   h.append(hh);
+  if(!S.haUrl){
+    h.append(Object.assign(el("p","note","Aftaler og vejr lægger sig ind her, når Home Assistant er koblet til — som linjer på de samme dage."),
+      {style:"margin:-4px 0 14px"}));
+  }
   dage.forEach((d,i) => {
     const k = iso(d), r = S.uge[k] ? ret(S.uge[k]) : null;
     const row = el("div","tg-dag" + (k === idagK ? " idag" : ""));
