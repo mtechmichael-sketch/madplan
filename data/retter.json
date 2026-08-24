@@ -1,5 +1,5 @@
 {
- "version": 6,
+ "version": 7,
  "retter": [
   {
    "id": "karry",
@@ -737,6 +737,34 @@
     "Servér med blomkålsris."
    ],
    "kilde": "https://www.madbanditten.dk/kylling-i-karry/"
+  },
+  {
+   "id": "mexiburgerfad",
+   "navn": "Mexicansk burgerfad",
+   "portioner": 4,
+   "ing": {
+    "hakket_okse": 550,
+    "log": 70,
+    "hvidlog": 1,
+    "spidskaal": 270,
+    "tacokrydderi": 16,
+    "tacosauce": 135,
+    "jalapenos": 30,
+    "aeg": 1,
+    "revet_ost": 100,
+    "koriander": 10,
+    "smor": 20
+   },
+   "opskrift": [
+    "Hak løget og snit spidskålen fint.",
+    "Sveds løget klart i smør på en stor pande, og brun kødet med.",
+    "Kom kål og tacokrydderi i, og lad det simre 5–10 minutter.",
+    "Hæld det i et smurt fad og tænd ovnen på 180 grader.",
+    "Rør tacosauce, jalapeños og æg sammen, og hæld det over kødet.",
+    "Drys revet ost og jalapeños på, og bag 15–20 minutter til osten er gylden.",
+    "Top med frisk koriander før servering."
+   ],
+   "kilde": "https://www.madbanditten.dk/mexicansk-burgerfad/"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "version": 6,
+ "version": 7,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -1372,6 +1372,76 @@
    "nid": "",
    "est": false,
    "altid": true
+  },
+  {
+   "id": "spidskaal",
+   "navn": "Spidskål",
+   "enhed": "g",
+   "pakke": 700,
+   "pakkenavn": "1 stk. / ca. 700 g · pris anslået",
+   "pris": 15.0,
+   "holdbar": 10,
+   "frys": false,
+   "kategori": "Grønt",
+   "nid": "5030670",
+   "est": true,
+   "altid": false
+  },
+  {
+   "id": "koriander",
+   "navn": "Koriander øko.",
+   "enhed": "g",
+   "pakke": 25,
+   "pakkenavn": "1 potte / Rosborg · pris anslået",
+   "pris": 15.0,
+   "holdbar": 6,
+   "frys": false,
+   "kategori": "Grønt",
+   "nid": "5027932",
+   "est": true,
+   "altid": false
+  },
+  {
+   "id": "tacokrydderi",
+   "navn": "Taco kryddermix",
+   "enhed": "g",
+   "pakke": 28,
+   "pakkenavn": "28 g brev / Santa Maria · pris anslået",
+   "pris": 9.0,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5021688",
+   "est": true,
+   "altid": false
+  },
+  {
+   "id": "tacosauce",
+   "navn": "Taco sauce (medium)",
+   "enhed": "g",
+   "pakke": 230,
+   "pakkenavn": "230 g / Santa Maria · pris anslået",
+   "pris": 18.0,
+   "holdbar": 90,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5021649",
+   "est": true,
+   "altid": false
+  },
+  {
+   "id": "jalapenos",
+   "navn": "Jalapeños (syltede)",
+   "enhed": "g",
+   "pakke": 215,
+   "pakkenavn": "215 g glas / Santa Maria · pris anslået",
+   "pris": 19.0,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5500850",
+   "est": true,
+   "altid": false
   }
  ]
 }
