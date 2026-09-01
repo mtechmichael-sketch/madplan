@@ -250,6 +250,19 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
   <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Gem</button></footer>
 </form></dialog>
 
+<dialog id="dlgBasis"><form method="dialog">
+  <header id="tBasis">Basisvare</header>
+  <div class="krop"><div class="g2">
+    <label class="f">Navn<input id="bNavn" required></label>
+    <label class="f">Kategori<input id="bKat" list="bkats"></label>
+    <label class="f">Interval (dage)<input id="bInterval" type="number" min="1" step="1" required></label>
+    <label class="f">Sidst købt<input id="bSidst" type="date"></label>
+  </div>
+  <p class="note">Intervallet er hvor mange dage der typisk går, før varen skal købes igen. Lad «sidst købt» stå tom, hvis den skal med på næste indkøb.</p></div>
+  <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Gem</button></footer>
+</form></dialog>
+<datalist id="bkats"><option value="Husholdning"><option value="Personlig pleje"></datalist>
+
 <dialog id="dlgRet"><form method="dialog">
   <header id="tRet">Ret</header>
   <div class="krop">
@@ -274,7 +287,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.6.5";
+const VERSION = "0.7.0";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -407,6 +420,33 @@ const SEED_RAAVARER = [
   ["jalapenos","Jalapeños (syltede)","g",215,"215 g glas / Santa Maria · pris anslået",19.00,365,0,"Kolonial","5500850",1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
              holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11]}));
+
+/* ============================================================
+   BASISVARER — det der slipper op med tiden i stedet for at høre til en ret.
+   interval = typiske dage mellem indkøb. Skøn til at starte med; ret dem
+   når I opdager at toiletpapiret holder længere end jeg troede.
+   ============================================================ */
+const SEED_BASIS = [
+  ["toiletpapir","Toiletpapir","Husholdning",14],
+  ["koekkenrulle","Køkkenrulle","Husholdning",21],
+  ["opvasketabs","Opvasketabs","Husholdning",30],
+  ["opvaskemiddel","Opvaskemiddel (hånd)","Husholdning",45],
+  ["vaskemiddel","Vaskemiddel","Husholdning",30],
+  ["skyllemiddel","Skyllemiddel","Husholdning",60],
+  ["universalrens","Universalrengøring","Husholdning",90],
+  ["affaldsposer","Affaldsposer","Husholdning",45],
+  ["karklude","Karklude og svampe","Husholdning",30],
+  ["fryseposer","Fryseposer","Husholdning",90],
+  ["madfilm","Alufolie og madfilm","Husholdning",120],
+  ["tandpasta","Tandpasta","Personlig pleje",30],
+  ["tandboerster","Tandbørster","Personlig pleje",90],
+  ["shampoo","Shampoo","Personlig pleje",45],
+  ["balsam","Balsam","Personlig pleje",60],
+  ["haandsaebe","Håndsæbe","Personlig pleje",30],
+  ["badesaebe","Bad og sæbe","Personlig pleje",30],
+  ["deodorant","Deodorant","Personlig pleje",60],
+  ["barberblade","Barberblade","Personlig pleje",60],
+].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], sidst:null, est:true}));
 
 const SEED_RETTER = [
   ["karry","Kylling i karry m. ris",4,{kyllingebryst:600,log:200,karrypasta:50,kokosmaelk:400,ris:300,gulerodder:200},
@@ -588,12 +628,17 @@ function load(){
     }
   }catch(e){ /* korrupt data — start forfra frem for at gå i stå */ }
   return {v:VERSION, dataVersion:DATA_VERSION, raavarer:SEED_RAAVARER, retter:SEED_RETTER,
-          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, haUrl:"", tomgangMin:3, tema:"auto"};
+          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, basis:SEED_BASIS, basisValgt:{},
+          haUrl:"", tomgangMin:3, tema:"auto"};
 }
 
 /* Opdaterer gemte data uden at røre det du selv har lavet. */
 function migrer(d){
   d.uge = d.uge || {};
+  d.basisValgt = d.basisValgt || {};
+  if(!Array.isArray(d.basis)) d.basis = SEED_BASIS;
+  else { const har = new Set(d.basis.map(x => x.id));   // nye basisvarer lægges ind, dine egne røres ikke
+         SEED_BASIS.forEach(x => { if(!har.has(x.id)) d.basis.push(x); }); }
   d.haUrl = d.haUrl || "";
   d.tema = d.tema || "auto";
   if(d.tomgangMin == null) d.tomgangMin = 3;
@@ -782,7 +827,8 @@ function tegn(){
   document.getElementById("fMad").setAttribute("aria-current", String(visning !== "hjem"));
   document.getElementById("fHjem").setAttribute("aria-current", String(visning === "hjem"));
   V.innerHTML = ""; BAR.innerHTML = ""; BAR.hidden = true; V.className = "view";
-  ({plan:sPlan, ret:sRet, liste:sListe, mere:sMere, retter:sRetter, raavarer:sRaavarer, hjem:sHjem}[visning] || sPlan)();
+  ({plan:sPlan, ret:sRet, liste:sListe, mere:sMere, retter:sRetter, raavarer:sRaavarer,
+  basis:sBasis, hjem:sHjem}[visning] || sPlan)();
   save();
 }
 
@@ -990,6 +1036,9 @@ function sListe(){
 
   if(!rows.length){
     V.append(el("p","tom","Vælg nogle retter, så laver jeg listen."));
+    const kb = el("div","knaprad");
+    const b2 = el("button","btn ghost","Basisvarer" + (basisPaaTur() ? " (" + basisPaaTur() + " på tur)" : ""));
+    b2.onclick = () => { basisFra = "liste"; vis("basis"); }; kb.append(b2); V.append(kb);
     return;
   }
 
@@ -1034,21 +1083,134 @@ function sListe(){
     });
     V.append(box);
   }
+  const bv = basisValgte();
+  if(bv.length){
+    const hb = el("div","hint"); hb.style.marginTop = "26px";
+    hb.append(el("span","eyebrow","Basisvarer"), el("span","sub", bv.length + " varer"));
+    V.append(hb);
+    const bbox = el("div");
+    let bkat = null;
+    [...bv].sort((a,b) => a.kategori === b.kategori ? a.navn.localeCompare(b.navn,"da") : a.kategori.localeCompare(b.kategori,"da"))
+      .forEach(b => {
+        if(b.kategori !== bkat){ bkat = b.kategori; bbox.append(el("div","eyebrow", bkat)); }
+        const row = el("div","raekke");
+        const [cls, txt] = basisMrk(b);
+        row.append(el("span","n", b.navn), el("span", cls ? "mrk " + cls : "d", txt));
+        const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); row.append(k);
+        bbox.append(row);
+      });
+    V.append(bbox);
+  }
   V.append(Object.assign(el("div"),{style:"height:24px"}));
 
   const sum = rows.reduce((s,x) => s + x.pris, 0);
   const port = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id)?.portioner || 0), 0);
   bar([["I alt", kr2(sum), null],
        ["Pris pr. portion", port ? kr2(sum/port) : "–", "var(--ok)"]],
-      [["Kopiér liste","ghost", kopier, 'M9 9h11v11H9zM5 15V5a1 1 0 0 1 1-1h9']]);
+      [["Basisvarer" + (basisPaaTur() ? " (" + basisPaaTur() + " på tur)" : ""),"ghost", () => { basisFra = "liste"; vis("basis"); },
+        'M3 3h18v4H3zM5 7v13h14V7'],
+       ["Kopiér liste","ghost", kopier, 'M9 9h11v11H9zM5 15V5a1 1 0 0 1 1-1h9']]);
 }
 async function kopier(e){
   const rows = indkoeb(behov(S.valgt));
-  const txt = rows.map(x => x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed)) + " " + x.r.navn).join("\n");
+  let txt = rows.map(x => x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed)) + " " + x.r.navn).join("\n");
+  const bv = basisValgte();
+  if(bv.length) txt += "\n\nBasisvarer\n" + bv.map(b => "· " + b.navn).join("\n");
   const b = e.currentTarget;
   try{ await navigator.clipboard.writeText(txt); b.lastChild.textContent = "Kopieret"; }
   catch(err){ b.lastChild.textContent = "Kunne ikke kopiere"; }
   setTimeout(() => b.lastChild.textContent = "Kopiér liste", 1800);
+}
+
+/* ============================================================
+   BASISVARER
+   ============================================================ */
+const DAG = 86400000;
+const idag = () => new Date().toISOString().slice(0,10);
+const dageSiden = iso => Math.floor((Date.now() - new Date(iso + "T12:00:00").getTime()) / DAG);
+
+/* Dage til varen er på tur igen. Aldrig købt = på tur nu. */
+function basisTil(b){
+  if(!b.sidst) return null;            // rytmen er ikke startet endnu
+  return (b.interval || 30) - dageSiden(b.sidst);
+}
+function basisMrk(b){
+  const d = basisTil(b);
+  if(d === null) return ["", "ikke i gang"];
+  if(d < 0)      return ["m-crit", "over tid — " + (-d) + (-d === 1 ? " dag" : " dage") + " siden"];
+  if(d <= 3)     return ["m-warn", d <= 0 ? "på tur nu" : "om " + d + (d === 1 ? " dag" : " dage")];
+  return ["m-ok", "om " + d + " dage"];
+}
+const basisPaaTur = () => S.basis.filter(b => { const d = basisTil(b); return d !== null && d <= 3; }).length;
+const basisValgte = () => S.basis.filter(b => S.basisValgt[b.id]);
+
+function basisKoebt(id){
+  const b = S.basis.find(x => x.id === id); if(!b) return;
+  b.sidst = idag();
+  delete S.basisValgt[id];
+  tegn();
+}
+
+let basisFra = "liste";
+function sBasis(){
+  const tilbage = el("button","btn ghost","Tilbage");
+  tilbage.onclick = () => vis(basisFra);
+  const hd = el("div","hint"); hd.style.marginBottom = "16px";
+  const nv = el("span",null,"Basisvarer"); nv.style.fontSize = "20px"; nv.style.fontWeight = "700";
+  const paaTur = basisPaaTur();
+  hd.append(tilbage, nv, el("span","sub", paaTur ? paaTur + " på tur" : "ingenting på tur lige nu"));
+  V.append(hd);
+
+  V.append(Object.assign(el("p","note",
+    "Sæt flueben ved det der skal med. Intervallerne er skøn til at starte med — tryk «Købt» når du har handlet, så tæller den forfra derfra."),
+    {style:"margin:0 0 18px;max-width:620px"}));
+
+  const box = el("div");
+  let kat = null;
+  const rang = x => { const d = basisTil(x); return d === null ? 1e6 : d; };
+  [...S.basis].sort((a,b) => rang(a) - rang(b) || a.navn.localeCompare(b.navn,"da")).forEach(b => {
+    const row = el("div","raekke");
+    const lab = el("label","n");
+    lab.style.cssText = "display:flex;gap:10px;align-items:center;cursor:pointer";
+    const c = el("input"); c.type = "checkbox"; c.checked = !!S.basisValgt[b.id];
+    c.onchange = () => { if(c.checked) S.basisValgt[b.id] = true; else delete S.basisValgt[b.id]; tegn(); };
+    lab.append(c, el("span",null,b.navn));
+    const [cls, txt] = basisMrk(b);
+    row.append(lab, el("span", cls ? "mrk " + cls : "d", txt),
+      el("span","d", b.kategori + " · hver " + b.interval + ". dag" +
+        (b.sidst ? " · sidst " + new Date(b.sidst + "T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"short"}) : " · aldrig købt")));
+    const kn2 = el("div"); kn2.style.cssText = "display:flex;gap:8px;flex:none";
+    const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); kn2.append(k);
+    const e2 = el("button","btn ghost","Ret"); e2.onclick = () => editBasis(b); kn2.append(e2);
+    row.append(kn2);
+    box.append(row);
+  });
+  V.append(box);
+
+  const kn = el("div","knaprad");
+  const tb = el("button","btn","Tilføj basisvare"); tb.onclick = () => editBasis(null); kn.append(tb);
+  const valgte = basisValgte();
+  if(valgte.length){
+    const ab = el("button","btn ghost","Markér de " + valgte.length + " valgte som købt");
+    ab.onclick = () => { valgte.forEach(b => { b.sidst = idag(); delete S.basisValgt[b.id]; }); tegn(); };
+    kn.append(ab);
+  }
+  V.append(kn);
+
+  bar([["På tur", String(paaTur), paaTur ? "var(--warn)" : null],
+       ["Valgt til listen", String(valgte.length), null]],
+      [["Se indkøbslisten","", () => vis("liste"), 'M3 5h2l2.4 10.4a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.55L20.5 8H6']]);
+}
+
+let basisEdit = null;
+function editBasis(b){
+  basisEdit = b;
+  tBasis.textContent = b ? b.navn : "Ny basisvare";
+  bNavn.value = b ? b.navn : "";
+  bKat.value = b ? b.kategori : "Husholdning";
+  bInterval.value = b ? b.interval : 30;
+  bSidst.value = b && b.sidst ? b.sidst : "";
+  dlgBasis.showModal();
 }
 
 /* ---------- Hjem (Home Assistant) ---------- */
@@ -1081,8 +1243,8 @@ function sMere(){
   hd.append(tilbage); V.append(hd);
 
   const nav = el("div","knaprad"); nav.style.marginTop = "0";
-  [["Retter","retter"],["Råvarer","raavarer"]].forEach(([t,n]) => {
-    const b = el("button","btn ghost",t); b.onclick = () => vis(n); nav.append(b);
+  [["Retter","retter"],["Råvarer","raavarer"],["Basisvarer","basis"]].forEach(([t,n]) => {
+    const b = el("button","btn ghost",t); b.onclick = () => { if(n === "basis") basisFra = "mere"; vis(n); }; nav.append(b);
   });
   V.append(nav);
 
@@ -1293,6 +1455,16 @@ dlgRaa.addEventListener("close", () => {
     pakke: +rPakke.value, pakkenavn: rPakkenavn.value.trim(), pris: +rPris.value || 0,
     holdbar: +rHold.value || 7, frys: rFrys.value === "1", altid: rAltid.value === "1"};
   if(raaEdit) Object.assign(raaEdit, o); else S.raavarer.push(o);
+  tegn();
+});
+
+const dlgBasis = document.getElementById("dlgBasis");
+dlgBasis.addEventListener("close", () => {
+  if(dlgBasis.returnValue !== "ok" || !bNavn.value.trim() || !(+bInterval.value > 0)) return;
+  const o = {id: basisEdit ? basisEdit.id : "b" + Date.now().toString(36),
+    navn: bNavn.value.trim(), kategori: bKat.value.trim() || "Husholdning",
+    interval: +bInterval.value, sidst: bSidst.value || null, est: false};
+  if(basisEdit) Object.assign(basisEdit, o); else S.basis.push(o);
   tegn();
 });
 
