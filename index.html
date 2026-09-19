@@ -203,6 +203,9 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 .tg-dag .lab i{display:block;font-style:normal;font-size:14px;color:var(--muted);opacity:.75}
 .tg-dag .r{flex:1;min-width:0;font-size:17px;font-weight:600;padding-top:1px}
 .tg-dag .r.fri{font-weight:400;color:var(--line-strong)}
+.tg-dag .vj{font-size:14px;font-weight:400;color:var(--muted);margin-top:3px}
+.tg-vejr{display:flex;align-items:baseline;gap:12px;margin-top:18px;font-size:clamp(16px,2.1vw,21px);color:var(--muted)}
+.tg-vejr b{font-size:clamp(28px,4.4vw,44px);font-weight:700;color:var(--ink);letter-spacing:-.01em}
 .tgfod{margin-top:auto;padding-top:20px;display:flex;align-items:center;gap:10px;color:var(--line-strong);font-size:15px}
 .tgfod svg{stroke:currentColor}
 </style>
@@ -287,7 +290,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.7.0";
+const VERSION = "0.7.2";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -619,6 +622,12 @@ const SEED_RETTER = [
 let S = load();
 let visning = "plan", aabenRet = null;
 
+/* Ligger appen i Home Assistants egen www-mappe (adressen begynder med /local/),
+   er Home Assistant den server siden selv kom fra. Så skal ingen taste en adresse,
+   og der står ingen adresse fra hjemmenettet i koden. */
+const HOS_HA = location.protocol.startsWith("http") && location.pathname.startsWith("/local/");
+if(HOS_HA && !S.haUrl) S.haUrl = location.origin + "/";
+
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
@@ -705,6 +714,88 @@ async function hentFaelles(){
   }catch(e){}
   if(aendret) tegn();
 }
+
+/* Ser efter om der ligger en nyere udgave af appen på serveren.
+   Home Assistant beder browseren gemme filer fra /local/ i 31 dage, og en
+   køkkenskærm der aldrig lukkes ville ellers blive på den gamle udgave.
+   Siden hentes uden om mellemlageret, versionsnummeret læses ud, og er det et
+   andet end det der kører, åbnes siden på en adresse browseren ikke har gemt. */
+async function tjekNyVersion(){
+  if(location.protocol === "file:") return;
+  try{
+    const r = await fetch(location.pathname, {cache:"no-store"});
+    if(!r.ok) return;
+    const m = (await r.text()).match(/const VERSION = "([^"]+)"/);
+    if(!m || m[1] === VERSION) return;
+    if(new URLSearchParams(location.search).get("v") === m[1]) return;   // allerede forsøgt — gå ikke i ring
+    save();
+    location.replace(location.pathname + "?v=" + encodeURIComponent(m[1]));
+  }catch(e){}
+}
+
+/* ============================================================
+   VEJR FRA HOME ASSISTANT
+   ============================================================
+   Virker kun på køkkenkopien, altså når appen ligger hos Home Assistant selv.
+   Fra en anden server spærrer browseren for kaldet.
+
+   Tokenet ligger under SIN EGEN nøgle i browseren og ikke i S. Det er med
+   vilje: "Gem data" skriver hele S ud i en fil, og den fil bliver flyttet
+   mellem enheder. Et token må aldrig følge med. Det står heller aldrig i
+   koden eller i en fil på serveren — kun i den ene browser det er sat ind i. */
+const TOKEN_KEY = "mtech_madplan_ha_token";
+const VEJR_STD = "weather.forecast_hjem";
+const haToken = () => { try{ return localStorage.getItem(TOKEN_KEY) || ""; }catch(e){ return ""; } };
+function saetToken(t){ try{ t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); }catch(e){} }
+
+const VEJRORD = {"clear-night":"Klart", cloudy:"Overskyet", exceptional:"Usædvanligt vejr", fog:"Tåge",
+  hail:"Hagl", lightning:"Torden", "lightning-rainy":"Torden og regn", partlycloudy:"Let skyet",
+  pouring:"Skybrud", rainy:"Regn", snowy:"Sne", "snowy-rainy":"Slud", sunny:"Sol", windy:"Blæst",
+  "windy-variant":"Blæst og skyer"};
+const vejrord = t => VEJRORD[t] || t || "";
+const grader = x => (x == null || isNaN(x)) ? "–" : Math.round(x) + "°";
+
+let VEJR = {nu:null, dage:{}, hentet:null, fejl:""};
+
+async function hentVejr(){
+  const tok = haToken();
+  if(!HOS_HA || !tok){ VEJR = {nu:null, dage:{}, hentet:null, fejl:""}; return; }
+  const ent = S.haVejr || VEJR_STD;
+  const hoved = {"Authorization":"Bearer " + tok, "Content-Type":"application/json"};
+  try{
+    // 1. Vejret lige nu
+    const r1 = await fetch(location.origin + "/api/states/" + encodeURIComponent(ent), {headers:hoved, cache:"no-store"});
+    if(r1.status === 401) throw new Error("Home Assistant afviste tokenet (401). Lav et nyt under brugerens profil og sæt det ind.");
+    if(r1.status === 404) throw new Error("Home Assistant kender ikke " + ent + " (404). Ret navnet nedenfor.");
+    if(!r1.ok) throw new Error("Home Assistant svarede med fejl " + r1.status + ".");
+    const st = await r1.json();
+    if(st.state === "unavailable" || st.state === "unknown") throw new Error("Vejrtjenesten i Home Assistant svarer ikke lige nu.");
+    const a = st.attributes || {};
+    let vind = a.wind_speed;
+    if(vind != null && a.wind_speed_unit === "km/h") vind = vind / 3.6;   // vi siger m/s herhjemme
+    const nu = {temp:a.temperature, tilstand:st.state, vind};
+
+    // 2. Prognosen dag for dag. Den ligger ikke på entiteten — den skal bestilles som et servicekald.
+    const dage = {};
+    const r2 = await fetch(location.origin + "/api/services/weather/get_forecasts?return_response",
+      {method:"POST", headers:hoved, body:JSON.stringify({entity_id:ent, type:"daily"})});
+    if(r2.ok){
+      const j = await r2.json();
+      const fc = (((j.service_response || {})[ent]) || {}).forecast || [];
+      fc.forEach(f => {
+        const k = iso(new Date(f.datetime));
+        if(!dage[k]) dage[k] = {hoej:f.temperature, lav:f.templow, tilstand:f.condition, regn:f.precipitation};
+      });
+    }
+    VEJR = {nu, dage, hentet:new Date(), fejl:""};
+  }catch(e){
+    // Behold de sidste tal — de er stadig bedre end ingenting i et par timer — men sig hvad der er galt
+    VEJR.fejl = (e instanceof TypeError) ? "Kan ikke få forbindelse til Home Assistant." : e.message;
+  }
+  if(visning === "tomgang") tegnTomgang();
+}
+/* Tal ældre end tre timer vises ikke. Så hellere et tomt felt end et forkert. */
+const vejrFrisk = () => VEJR.hentet && (Date.now() - VEJR.hentet.getTime()) < 3 * 3600000;
 
 const raa = id => S.raavarer.find(r => r.id === id);
 const ret = id => S.retter.find(r => r.id === id);
@@ -1271,6 +1362,55 @@ function sMere(){
   pv.onclick = () => vis("tomgang"); c.append(pv);
   V.append(c);
 
+  const hk = el("div","kort"); hk.style.maxWidth = "620px"; hk.style.marginTop = "18px";
+  hk.append(el("div","eyebrow","Home Assistant"),
+    Object.assign(el("p","note", HOS_HA
+      ? "Appen ligger hos Home Assistant selv, så adressen er fundet automatisk. Tøm feltet og gem for at finde den igen."
+      : "Adressen til Home Assistant på denne enhed. Tøm feltet og gem for at koble fra."),{style:"margin:8px 0 12px"}));
+  const hl = el("label","f"); hl.append(document.createTextNode("Adresse"));
+  const hi = el("input"); hi.type = "url"; hi.value = S.haUrl || "";
+  hl.append(hi); hk.append(hl);
+  const hb = el("button","btn ghost","Gem adresse"); hb.style.marginTop = "14px";
+  hb.onclick = () => { S.haUrl = hi.value.trim() || (HOS_HA ? location.origin + "/" : ""); tegn(); };
+  hk.append(hb);
+
+  if(HOS_HA){
+    const harTok = !!haToken();
+    hk.append(Object.assign(el("div","eyebrow","Vejr på tomgangsskærmen"),{style:"margin-top:26px"}),
+      Object.assign(el("p","note","Kræver et langtidstoken fra Home Assistant: log ind som køkkenbrugeren, åbn profilen (nederst til venstre), fanen Sikkerhed, og opret et token nederst på siden. Tokenet bliver kun gemt i denne browser. Det følger ikke med i «Gem data»."),{style:"margin:8px 0 12px"}));
+    const tl = el("label","f"); tl.append(document.createTextNode("Token"));
+    const ti = el("input"); ti.type = "password"; ti.autocomplete = "off";
+    ti.placeholder = harTok ? "Et token er gemt — indsæt et nyt for at skifte" : "Indsæt tokenet her";
+    tl.append(ti); hk.append(tl);
+    const el2 = el("label","f"); el2.style.marginTop = "12px"; el2.append(document.createTextNode("Vejr-entitet"));
+    const ei = el("input"); ei.type = "text"; ei.value = S.haVejr || VEJR_STD; el2.append(ei); hk.append(el2);
+
+    const st = el("p","note"); st.style.margin = "12px 0 0";
+    const visStatus = () => {
+      st.textContent = !haToken() ? "Intet token endnu."
+        : VEJR.fejl ? "Fejl: " + VEJR.fejl
+        : VEJR.nu ? "Virker. Hentet kl. " + VEJR.hentet.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"}) +
+            ": " + grader(VEJR.nu.temp) + ", " + vejrord(VEJR.nu.tilstand).toLowerCase() +
+            ", prognose for " + Object.keys(VEJR.dage).length + " dage."
+        : "Henter…";
+    };
+    visStatus();
+
+    const kr = el("div","knaprad"); kr.style.marginTop = "14px";
+    const tb = el("button","btn ghost","Gem og prøv");
+    tb.onclick = async () => {
+      if(ti.value.trim()) saetToken(ti.value.trim());
+      S.haVejr = ei.value.trim() || VEJR_STD; save();
+      ti.value = ""; st.textContent = "Henter…";
+      await hentVejr(); visStatus();
+      ti.placeholder = haToken() ? "Et token er gemt — indsæt et nyt for at skifte" : "Indsæt tokenet her";
+    };
+    const fb = el("button","btn ghost","Fjern token");
+    fb.onclick = async () => { saetToken(""); await hentVejr(); tegn(); };
+    kr.append(tb, fb); hk.append(kr, st);
+  }
+  V.append(hk);
+
   const d = el("div","knaprad");
   [["Gem data", eksport],["Indlæs data", () => document.getElementById("importFile").click()]].forEach(([t,f]) => {
     const b = el("button","btn ghost",t); b.onclick = f; d.append(b);
@@ -1371,6 +1511,13 @@ function tegnTomgang(){
   const ur = el("div","ur num", nu.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"}));
   v.append(ur, el("div","dato", nu.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long"})
                     .replace(/^./, c => c.toUpperCase())));
+  if(vejrFrisk() && VEJR.nu){
+    const vj = el("div","tg-vejr");
+    vj.append(el("b","num", grader(VEJR.nu.temp)),
+      el("span",null, vejrord(VEJR.nu.tilstand) +
+        (VEJR.nu.vind != null ? " · vind " + Math.round(VEJR.nu.vind) + " m/s" : "")));
+    v.append(vj);
+  }
 
   const ia = el("div","iaften");
   ia.append(el("div","eyebrow", iaften ? "I aften" : "Ugens mad"));
@@ -1402,13 +1549,25 @@ function tegnTomgang(){
   if(!S.haUrl){
     h.append(Object.assign(el("p","note","Aftaler og vejr lægger sig ind her, når Home Assistant er koblet til — som linjer på de samme dage."),
       {style:"margin:-4px 0 14px"}));
+  }else if(HOS_HA && (VEJR.fejl || !haToken())){
+    // Sig hvorfor vejret mangler, frem for bare at lade pladsen stå tom
+    h.append(Object.assign(el("p","note", VEJR.fejl ? "Vejret mangler: " + VEJR.fejl
+        : "Vejret mangler et token fra Home Assistant. Det sættes ind under Mere."),
+      {style:"margin:-4px 0 14px"}));
   }
+  const visVejr = vejrFrisk();
   dage.forEach((d,i) => {
     const k = iso(d), r = S.uge[k] ? ret(S.uge[k]) : null;
     const row = el("div","tg-dag" + (k === idagK ? " idag" : ""));
     const lab = el("div","lab");
     lab.append(el("b",null, k === idagK ? "I dag" : DAGE[i]), el("i",null, DAGK[i] + " " + d.getDate()));
-    row.append(lab, el("div","r" + (r ? "" : " fri"), r ? r.navn : "—"));
+    const indhold = el("div","r" + (r ? "" : " fri"), r ? r.navn : "—");
+    const w = visVejr ? VEJR.dage[k] : null;
+    if(w){
+      indhold.append(el("div","vj", grader(w.hoej) + " / " + grader(w.lav) + " · " + vejrord(w.tilstand) +
+        (w.regn > 0 ? " · " + String(Math.round(w.regn * 10) / 10).replace(".", ",") + " mm" : "")));
+    }
+    row.append(lab, indhold);
     h.append(row);
   });
   const fod = el("div","tgfod");
@@ -1542,6 +1701,10 @@ temaPaa();
 vis("plan");
 nulstilIdle();
 hentFaelles();
+tjekNyVersion();
+setInterval(tjekNyVersion, 60 * 60000);   // en gang i timen
+hentVejr();
+setInterval(hentVejr, 30 * 60000);        // hver halve time
 </script>
 </body>
 </html>

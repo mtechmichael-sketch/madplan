@@ -82,6 +82,25 @@ Fælles familiedata kommer først med backenden på Raspberry Pi'en.
 
 Brug **Gem data** / **Indlæs data** i appen til at flytte eller sikkerhedskopiere.
 
+**Tokenet til Home Assistant ligger for sig selv**, under nøglen
+`mtech_madplan_ha_token`, og er med vilje ikke en del af `mtech_madplan_v1`.
+«Gem data» skriver hele planen ud i en fil der bliver flyttet rundt mellem
+enheder — et token må aldrig følge med i den. Det står heller aldrig i koden
+eller i en fil på serveren, kun i den ene browser det er sat ind i.
+
+## Køkkenkopien hos Home Assistant
+
+Ligger appen i Home Assistants `www`-mappe (adressen begynder med `/local/`),
+sker der tre ting af sig selv:
+
+- Adressen til Home Assistant findes automatisk — det er serveren siden kom fra.
+  «Hjem»-fanen virker kun her, fordi Home Assistant kun lader sig vise i en
+  ramme på en side fra samme server.
+- Tomgangsskærmen viser vejr, når der er sat et token ind under Mere.
+- Appen ser en gang i timen efter en nyere udgave og genindlæser selv. Det er
+  nødvendigt, fordi Home Assistant beder browseren gemme filerne i 31 dage.
+  **Hæv `VERSION` i `index.html` ved hver ændring**, ellers opdager skærmen det ikke.
+
 ## Hvad der IKKE må ligge her
 
 Repoet er offentligt, fordi GitHub Pages kræver det på en gratis konto.
