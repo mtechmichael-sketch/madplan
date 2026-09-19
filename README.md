@@ -97,9 +97,15 @@ sker der tre ting af sig selv:
   «Hjem»-fanen virker kun her, fordi Home Assistant kun lader sig vise i en
   ramme på en side fra samme server.
 - Tomgangsskærmen viser vejr, når der er sat et token ind under Mere.
+- Tomgangsskærmen viser strømprisen nu og de billigste 3 timer, hvis Home
+  Assistant har en sensor `sensor.elpris_total` med attributten
+  `priser: [{"s": "<lokal tid>", "p": <kr/kWh>}, ...]`. Selve udregningen —
+  netselskab, tariffer og elaftale — ligger i Home Assistant og ikke her.
 - Appen ser en gang i timen efter en nyere udgave og genindlæser selv. Det er
   nødvendigt, fordi Home Assistant beder browseren gemme filerne i 31 dage.
   **Hæv `VERSION` i `index.html` ved hver ændring**, ellers opdager skærmen det ikke.
+  Tjekket ligger i sin egen `<script>`-blok nederst, så det også kører hvis
+  resten af appen har en fejl. Lad det blive der.
 
 ## Hvad der IKKE må ligge her
 

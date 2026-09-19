@@ -206,6 +206,9 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 .tg-dag .vj{font-size:14px;font-weight:400;color:var(--muted);margin-top:3px}
 .tg-vejr{display:flex;align-items:baseline;gap:12px;margin-top:18px;font-size:clamp(16px,2.1vw,21px);color:var(--muted)}
 .tg-vejr b{font-size:clamp(28px,4.4vw,44px);font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.tg-el{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;row-gap:4px;margin-top:10px;font-size:clamp(15px,1.9vw,19px);color:var(--muted)}
+.tg-el b{font-size:clamp(20px,2.8vw,28px);font-weight:700;color:var(--ink)}
+.tg-el .bil{flex-basis:100%}
 .tgfod{margin-top:auto;padding-top:20px;display:flex;align-items:center;gap:10px;color:var(--line-strong);font-size:15px}
 .tgfod svg{stroke:currentColor}
 </style>
@@ -290,7 +293,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.7.2";
+const VERSION = "0.7.4";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -715,23 +718,7 @@ async function hentFaelles(){
   if(aendret) tegn();
 }
 
-/* Ser efter om der ligger en nyere udgave af appen på serveren.
-   Home Assistant beder browseren gemme filer fra /local/ i 31 dage, og en
-   køkkenskærm der aldrig lukkes ville ellers blive på den gamle udgave.
-   Siden hentes uden om mellemlageret, versionsnummeret læses ud, og er det et
-   andet end det der kører, åbnes siden på en adresse browseren ikke har gemt. */
-async function tjekNyVersion(){
-  if(location.protocol === "file:") return;
-  try{
-    const r = await fetch(location.pathname, {cache:"no-store"});
-    if(!r.ok) return;
-    const m = (await r.text()).match(/const VERSION = "([^"]+)"/);
-    if(!m || m[1] === VERSION) return;
-    if(new URLSearchParams(location.search).get("v") === m[1]) return;   // allerede forsøgt — gå ikke i ring
-    save();
-    location.replace(location.pathname + "?v=" + encodeURIComponent(m[1]));
-  }catch(e){}
-}
+/* Opdateringstjekket ligger i sin egen <script>-blok nederst i filen. */
 
 /* ============================================================
    VEJR FRA HOME ASSISTANT
@@ -796,6 +783,52 @@ async function hentVejr(){
 }
 /* Tal ældre end tre timer vises ikke. Så hellere et tomt felt end et forkert. */
 const vejrFrisk = () => VEJR.hentet && (Date.now() - VEJR.hentet.getTime()) < 3 * 3600000;
+
+/* ============================================================
+   STRØMPRIS FRA HOME ASSISTANT
+   ============================================================
+   Totalprisen (spot + nettarif + afgifter + moms) regnes ud i Home Assistant,
+   ikke her. Så står netselskab og elaftale kun på Pi'en og aldrig i det
+   offentlige repo. Appen læser bare sensoren og dens liste over kvarterer:
+     priser: [{"s": "2026-09-19T22:00", "p": 0.924}, ...]   s = lokal tid, p = kr/kWh
+   Findes sensoren ikke, vises linjen bare ikke. */
+const EL_ENT = "sensor.elpris_total";
+let EL = {priser:[], hentet:null};
+
+async function hentEl(){
+  const tok = haToken();
+  if(!HOS_HA || !tok){ EL = {priser:[], hentet:null}; return; }
+  try{
+    const r = await fetch(location.origin + "/api/states/" + EL_ENT,
+      {headers:{"Authorization":"Bearer " + tok}, cache:"no-store"});
+    if(!r.ok) return;                          // 404: sensoren er ikke sat op — ingen linje
+    const st = await r.json();
+    const p = ((st.attributes || {}).priser || []).map(x => ({t:new Date(x.s), p:+x.p})).filter(x => !isNaN(x.p));
+    EL = {priser:p, hentet:new Date()};
+  }catch(e){}                                  // behold de sidste priser; de gælder stadig
+  if(visning === "tomgang") tegnTomgang();
+}
+
+const KVARTER = 15 * 60000;
+/* Prisen lige nu, og det billigste sammenhængende vindue på `timer` timer fra nu af */
+function elNu(){
+  const nu = Date.now();
+  const x = EL.priser.find(q => q.t.getTime() <= nu && nu < q.t.getTime() + KVARTER);
+  return x ? x.p : null;
+}
+function elBilligst(timer){
+  const n = timer * 4, nu = Date.now();
+  const frem = EL.priser.filter(q => q.t.getTime() + KVARTER > nu);
+  let bedst = null;
+  for(let i = 0; i + n <= frem.length; i++){
+    // kun sammenhængende kvarterer — ingen huller hvis en dag mangler
+    if(frem[i+n-1].t.getTime() - frem[i].t.getTime() !== (n-1) * KVARTER) continue;
+    let sum = 0; for(let j = i; j < i + n; j++) sum += frem[j].p;
+    if(!bedst || sum / n < bedst.snit) bedst = {fra:frem[i].t, snit:sum / n};
+  }
+  return bedst;
+}
+const krEl = x => x.toLocaleString("da-DK",{minimumFractionDigits:2, maximumFractionDigits:2}) + " kr";   // med øre — kr() længere nede runder til hele kroner
 
 const raa = id => S.raavarer.find(r => r.id === id);
 const ret = id => S.retter.find(r => r.id === id);
@@ -1518,6 +1551,19 @@ function tegnTomgang(){
         (VEJR.nu.vind != null ? " · vind " + Math.round(VEJR.nu.vind) + " m/s" : "")));
     v.append(vj);
   }
+  const elp = (EL.hentet && Date.now() - EL.hentet.getTime() < 3 * 3600000) ? elNu() : null;
+  if(elp != null){
+    const lj = el("div","tg-el");
+    lj.append(el("b","num", krEl(elp)), el("span",null,"pr. kWh nu"));
+    const b = elBilligst(3);
+    if(b){
+      const slut = new Date(b.fra.getTime() + 3 * 3600000);
+      const hh = d => String(d.getHours()).padStart(2,"0") + (d.getMinutes() ? "." + String(d.getMinutes()).padStart(2,"0") : "");
+      const dag = iso(b.fra) === iso(nu) ? "i dag" : "i morgen";
+      lj.append(el("span","bil", "Billigste 3 timer: " + dag + " " + hh(b.fra) + "–" + hh(slut) + " · " + krEl(b.snit)));
+    }
+    v.append(lj);
+  }
 
   const ia = el("div","iaften");
   ia.append(el("div","eyebrow", iaften ? "I aften" : "Ugens mad"));
@@ -1701,10 +1747,45 @@ temaPaa();
 vis("plan");
 nulstilIdle();
 hentFaelles();
-tjekNyVersion();
-setInterval(tjekNyVersion, 60 * 60000);   // en gang i timen
 hentVejr();
 setInterval(hentVejr, 30 * 60000);        // hver halve time
+hentEl();
+setInterval(hentEl, 15 * 60000);          // hvert kvarter, som priserne skifter
+</script>
+
+<script>
+/* ============================================================
+   OPDATERINGSTJEK — med vilje i sin egen <script>-blok.
+   ============================================================
+   Home Assistant beder browseren gemme filer fra /local/ i 31 dage, og en
+   køkkenskærm der aldrig lukkes ville ellers blive på den gamle udgave. Så en
+   gang i timen hentes siden uden om mellemlageret, versionsnummeret læses ud,
+   og er det et andet end det der kører, åbnes siden på en adresse browseren
+   ikke har gemt (?v=…).
+
+   Den står for sig selv, fordi en fejl i blokken ovenfor stopper HELE den blok
+   — men ikke denne. Så kan en udgave med en fejl stadig selv hente rettelsen.
+   Derfor må den ikke bruge noget fra blokken ovenfor uden at tjekke det først.
+
+   Mønsteret er stykket sammen, så det ikke matcher sin egen kildetekst. */
+(function(){
+  if(location.protocol === "file:") return;
+  const moenster = new RegExp("const VERSION = " + '"' + "([0-9.]+)" + '"');
+  const koerer = (document.documentElement.innerHTML.match(moenster) || [])[1] || "";
+  async function tjek(){
+    try{
+      const r = await fetch(location.pathname, {cache:"no-store"});
+      if(!r.ok) return;
+      const m = (await r.text()).match(moenster);
+      if(!m || m[1] === koerer) return;
+      if(new URLSearchParams(location.search).get("v") === m[1]) return;   // allerede forsøgt — gå ikke i ring
+      try{ if(typeof save === "function") save(); }catch(e){}
+      location.replace(location.pathname + "?v=" + encodeURIComponent(m[1]));
+    }catch(e){}
+  }
+  tjek();
+  setInterval(tjek, 60 * 60000);   // en gang i timen
+})();
 </script>
 </body>
 </html>
