@@ -5,44 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="app-version" content="0.4.0">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#FBF8F2" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#17150F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F7F3EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171914" media="(prefers-color-scheme: dark)">
 <title>Madplan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  --paper:#FBF8F2; --surface:#FFFFFF; --surface-2:#F4F0E6;
-  --ink:#232019; --muted:#7A7264; --line:#E4DCCE; --line-strong:#CFC4B1;
-  --accent:#16495C; --accent-ink:#FFFFFF; --accent-soft:#E2EDF1;
-  --ok:#2E6B4F; --ok-soft:#E3EFE7;
-  --warn:#8F6408; --warn-soft:#F7EEDA;
-  --crit:#A33B27;
+  --paper:#F7F3EA; --surface:#FFFCF7; --surface-2:#EEE8DB;
+  --ink:#26251F; --muted:#686256; --line:#DDD3C2; --line-strong:#9D917E;
+  --accent:#496A52; --accent-ink:#FFFCF7; --accent-soft:#E4EDE4;
+  --ok:#3F7654; --ok-soft:#E4EFE7;
+  --warn:#8A5A12; --warn-soft:#F6E9CF;
+  --crit:#A14332;
   --tile-l:0.62; --tile-c:0.10; --tile-tl:0.30;
   --shadow:0 1px 2px rgba(45,38,26,.06), 0 6px 18px -10px rgba(45,38,26,.22);
 }
+
+/* Morkt tema. Bruges baade naar tabletten staar paa morkt, og naar systemet gor. */
+:root[data-theme="dark"]{
+  --paper:#171914; --surface:#20231D; --surface-2:#2A2E26;
+  --ink:#F3EFE6; --muted:#B1A996; --line:#393D33; --line-strong:#676E5C;
+  --accent:#A8C8A8; --accent-ink:#182019; --accent-soft:#2B3A2E;
+  --ok:#8FD0A5; --ok-soft:#24362A;
+  --warn:#E3BE6B; --warn-soft:#3A321D;
+  --crit:#E99483;
+  --tile-l:0.52; --tile-c:0.08; --tile-tl:0.92;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
+}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#17150F; --surface:#211E18; --surface-2:#2A261F;
-    --ink:#F1ECE0; --muted:#A09683; --line:#332E26; --line-strong:#4A4237;
-    --accent:#7FC0D8; --accent-ink:#10222A; --accent-soft:#1D3540;
-    --ok:#7FC79E; --ok-soft:#1C2F26;
-    --warn:#DFB25A; --warn-soft:#332A16;
-    --crit:#E8907C;
+    --paper:#171914; --surface:#20231D; --surface-2:#2A2E26;
+    --ink:#F3EFE6; --muted:#B1A996; --line:#393D33; --line-strong:#676E5C;
+    --accent:#A8C8A8; --accent-ink:#182019; --accent-soft:#2B3A2E;
+    --ok:#8FD0A5; --ok-soft:#24362A;
+    --warn:#E3BE6B; --warn-soft:#3A321D;
+    --crit:#E99483;
     --tile-l:0.52; --tile-c:0.08; --tile-tl:0.92;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
   }
-}
-:root[data-theme="dark"]{
-  --paper:#17150F; --surface:#211E18; --surface-2:#2A261F;
-  --ink:#F1ECE0; --muted:#A09683; --line:#332E26; --line-strong:#4A4237;
-  --accent:#7FC0D8; --accent-ink:#10222A; --accent-soft:#1D3540;
-  --ok:#7FC79E; --ok-soft:#1C2F26;
-  --warn:#DFB25A; --warn-soft:#332A16;
-  --crit:#E8907C;
-  --tile-l:0.52; --tile-c:0.08; --tile-tl:0.92;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
 }
 
 *{box-sizing:border-box}
@@ -130,6 +132,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @media (min-width:1000px){.detalje{grid-template-columns:290px minmax(0,1fr) minmax(0,1fr)}}
 .stortile{height:clamp(150px,20vw,230px);border-radius:16px;display:grid;place-items:center}
 .stortile span{font-size:clamp(64px,9vw,104px);font-weight:700}
+.motiv{display:grid;place-items:center;width:58%;height:58%}
+.motiv svg{width:100%;height:100%;display:block}
 .kort{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
 .ing{display:flex;align-items:baseline;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
 .ing .n{flex:1;font-size:18px;font-weight:600}
@@ -293,7 +297,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.7.4";
+const VERSION = "0.8.1";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -926,6 +930,74 @@ const tileFg = id => `oklch(var(--tile-tl) 0.06 ${kulor(id)})`;
 const bogstav = n => (n.trim()[0] || "?").toUpperCase();
 
 /* ============================================================
+   MOTIVER PÅ FLISERNE
+   ============================================================
+   Tegninger, ikke fotos: de fylder næsten intet, virker uden net, og følger
+   temaets farver fordi de tegnes med currentColor. Retter uden motiv beholder
+   forbogstavet som før.
+
+   To måder at give en ret et motiv:
+     1. Sæt "motiv" på retten, fx {"id":"karry", "motiv":"kylling", ...}
+     2. Ellers gættes der ud fra navnet med ORDBOG nedenfor. Rækkefølgen
+        betyder noget — første træf vinder, så det mest specifikke først.
+
+   Vil du tilføje et motiv: tegn det i 24×24, kun streger, ingen farver.
+   Skal en ret have et rigtigt foto senere, lægges det ind samme sted som
+   motivet tegnes — se flisemotiv(). */
+const MOTIVER = {
+  /* kyllingelår: kødet øverst til højre, benet ned mod venstre med to knuder */
+  kylling: '<path d="M18.9 5.1a4.8 4.8 0 0 0-8.1 4.9l-1.5 1.5 2.9 2.9 1.5-1.5a4.8 4.8 0 0 0 5.2-7.8z"/>'
+         + '<path d="M10.2 13.3 8.6 14.9"/>'
+         + '<circle cx="7.1" cy="14.9" r="1.8"/><circle cx="8.8" cy="16.6" r="1.8"/>',
+  /* burger: bolle, fyld, bund */
+  burger:  '<path d="M4 10.6C4 7.3 7.6 5 12 5s8 2.3 8 5.6z"/>'
+         + '<path d="M4.6 13.2h14.8"/>'
+         + '<path d="M4 16.4h16c0 2-1.6 3.6-3.6 3.6H7.6C5.6 20 4 18.4 4 16.4z"/>',
+  /* pasta: spaghetti snoet om gaflen */
+  pasta:   '<path d="M16.8 3.6v8"/>'
+         + '<path d="M14.6 3.6v2.6a2.2 2.2 0 0 0 4.4 0V3.6"/>'
+         + '<circle cx="9.2" cy="13.6" r="5"/>'
+         + '<path d="M5.6 11.2c2 1.1 4.3 1.3 6.5.6M5.4 15.2c2.2.7 4.5.4 6.5-.9"/>',
+  /* fisk */
+  fisk:    '<path d="M5 12c2.4-3.3 5.3-5 8.6-5 2.8 0 5.2 1.7 7.1 5-1.9 3.3-4.3 5-7.1 5-3.3 0-6.2-1.7-8.6-5z"/>'
+         + '<path d="M5 12 2.2 8.8v6.4z"/>'
+         + '<path d="M9.7 8.3c-.8 2.4-.8 5 0 7.4"/>'
+         + '<circle cx="16.9" cy="10.5" r=".9"/>',
+  /* gryderet: skål med damp */
+  gryde:   '<path d="M3.6 13.6h16.8a8.4 8.4 0 0 1-16.8 0z"/>'
+         + '<path d="M8.2 13.6c0-2.6 1.7-4.2 3.8-4.2s3.8 1.6 3.8 4.2"/>'
+         + '<path d="M10.2 13.6c0-1.4.8-2.2 1.8-2.2s1.8.8 1.8 2.2"/>'
+         + '<path d="M10 7c.6-.7.6-1.5 0-2.2M14 7c.6-.7.6-1.5 0-2.2"/>'
+};
+const ORDBOG = [
+  [/laks|fisk|torsk|tun|rejer/i, "fisk"],
+  [/spaghetti|lasagne|pasta|bolognese/i, "pasta"],
+  [/burger|sliders/i, "burger"],
+  [/kylling|chicken/i, "kylling"],
+  [/gryde|suppe|chili|boller i|frikadellefad/i, "gryde"]
+];
+function motivFor(d){
+  if(d.motiv) return MOTIVER[d.motiv] || null;                 // sat på retten
+  const t = ORDBOG.find(([re]) => re.test(d.navn));
+  return t ? MOTIVER[t[1]] : null;
+}
+/* Indholdet i en flise: motiv hvis der er et, ellers forbogstavet.
+   Her skal et rigtigt foto lægges ind den dag vi bygger det. */
+function flisemotiv(d){
+  const m = motivFor(d);
+  if(!m){
+    const bg = el("span","bogstav", bogstav(d.navn));
+    bg.style.color = tileFg(d.id);
+    return bg;
+  }
+  const sp = el("span","motiv");
+  sp.style.color = tileFg(d.id);
+  sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" '
+               + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + m + '</svg>';
+  return sp;
+}
+
+/* ============================================================
    SKÆRME
    ============================================================ */
 const el = (t, c, x) => { const e = document.createElement(t); if(c) e.className = c; if(x != null) e.textContent = x; return e; };
@@ -974,8 +1046,7 @@ function sPlan(){
     const n = S.valgt[d.id] || 0;
     const b = el("button","flise"); b.dataset.on = n ? "1" : "0";
     const t = el("div","top-t"); t.style.background = tileBg(d.id);
-    const bg = el("span","bogstav", bogstav(d.navn)); bg.style.color = tileFg(d.id);
-    t.append(bg); b.append(t);
+    t.append(flisemotiv(d)); b.append(t);
     if(n){ const p = el("span","pil", n + "×"); b.append(p); }
     const i = el("span","info");
     i.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.5"/></svg>';
@@ -1051,7 +1122,7 @@ function sRet(){
   // venstre
   const v = el("div"); v.style.display = "flex"; v.style.flexDirection = "column"; v.style.gap = "16px";
   const t = el("div","stortile"); t.style.background = tileBg(d.id);
-  const bg = el("span",null,bogstav(d.navn)); bg.style.color = tileFg(d.id); t.append(bg);
+  t.append(flisemotiv(d));
   const nb = el("div");
   nb.append(Object.assign(el("div",null,d.navn),{style:"font-size:22px;font-weight:700;line-height:1.2"}),
             Object.assign(el("div","sub", d.portioner + " portioner"),{style:"margin-top:5px;font-size:15px"}));
@@ -1571,7 +1642,7 @@ function tegnTomgang(){
   if(iaften){
     const k = el("button","kort");
     const t = el("div","tile"); t.style.background = tileBg(iaften.id);
-    const b = el("span",null,bogstav(iaften.navn)); b.style.color = tileFg(iaften.id); t.append(b);
+    t.append(flisemotiv(iaften));
     const tx = el("div"); tx.style.flex = "1"; tx.style.minWidth = "0";
     tx.append(el("div","n", iaften.navn),
               Object.assign(el("div","sub", iaften.portioner + " portioner"),{style:"margin-top:5px;font-size:16px"}));
