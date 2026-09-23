@@ -9,7 +9,9 @@ Live: `https://mtechmichael-sketch.github.io/madplan/`
 ## Filer
 
 ```
-index.html          Hele appen. Én selvstændig fil, virker offline.
+index.html          Funktionerne: data, beregninger, skærmene. Virker offline.
+style.css           Udseendet: afstande, hjørner, kort, knapper, fliser.
+tema.css            Farverne, i et lyst og et mørkt sæt.
 manifest.json       Så den kan lægges på hjemmeskærmen
 icon-192.png
 icon-512.png
@@ -17,6 +19,12 @@ data/
   raavarer.json     Råvarekatalog med pakkestørrelser, priser og Nemlig-ID
   retter.json       Retterne med ingredienser og mængder
 ```
+
+Siden v0.9.0 er udseendet skilt ud i `style.css` og `tema.css`, så de kan
+laves om uden at røre koden. `index.html` henter dem med `?v=<VERSION>`, så
+browseren ikke bruger en gammel kopi. **Hæv `VERSION` også, når kun CSS'en
+ændres** — ellers ser man det nye først, når browserens gemte kopi udløber.
+Klassenavnene er fælles for kode og CSS; omdøbes et, forsvinder noget.
 
 ## Hvordan data hænger sammen
 
@@ -101,11 +109,19 @@ sker der tre ting af sig selv:
   Assistant har en sensor `sensor.elpris_total` med attributten
   `priser: [{"s": "<lokal tid>", "p": <kr/kWh>}, ...]`. Selve udregningen —
   netselskab, tariffer og elaftale — ligger i Home Assistant og ikke her.
-- Appen ser en gang i timen efter en nyere udgave og genindlæser selv. Det er
+- Appen ser hvert tiende minut efter en nyere udgave og genindlæser selv — og
+  med det samme, når skærmen vågner eller nettet kommer tilbage. Det er
   nødvendigt, fordi Home Assistant beder browseren gemme filerne i 31 dage.
   **Hæv `VERSION` i `index.html` ved hver ændring**, ellers opdager skærmen det ikke.
   Tjekket ligger i sin egen `<script>`-blok nederst, så det også kører hvis
   resten af appen har en fejl. Lad det blive der.
+
+## Fotos af retterne
+
+Appen prøver at hente `billeder/<rettens id>.jpg`. Findes filen ikke, vises
+rettens tegnede motiv på samme plads, så intet hopper. **Fotoene ligger ikke i
+dette repo** (`.gitignore`) — de er husets egne og lægges kun på køkkenkopien.
+På GitHub Pages ser man derfor altid motiverne.
 
 ## Hvad der IKKE må ligge her
 

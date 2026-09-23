@@ -11,211 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<style>
-:root{
-  --paper:#F7F3EA; --surface:#FFFCF7; --surface-2:#EEE8DB;
-  --ink:#26251F; --muted:#686256; --line:#DDD3C2; --line-strong:#9D917E;
-  --accent:#496A52; --accent-ink:#FFFCF7; --accent-soft:#E4EDE4;
-  --ok:#3F7654; --ok-soft:#E4EFE7;
-  --warn:#8A5A12; --warn-soft:#F6E9CF;
-  --crit:#A14332;
-  --tile-l:0.62; --tile-c:0.10; --tile-tl:0.30;
-  --shadow:0 1px 2px rgba(45,38,26,.06), 0 6px 18px -10px rgba(45,38,26,.22);
-}
-
-/* Morkt tema. Bruges baade naar tabletten staar paa morkt, og naar systemet gor. */
-:root[data-theme="dark"]{
-  --paper:#171914; --surface:#20231D; --surface-2:#2A2E26;
-  --ink:#F3EFE6; --muted:#B1A996; --line:#393D33; --line-strong:#676E5C;
-  --accent:#A8C8A8; --accent-ink:#182019; --accent-soft:#2B3A2E;
-  --ok:#8FD0A5; --ok-soft:#24362A;
-  --warn:#E3BE6B; --warn-soft:#3A321D;
-  --crit:#E99483;
-  --tile-l:0.52; --tile-c:0.08; --tile-tl:0.92;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --paper:#171914; --surface:#20231D; --surface-2:#2A2E26;
-    --ink:#F3EFE6; --muted:#B1A996; --line:#393D33; --line-strong:#676E5C;
-    --accent:#A8C8A8; --accent-ink:#182019; --accent-soft:#2B3A2E;
-    --ok:#8FD0A5; --ok-soft:#24362A;
-    --warn:#E3BE6B; --warn-soft:#3A321D;
-    --crit:#E99483;
-    --tile-l:0.52; --tile-c:0.08; --tile-tl:0.92;
-    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
-  }
-}
-
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;height:100%}
-body{
-  background:var(--paper); color:var(--ink);
-  font-family:"Familjen Grotesk","Segoe UI",system-ui,-apple-system,sans-serif;
-  font-size:16px; line-height:1.45; -webkit-text-size-adjust:100%;
-  overflow:hidden;
-}
-.num{font-family:"DM Mono",ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
-.top{
-  flex:none;background:var(--surface);border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:14px;padding:12px clamp(14px,2.4vw,28px);min-height:72px;
-}
-.brand{display:flex;align-items:baseline;gap:11px;margin-right:auto;min-width:0}
-.brand h1{font-size:clamp(18px,2.2vw,24px);font-weight:700;letter-spacing:-.01em;margin:0}
-.brand .uge{font-size:14px;color:var(--muted);white-space:nowrap}
-@media (max-width:640px){.brand .uge{display:none}}
-.seg{display:flex;gap:4px;background:var(--paper);padding:5px;border-radius:12px;border:1px solid var(--line)}
-.seg button{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;font-weight:600;font-size:15px;color:var(--muted);min-height:44px}
-.seg button[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.seg svg{stroke:currentColor}
-@media (max-width:560px){.seg button span{display:none}.seg button{padding:10px 14px}}
-.icnbtn{width:46px;height:46px;border-radius:11px;border:1px solid var(--line-strong);display:grid;place-items:center;flex:none}
-.icnbtn:hover{border-color:var(--accent);color:var(--accent)}
-
-.view{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:clamp(14px,2.2vw,24px) clamp(14px,2.4vw,28px) 0}
-.view.pad0{padding:0}
-.bar{
-  flex:none;background:var(--surface);border-top:1px solid var(--line-strong);
-  display:flex;align-items:center;gap:clamp(14px,2.4vw,32px);
-  padding:12px clamp(14px,2.4vw,28px);min-height:88px;flex-wrap:wrap;
-}
-.kpi .lab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.kpi .val{font-size:clamp(21px,2.6vw,29px);line-height:1.15}
-.sep{width:1px;height:44px;background:var(--line)}
-@media (max-width:720px){.sep{display:none}}
-.grow{margin-left:auto}
-.btn{display:flex;align-items:center;gap:10px;border-radius:11px;padding:0 clamp(16px,2vw,24px);height:54px;font-size:16px;font-weight:700;background:var(--accent);color:var(--accent-ink)}
-.btn svg{stroke:currentColor}
-.btn.ghost{background:none;color:var(--muted);border:1px solid var(--line-strong);font-weight:600}
-.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
-.btn.fare{background:none;color:var(--crit);border:1px solid var(--crit)}
-
-.hint{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.eyebrow.acc{color:var(--accent)}
-.eyebrow.adv{color:var(--warn)}
-.sub{font-size:13px;color:var(--muted)}
-
-/* ---- rettegitter ---- */
-.gitter{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-@media (min-width:1180px){.gitter{grid-template-columns:repeat(6,minmax(0,1fr))}}
-.flise{position:relative;text-align:left;background:var(--surface);border:1px solid var(--line-strong);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .12s}
-.flise:hover{border-color:var(--accent)}
-.flise[data-on="1"]{border:2px solid var(--accent)}
-.flise .top-t{height:clamp(76px,9vw,104px);display:grid;place-items:center}
-.flise .bogstav{font-size:clamp(34px,4.4vw,48px);font-weight:700}
-.flise .n{font-size:15px;font-weight:600;line-height:1.25;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em;overflow-wrap:anywhere}
-.flise[data-on="1"] .n{padding-right:36px}
-.flise .m{font-size:12px;color:var(--muted);margin-top:3px}
-.flise .krop{padding:10px 12px 12px}
-.pil{position:absolute;top:8px;left:8px;background:var(--accent);color:var(--accent-ink);border-radius:20px;font-size:13px;font-weight:700;padding:2px 10px}
-.info{position:absolute;top:6px;right:6px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center}
-.info svg{stroke:#fff}
-.dagmaerke{font-size:11px;font-weight:700;color:var(--accent);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
-
-/* ---- forslag ---- */
-.forslag{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.fkort{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:12px;padding:12px 15px;text-align:left;width:100%}
-.fkort .n{font-size:16px;font-weight:600}
-.fkort .why{font-size:13px;color:var(--muted);margin-top:3px}
-.fkort .why b{color:var(--ok);font-weight:600}
-.fkort .pris{text-align:right;flex:none}
-
-/* ---- detalje ---- */
-.detalje{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
-@media (min-width:1000px){.detalje{grid-template-columns:290px minmax(0,1fr) minmax(0,1fr)}}
-.stortile{height:clamp(150px,20vw,230px);border-radius:16px;display:grid;place-items:center}
-.stortile span{font-size:clamp(64px,9vw,104px);font-weight:700}
-.motiv{display:grid;place-items:center;width:58%;height:58%}
-.motiv svg{width:100%;height:100%;display:block}
-.kort{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.ing{display:flex;align-items:baseline;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
-.ing .n{flex:1;font-size:18px;font-weight:600}
-.trin{display:flex;gap:14px;margin-bottom:16px}
-.trin .nr{flex:none;width:30px;height:30px;border-radius:9px;background:var(--surface-2);color:var(--accent);display:grid;place-items:center;font-size:15px}
-.trin .t{font-size:17px;line-height:1.45;padding-top:2px}
-.dagvalg{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.dagvalg button{border:1px solid var(--line-strong);border-radius:10px;min-width:56px;height:46px;font-weight:600;font-size:14px;padding:0 10px}
-.dagvalg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-
-/* ---- liste ---- */
-.spalter{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(18px,3vw,34px)}
-@media (min-width:1000px){.spalter{grid-template-columns:repeat(2,minmax(0,1fr))}}
-table{width:100%;border-collapse:collapse}
-th{text-align:right;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 8px 7px;white-space:nowrap}
-th:first-child,td:first-child{text-align:left;padding-left:0}
-th:last-child,td:last-child{padding-right:0}
-td{text-align:right;padding:7px 8px;border-top:1px solid var(--line);font-size:13.5px;white-space:nowrap}
-td.v{text-align:left;font-size:14px;font-weight:600;white-space:normal}
-td.v small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
-td.kat{border-top:0;padding:15px 0 3px;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;text-align:left}
-.over{color:var(--warn)}
-.ingen{color:var(--line-strong)}
-
-/* ---- rester ---- */
-.rest{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
-.rest .n{font-weight:600;flex:1;min-width:0}
-.mrk{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.m-crit{background:var(--warn-soft);color:var(--crit)}
-.m-warn{background:var(--warn-soft);color:var(--warn)}
-.m-ok{background:var(--ok-soft);color:var(--ok)}
-
-/* ---- lister/editor ---- */
-.raekke{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap}
-.raekke:first-child{border-top:0}
-.raekke .n{font-weight:600;flex:1;min-width:150px}
-.raekke .d{font-size:13px;color:var(--muted)}
-.tom{color:var(--muted);font-size:14px;padding:10px 0}
-.knaprad{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 24px}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
-label.f input,label.f select,label.f textarea{font:inherit;padding:10px 12px;border:1px solid var(--line-strong);border-radius:9px;background:var(--surface);color:var(--ink);min-height:44px}
-label.f textarea{min-height:120px;resize:vertical;line-height:1.5}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;max-width:660px;width:calc(100vw - 28px);box-shadow:var(--shadow)}
-dialog::backdrop{background:rgba(20,16,10,.6)}
-dialog header{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:700}
-dialog .krop{padding:18px;max-height:70vh;overflow-y:auto}
-dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
-.ingrad{display:grid;grid-template-columns:1fr 92px 46px;gap:8px;align-items:center;margin-bottom:8px}
-.note{font-size:13px;color:var(--muted);line-height:1.5}
-
-/* ---- tomgang ---- */
-#tomgang{position:fixed;inset:0;z-index:60;background:var(--paper);color:var(--ink);display:none;grid-template-columns:minmax(0,1fr);overflow:hidden}
-#tomgang.vis{display:grid}
-@media (min-width:900px){#tomgang.vis{grid-template-columns:minmax(0,1fr) minmax(0,1.04fr)}}
-.tg-v{display:flex;flex-direction:column;padding:clamp(24px,4vw,52px);min-height:0}
-.tg-h{background:var(--surface);border-left:1px solid var(--line);padding:clamp(24px,4vw,50px);display:flex;flex-direction:column;min-height:0;overflow-y:auto}
-@media (max-width:899px){.tg-h{border-left:0;border-top:1px solid var(--line)}}
-.ur{font-size:clamp(64px,13vw,124px);line-height:.92;letter-spacing:-.02em}
-.dato{font-size:clamp(17px,2.4vw,24px);color:var(--muted);margin-top:12px}
-.iaften{margin-top:auto}
-.iaften .kort{display:flex;align-items:center;gap:18px;border-radius:18px;padding:16px 18px;text-align:left;width:100%}
-.iaften .tile{flex:none;width:clamp(72px,9vw,96px);height:clamp(72px,9vw,96px);border-radius:16px;display:grid;place-items:center}
-.iaften .tile span{font-size:clamp(34px,4.6vw,46px);font-weight:700}
-.iaften .n{font-size:clamp(21px,2.9vw,30px);font-weight:700;line-height:1.15}
-.tg-dag{display:flex;gap:16px;padding:11px 0;border-top:1px solid var(--line)}
-.tg-dag:first-of-type{border-top:0;padding-top:0}
-.tg-dag .lab{flex:none;width:96px}
-.tg-dag .lab b{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.tg-dag.idag .lab b{color:var(--accent)}
-.tg-dag .lab i{display:block;font-style:normal;font-size:14px;color:var(--muted);opacity:.75}
-.tg-dag .r{flex:1;min-width:0;font-size:17px;font-weight:600;padding-top:1px}
-.tg-dag .r.fri{font-weight:400;color:var(--line-strong)}
-.tg-dag .vj{font-size:14px;font-weight:400;color:var(--muted);margin-top:3px}
-.tg-vejr{display:flex;align-items:baseline;gap:12px;margin-top:18px;font-size:clamp(16px,2.1vw,21px);color:var(--muted)}
-.tg-vejr b{font-size:clamp(28px,4.4vw,44px);font-weight:700;color:var(--ink);letter-spacing:-.01em}
-.tg-el{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;row-gap:4px;margin-top:10px;font-size:clamp(15px,1.9vw,19px);color:var(--muted)}
-.tg-el b{font-size:clamp(20px,2.8vw,28px);font-weight:700;color:var(--ink)}
-.tg-el .bil{flex-basis:100%}
-.tgfod{margin-top:auto;padding-top:20px;display:flex;align-items:center;gap:10px;color:var(--line-strong);font-size:15px}
-.tgfod svg{stroke:currentColor}
-</style>
+<link rel="stylesheet" href="tema.css?v=0.10.2">
+<link rel="stylesheet" href="style.css?v=0.10.2">
 </head>
 <body>
 
@@ -297,7 +94,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.8.1";
+const VERSION = "0.10.2";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -981,6 +778,59 @@ function motivFor(d){
   const t = ORDBOG.find(([re]) => re.test(d.navn));
   return t ? MOTIVER[t[1]] : null;
 }
+/* ============================================================
+   FOTOS PÅ RETTERNE
+   ============================================================
+   Et foto af en ret ligger som billeder/<rettens id>.jpg ved siden af appen.
+   Der er ingen liste over hvilke der findes — vi prøver bare at hente
+   billedet, og falder tilbage til det tegnede motiv hvis det ikke er der.
+   Så kan der lægges fotos til løbende uden at røre koden.
+
+   Fotoene ligger kun på Pi'en, ikke på GitHub: de er husets egne. */
+function retFoto(d, klasse){
+  const b = el("img", klasse || "foto");
+  b.src = "billeder/" + d.id + ".jpg";
+  b.alt = "";                                   // pynt, ikke information
+  b.loading = "lazy";
+  b.onerror = () => {                           // intet foto: brug motivet
+    const erstat = el("span", (klasse || "foto") + " uden");
+    erstat.style.background = tileBg(d.id);
+    erstat.append(flisemotiv(d));
+    b.replaceWith(erstat);
+  };
+  return b;
+}
+
+/* Vejrikoner. Tegnet her, ikke hentet: skærmen skal virke uden net.
+   Navnene er dem Home Assistant bruger. */
+const VEJRIKON = {
+  sunny:'<circle cx="12" cy="12" r="4.6"/><path d="M12 2.4v2.6M12 19v2.6M2.4 12h2.6M19 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/>',
+  "clear-night":'<path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/>',
+  partlycloudy:'<circle cx="8.6" cy="8.6" r="3.2"/><path d="M8.6 2.6v1.8M2.6 8.6h1.8M4.3 4.3l1.3 1.3M12.9 4.3l-1.3 1.3"/><path d="M8.4 19.4h8.8a3.4 3.4 0 0 0 .3-6.8 4.8 4.8 0 0 0-9.1 1.2 2.8 2.8 0 0 0 0 5.6z"/>',
+  cloudy:'<path d="M7.4 19.4h9.8a3.7 3.7 0 0 0 .3-7.4 5.2 5.2 0 0 0-10 1.3 3.1 3.1 0 0 0-.1 6.1z"/>',
+  rainy:'<path d="M7.6 15.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><path d="M9 18.4l-.9 2.4M13 18.4l-.9 2.4M17 18.4l-.9 2.4"/>',
+  pouring:'<path d="M7.6 14.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><path d="M8.4 17.2l-1.4 4M12.4 17.2l-1.4 4M16.4 17.2l-1.4 4"/>',
+  snowy:'<path d="M7.6 15.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><path d="M9 19h.01M13 19h.01M17 19h.01M11 21.4h.01M15 21.4h.01"/>',
+  "snowy-rainy":'<path d="M7.6 15.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><path d="M9.4 18.4l-.9 2.4M17 18.6h.01M13 19h.01"/>',
+  fog:'<path d="M4.4 9.6h15.2M3.2 13.4h17.6M5.4 17.2h13.2"/>',
+  lightning:'<path d="M7.6 14.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><path d="M13.4 16.6l-3 3.4h3.4l-1 2.6"/>',
+  "lightning-rainy":'<path d="M7.6 14.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><path d="M13.4 16.6l-3 3.4h3.4l-1 2.6M8.6 17.6l-.8 2.2"/>',
+  windy:'<path d="M3.6 9.4h10.8a2.8 2.8 0 1 0-2.8-2.8M3.6 14.6h13.6a2.8 2.8 0 1 1-2.8 2.8"/>',
+  "windy-variant":'<path d="M3.6 9.4h10.8a2.8 2.8 0 1 0-2.8-2.8M3.6 14.6h13.6a2.8 2.8 0 1 1-2.8 2.8"/>',
+  hail:'<path d="M7.6 15.4h9.4a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6 1.2 3 3 0 0 0-.1 5.8z"/><circle cx="9.4" cy="19.4" r="1"/><circle cx="14.4" cy="19.4" r="1"/>',
+  exceptional:'<path d="M12 3.4l9 16.2H3z"/><path d="M12 9.6v4.2M12 16.8h.01"/>'
+};
+function vejrikon(tilstand, klasse){
+  const d = VEJRIKON[tilstand] || VEJRIKON.cloudy;
+  const sp = el("span", klasse || "vikon");
+  sp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" '
+               + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  return sp;
+}
+const LYNIKON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+              + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+              + '<path d="M13.4 2.4 4.6 13.6h6.2l-1.4 8 8.8-11.2h-6.2z"/></svg>';
+
 /* Indholdet i en flise: motiv hvis der er et, ellers forbogstavet.
    Her skal et rigtigt foto lægges ind den dag vi bygger det. */
 function flisemotiv(d){
@@ -1611,13 +1461,21 @@ function tegnTomgang(){
   const idagK = iso(nu);
   const iaften = S.uge[idagK] ? ret(S.uge[idagK]) : null;
 
+  // topbjælke: navn og undertitel. Ingen knapper - skærmen forsvinder ved berøring.
+  const bj = el("div","tg-top");
+  const mrk = el("div","tg-brand");
+  mrk.append(el("span","tg-navn","Madplan"), el("span","tg-slogan","Ugens mad i huset"));
+  bj.append(mrk);
+  T.append(bj);
+
   const v = el("div","tg-v");
   const ur = el("div","ur num", nu.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"}));
   v.append(ur, el("div","dato", nu.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long"})
                     .replace(/^./, c => c.toUpperCase())));
   if(vejrFrisk() && VEJR.nu){
     const vj = el("div","tg-vejr");
-    vj.append(el("b","num", grader(VEJR.nu.temp)),
+    vj.append(vejrikon(VEJR.nu.tilstand),
+      el("b","num", grader(VEJR.nu.temp)),
       el("span",null, vejrord(VEJR.nu.tilstand) +
         (VEJR.nu.vind != null ? " · vind " + Math.round(VEJR.nu.vind) + " m/s" : "")));
     v.append(vj);
@@ -1625,7 +1483,8 @@ function tegnTomgang(){
   const elp = (EL.hentet && Date.now() - EL.hentet.getTime() < 3 * 3600000) ? elNu() : null;
   if(elp != null){
     const lj = el("div","tg-el");
-    lj.append(el("b","num", krEl(elp)), el("span",null,"pr. kWh nu"));
+    const lyn = el("span","tg-lyn"); lyn.innerHTML = LYNIKON;
+    lj.append(lyn, el("b","num", krEl(elp)), el("span",null,"pr. kWh nu"));
     const b = elBilligst(3);
     if(b){
       const slut = new Date(b.fra.getTime() + 3 * 3600000);
@@ -1642,10 +1501,15 @@ function tegnTomgang(){
   if(iaften){
     const k = el("button","kort");
     const t = el("div","tile"); t.style.background = tileBg(iaften.id);
-    t.append(flisemotiv(iaften));
+    t.append(retFoto(iaften, "tgfoto"));       // foto hvis der er et, ellers motivet
     const tx = el("div"); tx.style.flex = "1"; tx.style.minWidth = "0";
-    tx.append(el("div","n", iaften.navn),
-              Object.assign(el("div","sub", iaften.portioner + " portioner"),{style:"margin-top:5px;font-size:16px"}));
+    tx.append(el("div","n", iaften.navn));
+    if(iaften.beskrivelse) tx.append(el("div","tg-beskriv", iaften.beskrivelse));
+    // linje med portioner, og tid hvis retten har fået et minuttal
+    const meta = el("div","tg-meta");
+    if(iaften.tid) meta.append(el("span",null, iaften.tid + " min"));
+    meta.append(el("span",null, iaften.portioner + " pers."));
+    tx.append(meta);
     const se = el("div"); se.style.cssText = "display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--accent);font-size:15px;font-weight:600";
     se.append(el("span",null,"Se opskriften"));
     se.insertAdjacentHTML("beforeend",'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>');
@@ -1659,9 +1523,12 @@ function tegnTomgang(){
   v.append(ia);
 
   const h = el("div","tg-h");
-  const hh = el("div","hint");
-  hh.append(el("span","eyebrow acc", S.haUrl ? "Ugen" : "Ugens aftensmad"),
-    Object.assign(el("span","sub", dage[0].getDate() + ".–" + dage[6].toLocaleDateString("da-DK",{day:"numeric",month:"long"})),{style:"margin-left:auto"}));
+  const hh = el("div","tg-ugehoved");
+  const hv = el("div");
+  hv.append(el("div","tg-ugetitel","Denne uge"),
+            el("div","tg-ugesub","Hvad skal vi have at spise?"));
+  hh.append(hv, el("span","tg-ugedato", dage[0].getDate() + ".–" +
+    dage[6].toLocaleDateString("da-DK",{day:"numeric",month:"long"})));
   h.append(hh);
   if(!S.haUrl){
     h.append(Object.assign(el("p","note","Aftaler og vejr lægger sig ind her, når Home Assistant er koblet til — som linjer på de samme dage."),
@@ -1681,10 +1548,18 @@ function tegnTomgang(){
     const indhold = el("div","r" + (r ? "" : " fri"), r ? r.navn : "—");
     const w = visVejr ? VEJR.dage[k] : null;
     if(w){
-      indhold.append(el("div","vj", grader(w.hoej) + " / " + grader(w.lav) + " · " + vejrord(w.tilstand) +
-        (w.regn > 0 ? " · " + String(Math.round(w.regn * 10) / 10).replace(".", ",") + " mm" : "")));
+      const vl = el("div","vj");
+      vl.append(vejrikon(w.tilstand, "vikon lille"),
+        el("span",null, grader(w.hoej) + " / " + grader(w.lav) + " · " + vejrord(w.tilstand) +
+          (w.regn > 0 ? " · " + String(Math.round(w.regn * 10) / 10).replace(".", ",") + " mm" : "")));
+      indhold.append(vl);
     }
     row.append(lab, indhold);
+    if(r){                                     // lille foto yderst til højre
+      const f = el("div","tg-dagfoto"); f.style.background = tileBg(r.id);
+      f.append(retFoto(r, "dagfoto"));
+      row.append(f);
+    }
     h.append(row);
   });
   const fod = el("div","tgfod");
@@ -1854,8 +1729,23 @@ setInterval(hentEl, 15 * 60000);          // hvert kvarter, som priserne skifter
       location.replace(location.pathname + "?v=" + encodeURIComponent(m[1]));
     }catch(e){}
   }
-  tjek();
-  setInterval(tjek, 60 * 60000);   // en gang i timen
+  /* Hvert tiende minut, ikke hver time. En time lyder af lidt, men uret
+     starter forfra hver gang skærmen henter en ny udgave, så to udgaver tæt
+     efter hinanden kunne tage over to timer at nå frem (set 20-09-2026).
+     Filen fylder 100 kB og hentes fra Pi'en på samme net — det koster intet. */
+  let sidst = 0;
+  async function maaske(){
+    if(Date.now() - sidst < 60000) return;      // aldrig oftere end ét minut
+    sidst = Date.now();
+    await tjek();
+  }
+  maaske();
+  setInterval(maaske, 10 * 60000);
+  /* og med det samme når skærmen vågner, eller nettet kommer tilbage.
+     visibilitychange SKAL sættes på document — på window blev den aldrig
+     kaldt (prøvet 20-09-2026). "online" hører derimod til på window. */
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) maaske(); });
+  addEventListener("online", maaske);
 })();
 </script>
 </body>
