@@ -382,3 +382,52 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
   .tg-el{margin-top:10px;padding:12px 14px}
   .dato{margin-top:10px}
 }
+
+/* ---- prisudvikling under stroemprisen (v0.11.0) ----
+   Et soejlediagram med en soejle pr. time de naeste 24 timer. Farverne er
+   maalt mod feltets baggrund #183831 (grafik skal have mindst 3:1):
+     almindelig time  #6B9384  3,7:1
+     billigste 3 t    #8FD0A5  7,1:1  (samme groen som «ok»)
+     timen lige nu    #F3C86A  8,1:1  (samme gul som prisen)
+   Gul og groen ligner hinanden i lyshed (1,1:1), saa «nu» staar ogsaa som
+   tekst under soejlen. 2 punkters mellemrum og runde toppe, flad bund. */
+.tg-graf{flex-basis:100%;margin-top:10px}
+.tg-soejler{position:relative;display:flex;gap:2px;height:46px;align-items:stretch}
+.tg-soejler .s{position:relative;flex:1;min-width:0}
+.tg-soejler .s i{position:absolute;left:0;right:0;background:#6B9384;border-radius:4px 4px 0 0}
+/* negativ pris: soejlen gaar nedad fra nullinjen - retningen siger det,
+   farven skal stadig kunne vaere groen eller gul (set 24-09: .7 i
+   gennemsigtighed goer de billigste timer graa). */
+.tg-soejler .s i.neg{border-radius:0 0 4px 4px}
+.tg-soejler .s.billig i{background:#8FD0A5}
+.tg-soejler .s.nu i{background:#F3C86A}
+/* nullinjen vises kun, naar der er negative priser */
+.tg-soejler[style*="--nul"]::after{content:"";position:absolute;left:0;right:0;bottom:var(--nul);border-top:1px solid #AEB9AD;opacity:.5}
+.tg-akse{display:flex;gap:2px;margin-top:4px}
+.tg-akse span{flex:1;min-width:0;font-size:12px;line-height:1;color:#AEB9AD;white-space:nowrap;overflow:visible}
+.tg-akse span:first-child{color:#F3C86A;font-weight:700}
+
+/* Venstre panel var fuldt i forvejen (683 af 683 punkter paa 1280 x 800).
+   Diagrammet tager ca. 62 punkter, som hentes her paa lave skaerme. */
+@media (max-height:860px) and (min-width:900px){
+  .ur{font-size:clamp(68px,10.5vw,112px)}
+  .dato{margin-top:6px}
+  .tg-vejr{margin-top:14px}
+  .tg-el{padding:11px 14px}
+  .iaften{padding-top:12px}
+  .tg-beskriv{-webkit-line-clamp:1}
+}
+
+/* ---- familiekalenderen paa ugelisten (v0.12.0) ----
+   Aftalerne deler linje med vejret, for panelet har ikke plads til en linje
+   mere. Den foerste aftale med klokkeslaet, «+2» hvis der er flere. Linjen
+   braekker aldrig - en lang titel afkortes med «…», saa panelet holder hoejden.
+   Farven #E8D9A8 er maalt mod raekkens baggrund: 11,4:1 paa #1B211B og 7,5:1
+   paa dagens fremhaevede #30412F. */
+.tg-dag .vj{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap}
+.tg-dag .vj .vikon.lille{flex:none}
+.tg-vejrtekst{flex:none}
+.tg-kal{min-width:0;overflow:hidden;text-overflow:ellipsis;color:#E8D9A8;font-weight:650}
+.tg-kal::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#E8D9A8;margin:0 7px 2px 6px;vertical-align:middle}
+.tg-kalflere{flex:none;color:#E8D9A8;font-weight:700;opacity:.85}

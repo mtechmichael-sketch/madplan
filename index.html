@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.10.2">
-<link rel="stylesheet" href="style.css?v=0.10.2">
+<link rel="stylesheet" href="tema.css?v=0.13.0">
+<link rel="stylesheet" href="style.css?v=0.13.0">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.10.2";
+const VERSION = "0.13.0";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -593,6 +593,99 @@ const vejrFrisk = () => VEJR.hentet && (Date.now() - VEJR.hentet.getTime()) < 3 
    offentlige repo. Appen læser bare sensoren og dens liste over kvarterer:
      priser: [{"s": "2026-09-19T22:00", "p": 0.924}, ...]   s = lokal tid, p = kr/kWh
    Findes sensoren ikke, vises linjen bare ikke. */
+/* ============================================================
+   FAMILIEKALENDEREN FRA HOME ASSISTANT
+   ============================================================
+   Home Assistant abonnerer på familiens Google-kalender (Remote Calendar,
+   calendar.familie) og henter den hvert kvarter. Appen spørger HA om ugens
+   aftaler med køkkenets token.
+
+   Aftalerne holdes KUN i hukommelsen her. De gemmes aldrig i S, aldrig i
+   localStorage og kommer derfor aldrig med i «Gem data» - kalenderen siger,
+   hvem der er hvor og hvornår huset er tomt. Findes kalenderen ikke, vises
+   der bare ingen aftaler.
+
+   ALLE kalendere i HA kommer med - familiekalenderen og børnenes Aula-
+   kalendere (Remote Calendar «Aula <barn>», én pr. barn). Aula skriver ikke,
+   hvem en aftale gælder, så navnet sættes foran: «Aula Anna» -> «Anna: …».
+   Navnene tages fra HA, så de aldrig står her i koden (repoet er offentligt).
+   Står den samme aftale i flere kalendere (skoleferie hos begge børn), vises
+   den én gang: «Anna + Bo: Ferie/fri». */
+const KAL_UDEN_NAVN = "calendar.familie";                       // familiens egne aftaler: intet navn foran
+const KAL = {};                                                 // entity_id -> {hvem, aftaler, hentet}
+
+async function hentKalender(){
+  const tok = haToken();
+  if(!HOS_HA || !tok){ for(const k in KAL) delete KAL[k]; return; }
+  const hdr = {headers:{"Authorization":"Bearer " + tok}, cache:"no-store"};
+  const fra = naesteDage(1)[0];                               // i dag, samme 7 dage som tomgangsskærmen
+  const til = new Date(fra.getTime() + 8 * 86400000);          // en dag ekstra af hensyn til sommertid
+  const tidspunkt = x => x.dateTime ? new Date(x.dateTime)
+    : (([y,m,d]) => new Date(y, m - 1, d))(x.date.split("-").map(Number));   // hel dag = lokal midnat
+  let kalendere;
+  try{
+    const r = await fetch(location.origin + "/api/calendars", hdr);
+    if(!r.ok) return;                                             // ingen kalendere endnu: ingen aftaler
+    kalendere = await r.json();
+  }catch(e){ return; }                                            // behold de sidste - bedre end tomt
+  await Promise.all(kalendere.map(async k => {
+    try{
+      const r = await fetch(location.origin + "/api/calendars/" + k.entity_id +
+        "?start=" + encodeURIComponent(fra.toISOString()) + "&end=" + encodeURIComponent(til.toISOString()), hdr);
+      if(!r.ok) return;
+      const liste = await r.json();
+      KAL[k.entity_id] = {
+        hvem: k.entity_id === KAL_UDEN_NAVN ? "" : String(k.name || "").replace(/^aula\s+/i, "").trim(),
+        aftaler: liste.map(a => ({
+          titel: a.summary || "(uden titel)",
+          fra: tidspunkt(a.start),
+          til: tidspunkt(a.end),
+          heleDagen: !a.start.dateTime
+        })),
+        hentet: new Date()
+      };
+    }catch(e){}                                                   // én kalender der driller, stopper ikke de andre
+  }));
+  if(visning === "tomgang") tegnTomgang();
+}
+
+/* Alle kalenderes aftaler samlet, med dubletter slået sammen. En kalender
+   der ikke er hentet i 6 timer, tæller ikke med - hellere ingen aftale end
+   en forældet. */
+function alleAftaler(){
+  const samlet = new Map();
+  for(const k of Object.values(KAL)){
+    if(Date.now() - k.hentet.getTime() > 6 * 3600000) continue;
+    for(const a of k.aftaler){
+      const noegle = a.titel + "|" + a.fra.getTime() + "|" + a.til.getTime();
+      const f = samlet.get(noegle) || {...a, hvem: []};
+      if(k.hvem && !f.hvem.includes(k.hvem)) f.hvem.push(k.hvem);
+      samlet.set(noegle, f);
+    }
+  }
+  return [...samlet.values()].map(a => ({...a, titel: (a.hvem.length ? a.hvem.join(" + ") + ": " : "") + a.titel}));
+}
+
+/* Aftalerne der rører en given dag. Heldagsaftaler først, så efter
+   klokkeslæt. I dag kommer de aftaler, der stadig mangler, før dem der er
+   overstået - det er den næste, man har brug for at se. */
+function aftalerPaa(dag, erIdag){
+  const d0 = new Date(dag); d0.setHours(0,0,0,0);
+  const d1 = new Date(d0.getTime() + 86400000);
+  const nu = Date.now();
+  return alleAftaler()
+    .filter(a => a.fra < d1 && a.til > d0)
+    .sort((a, b) => {
+      if(erIdag){
+        const aSlut = a.til.getTime() <= nu, bSlut = b.til.getTime() <= nu;
+        if(aSlut !== bSlut) return aSlut ? 1 : -1;
+      }
+      if(a.heleDagen !== b.heleDagen) return a.heleDagen ? -1 : 1;
+      return a.fra - b.fra;
+    });
+}
+const klokken = d => String(d.getHours()).padStart(2,"0") + "." + String(d.getMinutes()).padStart(2,"0");
+
 const EL_ENT = "sensor.elpris_total";
 let EL = {priser:[], hentet:null};
 
@@ -611,15 +704,86 @@ async function hentEl(){
 }
 
 const KVARTER = 15 * 60000;
-/* Prisen lige nu, og det billigste sammenhængende vindue på `timer` timer fra nu af */
+/* Prisen i den time, vi er i: gennemsnittet af timens fire kvarterer.
+   Nord Pool sætter pris pr. kvarter, men OK's app viser timepris - og
+   diagrammets søjler er også timer. Med kvartersprisen stod der 1,79 kr på
+   skærmen, mens OK sagde 1,67 og den gule søjle noget tredje (set 24-09).
+   Mangler et kvarter, bruges dem der er. */
 function elNu(){
-  const nu = Date.now();
-  const x = EL.priser.find(q => q.t.getTime() <= nu && nu < q.t.getTime() + KVARTER);
-  return x ? x.p : null;
+  const t0 = new Date(); t0.setMinutes(0, 0, 0);
+  const fra = t0.getTime(), til = fra + 3600000;
+  const q = EL.priser.filter(x => x.t.getTime() >= fra && x.t.getTime() < til);
+  return q.length ? q.reduce((s, x) => s + x.p, 0) / q.length : null;
 }
-function elBilligst(timer){
+/* Søjlediagram over prisen time for time, fra timen lige nu og frem.
+   Én søjle pr. time (gennemsnit af timens fire kvarterer) - kvarterer ville
+   være for tynde til at læse på to meters afstand.
+   Farverne har hver sin opgave: gul = timen lige nu (samme gul som prisen),
+   grøn = de billigste 3 timer (samme vindue som teksten ovenover), resten
+   neutral. Gul og grøn ligner hinanden i lyshed, så «nu» står også som tekst
+   under søjlen - farven bærer aldrig betydningen alene.
+   Ingen tooltips: skærmen lukker ved berøring. Ingen y-akse: prisen står
+   allerede som tal lige ovenover, og det er formen, der skal aflæses. */
+function prisgraf(timer, billigst){
+  const TIME = 3600000;
+  const start = new Date(); start.setMinutes(0, 0, 0);
+  const vaerdier = [];
+  for(let h = 0; h < timer; h++){
+    const t0 = start.getTime() + h * TIME;
+    const q = EL.priser.filter(x => x.t.getTime() >= t0 && x.t.getTime() < t0 + TIME);
+    if(!q.length) break;                              // i morgens priser er ikke kommet endnu
+    vaerdier.push({t:new Date(t0), p:q.reduce((s,x) => s + x.p, 0) / q.length});
+  }
+  if(vaerdier.length < 6) return null;               // for lidt at tegne en udvikling af
+
+  const lo = Math.min(0, ...vaerdier.map(v => v.p));  // negative priser forekommer
+  const hi = Math.max(...vaerdier.map(v => v.p));
+  const pct = x => (x - lo) / ((hi - lo) || 1) * 100;
+  const nul = pct(0);
+  const bFra = billigst ? billigst.fra.getTime() : -1;
+
+  const boks = el("div","tg-graf");
+  const soejler = el("div","tg-soejler");
+  const akse = el("div","tg-akse");
+  vaerdier.forEach((v, i) => {
+    const t = v.t.getTime();
+    // Vinduet starter på et kvarter (fx 07.30), søjlerne på hele timer:
+    // en søjle er grøn, når dens time overlapper vinduet.
+    const overlap = bFra >= 0 && t < bFra + 3 * TIME && t + TIME > bFra;
+    const s = el("div","s" + (i === 0 ? " nu" : "") + (overlap && i !== 0 ? " billig" : ""));
+    const b = el("i");
+    const top = pct(Math.max(v.p, 0)), bund = pct(Math.min(v.p, 0));
+    b.style.bottom = bund + "%";
+    b.style.height = Math.max(top - bund, 2) + "%";   // mindst en streg, også ved 0 kr
+    if(v.p < 0) b.classList.add("neg");
+    s.append(b);
+    soejler.append(s);
+    // etiket under hver 6. time, og «nu» under den første
+    const h = v.t.getHours();
+    akse.append(el("span", null, i === 0 ? "nu" : (h % 6 === 0 ? String(h).padStart(2,"0") : "")));
+  });
+  if(nul > 0) soejler.style.setProperty("--nul", nul + "%");
+
+  // En kort opsummering til skærmlæsere - selve diagrammet er tegnet i div'er
+  const dyr = vaerdier.reduce((a, v) => v.p > a.p ? v : a);
+  boks.setAttribute("role","img");
+  boks.setAttribute("aria-label", "Strømprisen de næste " + vaerdier.length + " timer. Dyrest kl. " +
+    String(dyr.t.getHours()).padStart(2,"0") + " med " + krEl(dyr.p) + " pr. kWh.");
+  boks.append(soejler, akse);
+  return boks;
+}
+
+/* horisont: kun kig så mange timer frem. Tomgangsskærmen bruger 24, så
+   teksten «billigste 3 timer» og de grønne søjler i diagrammet altid handler
+   om den samme periode. Uden grænse pegede teksten om eftermiddagen på i morgen
+   aften - uden for diagrammet (set 24-09). */
+function elBilligst(timer, horisont){
   const n = timer * 4, nu = Date.now();
-  const frem = EL.priser.filter(q => q.t.getTime() + KVARTER > nu);
+  // Fra hel time, ligesom diagrammet - ellers kan vinduet ende op til en time
+  // efter diagrammets sidste søjle (set 24-09: vindue 06-09, diagram til 08).
+  const timestart = new Date(nu); timestart.setMinutes(0, 0, 0);
+  const graense = horisont ? timestart.getTime() + horisont * 3600000 : Infinity;
+  const frem = EL.priser.filter(q => q.t.getTime() + KVARTER > nu && q.t.getTime() < graense);
   let bedst = null;
   for(let i = 0; i + n <= frem.length; i++){
     // kun sammenhængende kvarterer — ingen huller hvis en dag mangler
@@ -706,6 +870,18 @@ function maengde(n, enhed){
 const DAGE = ["Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag","Søndag"];
 const DAGK = ["man","tir","ons","tor","fre","lør","søn"];
 const iso = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+/* I dag og de n-1 følgende dage, hver ved lokal midnat. */
+function naesteDage(n){
+  const d0 = new Date(); d0.setHours(0,0,0,0);
+  return Array.from({length:n}, (_, i) => new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + i));
+}
+/* «27. sep.–3. okt.», eller «21.–27. september» inden for samme måned */
+function datoSpaend(a, b){
+  if(a.getMonth() === b.getMonth())
+    return a.getDate() + ".–" + b.toLocaleDateString("da-DK",{day:"numeric",month:"long"});
+  const kort = d => d.toLocaleDateString("da-DK",{day:"numeric",month:"short"});
+  return kort(a) + "–" + kort(b);
+}
 function ugensDage(){
   const nu = new Date();
   const man = new Date(nu);
@@ -787,16 +963,30 @@ function motivFor(d){
    Så kan der lægges fotos til løbende uden at røre koden.
 
    Fotoene ligger kun på Pi'en, ikke på GitHub: de er husets egne. */
+/* Retter vi allerede ved ikke har et foto. Tomgangsskærmen tegnes hvert minut,
+   og uden denne liste bad den om 7-8 manglende fotos hver gang - over 10.000
+   forgæves forespørgsler til Pi'en i døgnet (set 27-09). Listen tømmes, når
+   siden genindlæses, og det sker af sig selv ved hver ny udgave - også når
+   der er lagt nye fotos ud. */
+const MANGLER_FOTO = new Set();
+// Glem listen hver time: så dukker et nyt foto op inden for en time, også
+// hvis det er lagt ud uden en ny udgave af appen.
+setInterval(() => MANGLER_FOTO.clear(), 60 * 60000);
+function motivIStedet(d, klasse){
+  const erstat = el("span", (klasse || "foto") + " uden");
+  erstat.style.background = tileBg(d.id);
+  erstat.append(flisemotiv(d));
+  return erstat;
+}
 function retFoto(d, klasse){
+  if(MANGLER_FOTO.has(d.id)) return motivIStedet(d, klasse);
   const b = el("img", klasse || "foto");
   b.src = "billeder/" + d.id + ".jpg";
   b.alt = "";                                   // pynt, ikke information
   b.loading = "lazy";
-  b.onerror = () => {                           // intet foto: brug motivet
-    const erstat = el("span", (klasse || "foto") + " uden");
-    erstat.style.background = tileBg(d.id);
-    erstat.append(flisemotiv(d));
-    b.replaceWith(erstat);
+  b.onerror = () => {                           // intet foto: husk det, og brug motivet
+    MANGLER_FOTO.add(d.id);
+    b.replaceWith(motivIStedet(d, klasse));
   };
   return b;
 }
@@ -1457,7 +1647,9 @@ function tegnTomgang(){
   const T = document.getElementById("tomgang");
   T.innerHTML = "";
   const nu = new Date();
-  const dage = ugensDage();
+  // De næste 7 dage med i dag øverst - ikke mandag til søndag. Søndag aften
+  // er det netop mandagen, man har brug for at se (27-09).
+  const dage = naesteDage(7);
   const idagK = iso(nu);
   const iaften = S.uge[idagK] ? ret(S.uge[idagK]) : null;
 
@@ -1484,14 +1676,16 @@ function tegnTomgang(){
   if(elp != null){
     const lj = el("div","tg-el");
     const lyn = el("span","tg-lyn"); lyn.innerHTML = LYNIKON;
-    lj.append(lyn, el("b","num", krEl(elp)), el("span",null,"pr. kWh nu"));
-    const b = elBilligst(3);
+    lj.append(lyn, el("b","num", krEl(elp)), el("span",null,"pr. kWh denne time"));
+    const b = elBilligst(3, 24);            // samme 24 timer som diagrammet
     if(b){
       const slut = new Date(b.fra.getTime() + 3 * 3600000);
       const hh = d => String(d.getHours()).padStart(2,"0") + (d.getMinutes() ? "." + String(d.getMinutes()).padStart(2,"0") : "");
       const dag = iso(b.fra) === iso(nu) ? "i dag" : "i morgen";
       lj.append(el("span","bil", "Billigste 3 timer: " + dag + " " + hh(b.fra) + "–" + hh(slut) + " · " + krEl(b.snit)));
     }
+    const graf = prisgraf(24, b);
+    if(graf) lj.append(graf);
     v.append(lj);
   }
 
@@ -1525,10 +1719,9 @@ function tegnTomgang(){
   const h = el("div","tg-h");
   const hh = el("div","tg-ugehoved");
   const hv = el("div");
-  hv.append(el("div","tg-ugetitel","Denne uge"),
+  hv.append(el("div","tg-ugetitel","De næste 7 dage"),
             el("div","tg-ugesub","Hvad skal vi have at spise?"));
-  hh.append(hv, el("span","tg-ugedato", dage[0].getDate() + ".–" +
-    dage[6].toLocaleDateString("da-DK",{day:"numeric",month:"long"})));
+  hh.append(hv, el("span","tg-ugedato", datoSpaend(dage[0], dage[6])));
   h.append(hh);
   if(!S.haUrl){
     h.append(Object.assign(el("p","note","Aftaler og vejr lægger sig ind her, når Home Assistant er koblet til — som linjer på de samme dage."),
@@ -1544,14 +1737,25 @@ function tegnTomgang(){
     const k = iso(d), r = S.uge[k] ? ret(S.uge[k]) : null;
     const row = el("div","tg-dag" + (k === idagK ? " idag" : ""));
     const lab = el("div","lab");
-    lab.append(el("b",null, k === idagK ? "I dag" : DAGE[i]), el("i",null, DAGK[i] + " " + d.getDate()));
+    const ud = (d.getDay() + 6) % 7;            // mandag = 0, som DAGE og DAGK
+    lab.append(el("b",null, k === idagK ? "I dag" : (i === 1 ? "I morgen" : DAGE[ud])),
+               el("i",null, DAGK[ud] + " " + d.getDate()));
     const indhold = el("div","r" + (r ? "" : " fri"), r ? r.navn : "—");
     const w = visVejr ? VEJR.dage[k] : null;
-    if(w){
+    const aft = aftalerPaa(d, k === idagK);
+    // Vejr og aftaler deler én linje - panelet har ikke plads til en linje mere.
+    if(w || aft.length){
       const vl = el("div","vj");
-      vl.append(vejrikon(w.tilstand, "vikon lille"),
-        el("span",null, grader(w.hoej) + " / " + grader(w.lav) + " · " + vejrord(w.tilstand) +
-          (w.regn > 0 ? " · " + String(Math.round(w.regn * 10) / 10).replace(".", ",") + " mm" : "")));
+      if(w){
+        vl.append(vejrikon(w.tilstand, "vikon lille"),
+          el("span","tg-vejrtekst", grader(w.hoej) + " / " + grader(w.lav) + " · " + vejrord(w.tilstand) +
+            (w.regn > 0 ? " · " + String(Math.round(w.regn * 10) / 10).replace(".", ",") + " mm" : "")));
+      }
+      if(aft.length){
+        const f = aft[0];
+        vl.append(el("span","tg-kal", (f.heleDagen ? "" : klokken(f.fra) + " ") + f.titel));
+        if(aft.length > 1) vl.append(el("span","tg-kalflere", "+" + (aft.length - 1)));
+      }
       indhold.append(vl);
     }
     row.append(lab, indhold);
@@ -1697,6 +1901,8 @@ hentVejr();
 setInterval(hentVejr, 30 * 60000);        // hver halve time
 hentEl();
 setInterval(hentEl, 15 * 60000);          // hvert kvarter, som priserne skifter
+hentKalender();
+setInterval(hentKalender, 5 * 60000);     // HA henter fra Google hvert kvarter; vi spørger HA oftere
 </script>
 
 <script>
