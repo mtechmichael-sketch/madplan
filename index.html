@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.13.0">
-<link rel="stylesheet" href="style.css?v=0.13.0">
+<link rel="stylesheet" href="tema.css?v=0.13.2">
+<link rel="stylesheet" href="style.css?v=0.13.2">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.13.0";
+const VERSION = "0.13.2";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -685,6 +685,20 @@ function aftalerPaa(dag, erIdag){
     });
 }
 const klokken = d => String(d.getHours()).padStart(2,"0") + "." + String(d.getMinutes()).padStart(2,"0");
+/* Tiden set fra én bestemt dag:
+     begynder og slutter samme dag   «17.35–18.10»
+     begynder i dag, slutter senere  «18.00»        (overnatning, første dag)
+     begyndte før, slutter i dag     «til 10.00»    (overnatning, sidste dag)
+     begyndte før, slutter senere    «»             (hele dagen) */
+function tidsrum(a, dag){
+  const d0 = new Date(dag); d0.setHours(0,0,0,0);
+  const d1 = new Date(d0.getTime() + 86400000);
+  const startIdag = a.fra >= d0, slutIdag = a.til <= d1;
+  if(startIdag && slutIdag) return a.til > a.fra ? klokken(a.fra) + "–" + klokken(a.til) : klokken(a.fra);
+  if(startIdag) return klokken(a.fra);
+  if(slutIdag) return "til " + klokken(a.til);
+  return "";
+}
 
 const EL_ENT = "sensor.elpris_total";
 let EL = {priser:[], hentet:null};
@@ -966,22 +980,36 @@ function motivFor(d){
 /* Retter vi allerede ved ikke har et foto. Tomgangsskærmen tegnes hvert minut,
    og uden denne liste bad den om 7-8 manglende fotos hver gang - over 10.000
    forgæves forespørgsler til Pi'en i døgnet (set 27-09). Listen tømmes, når
-   siden genindlæses, og det sker af sig selv ved hver ny udgave - også når
-   der er lagt nye fotos ud. */
+   siden genindlæses, og det sker af sig selv ved hver ny udgave.
+
+   ?v=<VERSION> på adressen er NØDVENDIG: HA sender også 404-svar med
+   «max-age=2678400», så browseren husker «findes ikke» i 31 dage (målt
+   27-09 - tabletten havde spurgt efter alle fotos før de fandtes). Nye fotos
+   kræver derfor en ny VERSION; udrulningsscriptet nægter ellers. */
 const MANGLER_FOTO = new Set();
-// Glem listen hver time: så dukker et nyt foto op inden for en time, også
-// hvis det er lagt ud uden en ny udgave af appen.
-setInterval(() => MANGLER_FOTO.clear(), 60 * 60000);
+setInterval(() => MANGLER_FOTO.clear(), 60 * 60000);  // prøv igen hver time (fx efter et netudfald)
 function motivIStedet(d, klasse){
   const erstat = el("span", (klasse || "foto") + " uden");
   erstat.style.background = tileBg(d.id);
   erstat.append(flisemotiv(d));
   return erstat;
 }
+/* Mad-sidens fliser og opskriftens store billede: motivet tegnes som altid,
+   og fotoet lægges ovenpå. Findes fotoet ikke, fjernes det bare igen - så står
+   motivet der, og intet i layoutet flytter sig. */
+function fotoOver(boks, d){
+  if(MANGLER_FOTO.has(d.id)) return;
+  const b = el("img", "flisefoto");
+  b.src = "billeder/" + d.id + ".jpg?v=" + VERSION;
+  b.alt = "";
+  b.loading = "lazy";
+  b.onerror = () => { MANGLER_FOTO.add(d.id); b.remove(); };
+  boks.append(b);
+}
 function retFoto(d, klasse){
   if(MANGLER_FOTO.has(d.id)) return motivIStedet(d, klasse);
   const b = el("img", klasse || "foto");
-  b.src = "billeder/" + d.id + ".jpg";
+  b.src = "billeder/" + d.id + ".jpg?v=" + VERSION;
   b.alt = "";                                   // pynt, ikke information
   b.loading = "lazy";
   b.onerror = () => {                           // intet foto: husk det, og brug motivet
@@ -1086,7 +1114,7 @@ function sPlan(){
     const n = S.valgt[d.id] || 0;
     const b = el("button","flise"); b.dataset.on = n ? "1" : "0";
     const t = el("div","top-t"); t.style.background = tileBg(d.id);
-    t.append(flisemotiv(d)); b.append(t);
+    t.append(flisemotiv(d)); fotoOver(t, d); b.append(t);
     if(n){ const p = el("span","pil", n + "×"); b.append(p); }
     const i = el("span","info");
     i.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.5"/></svg>';
@@ -1162,7 +1190,7 @@ function sRet(){
   // venstre
   const v = el("div"); v.style.display = "flex"; v.style.flexDirection = "column"; v.style.gap = "16px";
   const t = el("div","stortile"); t.style.background = tileBg(d.id);
-  t.append(flisemotiv(d));
+  t.append(flisemotiv(d)); fotoOver(t, d);
   const nb = el("div");
   nb.append(Object.assign(el("div",null,d.navn),{style:"font-size:22px;font-weight:700;line-height:1.2"}),
             Object.assign(el("div","sub", d.portioner + " portioner"),{style:"margin-top:5px;font-size:15px"}));
@@ -1753,7 +1781,8 @@ function tegnTomgang(){
       }
       if(aft.length){
         const f = aft[0];
-        vl.append(el("span","tg-kal", (f.heleDagen ? "" : klokken(f.fra) + " ") + f.titel));
+        const tid = f.heleDagen ? "" : tidsrum(f, d);
+        vl.append(el("span","tg-kal", (tid ? tid + " " : "") + f.titel));
         if(aft.length > 1) vl.append(el("span","tg-kalflere", "+" + (aft.length - 1)));
       }
       indhold.append(vl);
