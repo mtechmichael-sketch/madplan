@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.13.2">
-<link rel="stylesheet" href="style.css?v=0.13.2">
+<link rel="stylesheet" href="tema.css?v=0.15.0">
+<link rel="stylesheet" href="style.css?v=0.15.0">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.13.2";
+const VERSION = "0.15.0";
 const DATA_VERSION = 8;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -484,7 +484,53 @@ function migrer(d){
   d.v = VERSION;
   return d;
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} sendListeSnart(); }
+
+/* ============================================================
+   INDKØBSLISTEN TIL PI'EN
+   ============================================================
+   Køkkenkopien sender ugens indkøbsliste til madplan-serveren på samme
+   maskine (port 8100), hver gang listen ændrer sig. Det er grundlaget for
+   senere at kunne fylde en Nemlig-kurv. Serveren tjekker køkkenets HA-token
+   hos Home Assistant og gemmer det ikke. Telefonudgaven (GitHub) sender intet.
+
+   save() kaldes efter hver tegning, så der sendes kun, når indholdet faktisk
+   er anderledes end det sidst modtagne. Hvert 10. minut sendes den under
+   alle omstændigheder: så ser Pi'en, at tabletten lever («senest bekræftet»),
+   og en sending der mislykkedes (serveren genstartede, nettet var væk)
+   kommer igennem. */
+let sidstSendt = "", sendTimer = null;
+function listeTilPi(){
+  const rows = indkoeb(behov(S.valgt));
+  return {
+    version: VERSION,
+    retter: Object.entries(S.valgt).filter(([, n]) => n).map(([id, n]) =>
+      ({id, navn: ret(id)?.navn || id, antal: n, portioner: ret(id)?.portioner || 0})),
+    plan: S.uge,
+    varer: rows.map(x => ({id: x.r.id, navn: x.r.navn, nid: x.r.nid || null,
+      pakkenavn: x.r.pakkenavn || null, pakker: x.pakker, kraevet: x.kraevet, koebt: x.koebt,
+      enhed: x.r.enhed, pris: x.pris, kategori: x.r.kategori || ""})),
+    basis: basisValgte().map(b => ({id: b.id, navn: b.navn, kategori: b.kategori || ""}))
+  };
+}
+function sendListeSnart(){
+  if(!HOS_HA) return;
+  clearTimeout(sendTimer);
+  sendTimer = setTimeout(sendListe, 3000);
+}
+async function sendListe(){
+  const tok = haToken(); if(!tok) return;
+  let krop;
+  try{ krop = JSON.stringify(listeTilPi()); }catch(e){ return; }
+  if(krop === sidstSendt) return;
+  try{
+    const r = await fetch(location.protocol + "//" + location.hostname + ":8100/api/indkoeb", {
+      method: "POST", body: krop,
+      headers: {"Authorization": "Bearer " + tok, "Content-Type": "application/json"}});
+    if(r.ok) sidstSendt = krop;
+  }catch(e){}
+}
+setInterval(() => { if(HOS_HA){ sidstSendt = ""; sendListe(); } }, 10 * 60000);
 
 /* Tema pr. enhed: køkkentabletten kan stå mørk, mens laptoppen følger systemet */
 function temaPaa(){
@@ -618,8 +664,8 @@ async function hentKalender(){
   const tok = haToken();
   if(!HOS_HA || !tok){ for(const k in KAL) delete KAL[k]; return; }
   const hdr = {headers:{"Authorization":"Bearer " + tok}, cache:"no-store"};
-  const fra = naesteDage(1)[0];                               // i dag, samme 7 dage som tomgangsskærmen
-  const til = new Date(fra.getTime() + 8 * 86400000);          // en dag ekstra af hensyn til sommertid
+  const fra = naesteDage(1)[0];                               // i dag, samme dage som tomgangsskærmen
+  const til = new Date(fra.getTime() + (TG_DAGE + 1) * 86400000);   // en dag ekstra af hensyn til sommertid
   const tidspunkt = x => x.dateTime ? new Date(x.dateTime)
     : (([y,m,d]) => new Date(y, m - 1, d))(x.date.split("-").map(Number));   // hel dag = lokal midnat
   let kalendere;
@@ -1673,11 +1719,14 @@ function bar(kpis, knapper){
 let urTimer;
 function tegnTomgang(){
   const T = document.getElementById("tomgang");
+  const gammel = T.querySelector(".tg-dage");   // husk hvor langt listen var rullet
+  if(gammel) tgRul.pos = gammel.scrollTop;
   T.innerHTML = "";
   const nu = new Date();
-  // De næste 7 dage med i dag øverst - ikke mandag til søndag. Søndag aften
-  // er det netop mandagen, man har brug for at se (27-09).
-  const dage = naesteDage(7);
+  // De næste 3 uger med i dag øverst - ikke mandag til søndag. Søndag aften
+  // er det netop mandagen, man har brug for at se (27-09). De første 7 dage
+  // står fremme; resten rulles frem i listen (28-09).
+  const dage = naesteDage(TG_DAGE);
   const idagK = iso(nu);
   const iaften = S.uge[idagK] ? ret(S.uge[idagK]) : null;
 
@@ -1747,9 +1796,9 @@ function tegnTomgang(){
   const h = el("div","tg-h");
   const hh = el("div","tg-ugehoved");
   const hv = el("div");
-  hv.append(el("div","tg-ugetitel","De næste 7 dage"),
+  hv.append(el("div","tg-ugetitel","De næste 3 uger"),
             el("div","tg-ugesub","Hvad skal vi have at spise?"));
-  hh.append(hv, el("span","tg-ugedato", datoSpaend(dage[0], dage[6])));
+  hh.append(hv, el("span","tg-ugedato", datoSpaend(dage[0], dage[dage.length - 1])));
   h.append(hh);
   if(!S.haUrl){
     h.append(Object.assign(el("p","note","Aftaler og vejr lægger sig ind her, når Home Assistant er koblet til — som linjer på de samme dage."),
@@ -1761,8 +1810,13 @@ function tegnTomgang(){
       {style:"margin:-4px 0 14px"}));
   }
   const visVejr = vejrFrisk();
+  // Dagene ligger i deres eget rulleområde; overskrift og fod står fast.
+  const liste = el("div","tg-dage");
   dage.forEach((d,i) => {
     const k = iso(d), r = S.uge[k] ? ret(S.uge[k]) : null;
+    if(i > 0 && d.getDay() === 1){               // ny uge begynder: skillelinje med ugenummer
+      liste.append(el("div","tg-ugeskille", "Uge " + ugeNr(d)));
+    }
     const row = el("div","tg-dag" + (k === idagK ? " idag" : ""));
     const lab = el("div","lab");
     const ud = (d.getDay() + 6) % 7;            // mandag = 0, som DAGE og DAGK
@@ -1793,14 +1847,21 @@ function tegnTomgang(){
       f.append(retFoto(r, "dagfoto"));
       row.append(f);
     }
-    h.append(row);
+    liste.append(row);
   });
+  h.append(liste);
+  // Rul- og berøringshåndtering. Skærmen tegnes forfra hvert minut, så
+  // positionen gemmes (øverst i funktionen) og sættes igen - ellers hopper
+  // listen til toppen, mens man kigger. Efter et minut uden berøring glider
+  // den selv tilbage til i dag.
+  ["pointerdown","wheel","touchstart"].forEach(e => liste.addEventListener(e, tgRulRoert, {passive:true}));
   const fod = el("div","tgfod");
   fod.insertAdjacentHTML("beforeend",'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5V5.6a1.6 1.6 0 0 1 3.2 0v5.3"/><path d="M12.2 10.9V9.4a1.6 1.6 0 0 1 3.2 0v1.5"/><path d="M15.4 11V9.9a1.6 1.6 0 0 1 3.2 0v4.7a5.4 5.4 0 0 1-5.4 5.4h-1.4a5 5 0 0 1-3.9-1.9l-2.7-3.4a1.6 1.6 0 0 1 2.4-2.1L9 13.9"/></svg>');
-  fod.append(el("span",null, S.haUrl ? "Rør skærmen for ugens mad og huset" : "Rør skærmen for at komme i gang"));
+  fod.append(el("span",null, S.haUrl ? "Rul i listen for flere dage · rør resten for ugens mad og huset" : "Rør skærmen for at komme i gang"));
   h.append(fod);
 
   T.append(v, h);
+  liste.scrollTop = Date.now() - tgRul.sidst < TG_RUL_TILBAGE ? tgRul.pos : 0;
   clearTimeout(urTimer);
   urTimer = setTimeout(() => { if(visning === "tomgang") tegnTomgang(); }, (60 - nu.getSeconds()) * 1000 + 200);
 }
@@ -1812,8 +1873,20 @@ function nulstilIdle(){
   if(!S.tomgangMin || innerWidth < 900) return;
   idleTimer = setTimeout(() => { if(visning !== "tomgang") vis("tomgang"); }, S.tomgangMin * 60000);
 }
+/* Ugelisten på tomgangsskærmen kan rulles. Berøring DER lukker ikke skærmen. */
+const TG_DAGE = 21, TG_RUL_TILBAGE = 60000;
+const tgRul = {pos: 0, sidst: 0, timer: null};
+function tgRulRoert(){
+  tgRul.sidst = Date.now();
+  clearTimeout(tgRul.timer);
+  tgRul.timer = setTimeout(() => {
+    tgRul.pos = 0;
+    const l = document.querySelector("#tomgang .tg-dage");
+    if(l) l.scrollTo({top: 0, behavior: "smooth"});
+  }, TG_RUL_TILBAGE);
+}
 ["pointerdown","keydown","wheel"].forEach(e => addEventListener(e, ev => {
-  if(visning === "tomgang" && !ev.target.closest(".iaften .kort")) vis("plan");
+  if(visning === "tomgang" && !ev.target.closest(".iaften .kort, .tg-dage")) vis("plan");
   nulstilIdle();
 }, {passive:true}));
 
