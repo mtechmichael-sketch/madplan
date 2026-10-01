@@ -465,3 +465,8 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 .nemlig-svar.fejl{border-color:var(--crit)}
 .nemlig-svar.fejl p:first-child{color:var(--crit)}
 .btn:disabled{opacity:.6;cursor:wait}
+
+/* Nemligs tilbud (v0.18.0): på indkøbslisten og som mærke på Mad-sidens fliser */
+td.v small.tilbud{color:var(--accent);font-weight:600}
+.tilbudmaerke{font-size:11px;font-weight:700;color:var(--accent);margin-top:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

@@ -1,5 +1,5 @@
 {
- "version": 9,
+ "version": 11,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -1405,13 +1405,13 @@
    "id": "tacokrydderi",
    "navn": "Taco kryddermix",
    "enhed": "g",
-   "pakke": 28,
-   "pakkenavn": "28 g brev / Santa Maria · pris anslået",
-   "pris": 9.0,
+   "pakke": 40,
+   "pakkenavn": "40 g / Banderos",
+   "pris": 5.25,
    "holdbar": 365,
    "frys": false,
    "kategori": "Kolonial",
-   "nid": "5021688",
+   "nid": "5046477",
    "est": true,
    "altid": false
   },

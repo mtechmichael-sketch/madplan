@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.17.2">
-<link rel="stylesheet" href="style.css?v=0.17.2">
+<link rel="stylesheet" href="tema.css?v=0.18.2">
+<link rel="stylesheet" href="style.css?v=0.18.2">
 </head>
 <body>
 
@@ -94,8 +94,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.17.2";
-const DATA_VERSION = 9;
+const VERSION = "0.18.2";
+const DATA_VERSION = 11;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -222,7 +222,7 @@ const SEED_RAAVARER = [
   // men priserne er skøn — nemlig.com lukker af for automatisk prisopslag.
   ["spidskaal","Spidskål øko.","g",700,"1 stk. / ca. 700 g",18.00,10,0,"Grønt","5028993",1],
   ["koriander","Koriander øko.","g",25,"1 potte / Rosborg · pris anslået",15.00,6,0,"Grønt","5027932",1],
-  ["tacokrydderi","Taco kryddermix","g",28,"28 g brev / Santa Maria · pris anslået",9.00,365,0,"Kolonial","5021688",1],
+  ["tacokrydderi","Taco kryddermix","g",40,"40 g / Banderos",5.25,365,0,"Kolonial","5046477",1],
   ["tacosauce","Taco sauce (medium)","g",230,"230 g / Santa Maria · pris anslået",18.00,90,0,"Kolonial","5021649",1],
   ["jalapenos","Jalapeños (syltede)","g",215,"215 g glas / Santa Maria · pris anslået",19.00,365,0,"Kolonial","5500850",1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
@@ -590,6 +590,8 @@ function anvendPriser(p){
     const np = p.priser[r.id];
     if(!np || typeof np.pris !== "number" || np.pris <= 0) return;
     if(r.pris !== np.pris){ r.pris = np.pris; aendret = true; }
+    const nt = np.tilbud || null;
+    if(JSON.stringify(r.tilbud || null) !== JSON.stringify(nt)){ r.tilbud = nt; aendret = true; }
     if(r.pakkenavn && r.pakkenavn.includes(" · pris anslået")){
       r.pakkenavn = r.pakkenavn.replace(" · pris anslået", ""); aendret = true;
     }
@@ -910,6 +912,29 @@ function behov(valgt){
   }
   return b;
 }
+/* ---------- Nemligs tilbud ----------
+   Pi'en henter dem hver nat sammen med priserne (data/priser.json → r.tilbud).
+   To slags: flerstyk («2 for 170 kr») og nedsat stykpris («1 for 15,75»).
+   Udløbne og tilbud der ikke er billigere end stykprisen, ignoreres. */
+function tilbudFor(r){
+  const t = r && r.tilbud;
+  if(!t || !(t.antal >= 1) || !(t.pris > 0) || !(r.pris > 0)) return null;
+  if(t.til && t.til < idag()) return null;
+  const spar = t.antal * r.pris - t.pris;
+  return spar > 0.005 ? {antal: t.antal, pris: t.pris, til: t.til, spar} : null;
+}
+const tilbudTekst = t => t.antal === 1 ? "Tilbud " + kr2(t.pris) + " (før " + kr2(t.pris + t.spar) + ")"
+                                      : t.antal + " for " + kr2(t.pris);
+/* Rettens bedste tilbud - kun reelle tilbud: mindst 10 kr OG mindst 15 % rabat.
+   Med 5 kr som grænse fik 21 af 32 retter et mærke (01-10), og så siger det intet. */
+function bedsteTilbud(d){
+  let bedst = null;
+  for(const vid of Object.keys(d.ing || {})){
+    const r = raa(vid), t = tilbudFor(r);
+    if(t && t.spar >= 10 && t.spar / (t.antal * r.pris) >= 0.15 && (!bedst || t.spar > bedst.t.spar)) bedst = {r, t};
+  }
+  return bedst;
+}
 function indkoeb(b){
   const rows = [];
   for(const [vid, kraevet] of Object.entries(b)){
@@ -917,7 +942,15 @@ function indkoeb(b){
     if(!r || r.altid) continue;   // krydderier og basisvarer købes ikke pr. ret
     const pakker = Math.ceil(kraevet / r.pakke - 1e-9);
     const koebt = pakker * r.pakke;
-    rows.push({r, kraevet, pakker, koebt, over: koebt - kraevet, pris: pakker * (r.pris || 0)});
+    // Nemlig-tilbud: hele «2 for 170» regnes til tilbudspris, resten til stykpris
+    const t = tilbudFor(r);
+    let pris = pakker * (r.pris || 0), sparet = 0;
+    if(t){
+      const g = Math.floor(pakker / t.antal);
+      const medTilbud = g * t.pris + (pakker - g * t.antal) * r.pris;
+      sparet = pris - medTilbud; pris = medTilbud;
+    }
+    rows.push({r, kraevet, pakker, koebt, over: koebt - kraevet, pris, tilbud: t, sparet});
   }
   rows.sort((a,b2) => a.r.kategori === b2.r.kategori
     ? a.r.navn.localeCompare(b2.r.navn,"da") : a.r.kategori.localeCompare(b2.r.kategori,"da"));
@@ -1201,6 +1234,8 @@ function sPlan(){
     b.append(i);
     const k = el("div","krop");
     k.append(el("div","n", d.navn), el("div","m", d.portioner + " portioner"));
+    const bt = bedsteTilbud(d);
+    if(bt) k.append(el("div","tilbudmaerke", "Tilbud på " + bt.r.navn));
     if(dagFor[d.id]){
       const dt = new Date(dagFor[d.id] + "T12:00:00");
       k.append(el("div","dagmaerke", DAGE[(dt.getDay()+6)%7]));
@@ -1401,6 +1436,9 @@ function sListe(){
       const tr = el("tr");
       const v = el("td","v"); v.append(el("span",null,x.r.navn),
         el("small",null, x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed))));
+      if(x.tilbud) v.append(el("small","tilbud", tilbudTekst(x.tilbud) + (x.sparet > 0.005
+        ? " · sparer " + kr2(x.sparet)
+        : " · køb " + x.tilbud.antal + " og spar " + kr2(x.tilbud.spar))));
       const c = [el("td","num", maengde(x.kraevet, x.r.enhed)),
                  el("td","num", maengde(x.koebt, x.r.enhed)),
                  el("td","num " + (x.over > 1e-9 ? "over" : "ingen"), x.over > 1e-9 ? maengde(x.over, x.r.enhed) : "–"),
@@ -1449,8 +1487,10 @@ function sListe(){
 
   const sum = rows.reduce((s,x) => s + x.pris, 0);
   const port = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id)?.portioner || 0), 0);
+  const sparet = rows.reduce((s,x) => s + (x.sparet || 0), 0);
   bar([["I alt", kr2(sum), null],
-       ["Pris pr. portion", port ? kr2(sum/port) : "–", "var(--ok)"]],
+       ["Pris pr. portion", port ? kr2(sum/port) : "–", "var(--ok)"],
+       ...(sparet > 0.005 ? [["Sparet på tilbud", kr2(sparet), "var(--accent)"]] : [])],
       [["Basisvarer" + (basisPaaTur() ? " (" + basisPaaTur() + " på tur)" : ""),"ghost", () => { basisFra = "liste"; vis("basis"); },
         'M3 3h18v4H3zM5 7v13h14V7'],
        ["Kopiér liste","ghost", kopier, 'M9 9h11v11H9zM5 15V5a1 1 0 0 1 1-1h9'],
