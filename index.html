@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.17.0">
-<link rel="stylesheet" href="style.css?v=0.17.0">
+<link rel="stylesheet" href="tema.css?v=0.17.2">
+<link rel="stylesheet" href="style.css?v=0.17.2">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.17.0";
+const VERSION = "0.17.2";
 const DATA_VERSION = 9;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -233,27 +233,30 @@ const SEED_RAAVARER = [
    interval = typiske dage mellem indkøb. Skøn til at starte med; ret dem
    når I opdager at toiletpapiret holder længere end jeg troede.
    ============================================================ */
+/* Basisvarer. nid = Nemligs varenummer (valgt 01-10-2026 ud fra tidligere ordrer
+   og Nemligs sortiment); kommer med på Nemlig-listen, når varen er afkrydset.
+   butik = købes et andet sted end Nemlig (intet nid) - nævnes i svaret fra Nemlig. */
 const SEED_BASIS = [
-  ["toiletpapir","Toiletpapir","Husholdning",14],
-  ["koekkenrulle","Køkkenrulle","Husholdning",21],
-  ["opvasketabs","Opvasketabs","Husholdning",30],
-  ["opvaskemiddel","Opvaskemiddel (hånd)","Husholdning",45],
-  ["vaskemiddel","Vaskemiddel","Husholdning",30],
-  ["skyllemiddel","Skyllemiddel","Husholdning",60],
-  ["universalrens","Universalrengøring","Husholdning",90],
-  ["affaldsposer","Affaldsposer","Husholdning",45],
-  ["karklude","Karklude og svampe","Husholdning",30],
-  ["fryseposer","Fryseposer","Husholdning",90],
-  ["madfilm","Alufolie og madfilm","Husholdning",120],
-  ["tandpasta","Tandpasta","Personlig pleje",30],
-  ["tandboerster","Tandbørster","Personlig pleje",90],
-  ["shampoo","Shampoo","Personlig pleje",45],
-  ["balsam","Balsam","Personlig pleje",60],
-  ["haandsaebe","Håndsæbe","Personlig pleje",30],
-  ["badesaebe","Bad og sæbe","Personlig pleje",30],
-  ["deodorant","Deodorant","Personlig pleje",60],
-  ["barberblade","Barberblade","Personlig pleje",60],
-].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], sidst:null, est:true}));
+  ["toiletpapir","Toiletpapir","Husholdning",14,null,null,"Harald Nyborg / jem & fix"],
+  ["koekkenrulle","Køkkenrulle","Husholdning",21,"5605522","4 rl. / First Price"],
+  ["opvasketabs","Maskinopvask","Husholdning",30,"5056712","0,60 l / flydende / Neophos"],
+  ["opvaskemiddel","Opvaskemiddel (hånd)","Husholdning",45,"5603229","0,5 l / First Price"],
+  ["vaskemiddel","Vaskemiddel","Husholdning",30,"5027730","0,70 l / Omo kulørt"],
+  ["skyllemiddel","Skyllemiddel","Husholdning",60,"208027","1 l / First Price"],
+  ["universalrens","Universalrengøring","Husholdning",90,"5013511","Rengøringsspray t. køkken 0,75 l"],
+  ["affaldsposer","Affaldsposer","Husholdning",45,"103412","20 l m. snører / 20 stk."],
+  ["karklude","Karklude og svampe","Husholdning",30,"5026025","Altmuligklude 10 stk."],
+  ["fryseposer","Fryseposer","Husholdning",90,"5061901","2 l / 30 stk."],
+  ["madfilm","Alufolie og madfilm","Husholdning",120,"5053486","Stanniol 2 x 20 m / First Price"],
+  ["tandpasta","Tandpasta","Personlig pleje",30,"5047911","Aquafresh 2 x 75 ml"],
+  ["tandboerster","Tandbørster","Personlig pleje",90,"5037925","Jordan blød / 4 stk."],
+  ["shampoo","Shampoo","Personlig pleje",45,"5600754","Alle hårtyper 0,50 l"],
+  ["balsam","Balsam","Personlig pleje",60,"5069153","Elvital 0,20 l"],
+  ["haandsaebe","Håndsæbe","Personlig pleje",30,"5070634","0,50 l / Grøn Balance"],
+  ["badesaebe","Bad og sæbe","Personlig pleje",30,"5043017","Palmolive showergel 0,75 l"],
+  ["deodorant","Deodorant","Personlig pleje",60,"5070806","Deospray 0,15 l"],
+  ["barberblade","Barberblade","Personlig pleje",60,"5071115","Gillette Venus / 4 stk."],
+].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], nid:a[4], pakkenavn:a[5], butik:a[6] || null, sidst:null, est:true}));
 
 const SEED_RETTER = [
   ["karry","Kylling i karry m. ris",4,{kyllingebryst:600,log:200,karrypasta:50,kokosmaelk:400,ris:300,gulerodder:200},
@@ -451,7 +454,16 @@ function migrer(d){
   d.basisValgt = d.basisValgt || {};
   if(!Array.isArray(d.basis)) d.basis = SEED_BASIS;
   else { const har = new Set(d.basis.map(x => x.id));   // nye basisvarer lægges ind, dine egne røres ikke
-         SEED_BASIS.forEach(x => { if(!har.has(x.id)) d.basis.push(x); }); }
+         SEED_BASIS.forEach(x => { if(!har.has(x.id)) d.basis.push(x); });
+         // Nemlig-numre (01-10): kun hvor varen ikke allerede har et - egne valg røres ikke
+         const seed = Object.fromEntries(SEED_BASIS.map(x => [x.id, x]));
+         d.basis.forEach(b => { const s = seed[b.id]; if(!s) return;
+           // Toiletpapir købes hos Harald Nyborg / jem & fix (01-10) - fjern
+           // det Nemlig-nummer, v0.17.1 gav den, men kun hvis det er vores eget
+           if(s.butik && !b.butik && (!b.nid || b.nid === "5066558")){ b.butik = s.butik; delete b.nid; delete b.pakkenavn; }
+           if(b.nid || b.butik || !s.nid) return;
+           b.nid = s.nid; b.pakkenavn = s.pakkenavn;
+           if(b.id === "opvasketabs" && b.navn === "Opvasketabs") b.navn = s.navn; }); }
   d.haUrl = d.haUrl || "";
   d.tema = d.tema || "auto";
   if(d.tomgangMin == null) d.tomgangMin = 3;
@@ -510,7 +522,7 @@ function listeTilPi(){
     varer: rows.map(x => ({id: x.r.id, navn: x.r.navn, nid: x.r.nid || null,
       pakkenavn: x.r.pakkenavn || null, pakker: x.pakker, kraevet: x.kraevet, koebt: x.koebt,
       enhed: x.r.enhed, pris: x.pris, kategori: x.r.kategori || ""})),
-    basis: basisValgte().map(b => ({id: b.id, navn: b.navn, kategori: b.kategori || ""}))
+    basis: basisValgte().map(b => ({id: b.id, navn: b.navn, kategori: b.kategori || "", nid: b.nid || null, pakkenavn: b.pakkenavn || null, butik: b.butik || null}))
   };
 }
 function sendListeSnart(){
@@ -1466,6 +1478,7 @@ async function sendNemlig(e){
       linjer = [s.pakker + " pakker (" + s.varer + " varer) ligger nu på listen «" + s.liste + "» hos Nemlig."];
       if(s.fjernet) linjer.push(s.fjernet + (s.fjernet === 1 ? " gammel vare" : " gamle varer") + " er fjernet fra listen.");
       if(s.udsolgt && s.udsolgt.length) linjer.push(punktum("Udsolgt hos Nemlig lige nu: " + s.udsolgt.join(", ")));
+      if(s.andet_sted && s.andet_sted.length) linjer.push(punktum("Købes et andet sted: " + s.andet_sted.join(", ")));
       if(s.uden_nummer && s.uden_nummer.length) linjer.push("Ikke sendt (intet Nemlig-nummer): " + s.uden_nummer.join(", ") + " – tilføj dem selv.");
       if(s.forkert && s.forkert.length){ fejl = true; linjer.push(punktum("Kom ikke rigtigt med: " + s.forkert.join(", "))); }
       linjer.push("Åbn Nemlig-appen → Indkøbslister → Madplan, læg listen i kurven og bestil.");
