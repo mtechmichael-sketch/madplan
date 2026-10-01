@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.18.2">
-<link rel="stylesheet" href="style.css?v=0.18.2">
+<link rel="stylesheet" href="tema.css?v=0.18.3">
+<link rel="stylesheet" href="style.css?v=0.18.3">
 </head>
 <body>
 
@@ -94,13 +94,14 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.18.2";
+const VERSION = "0.18.3";
 const DATA_VERSION = 11;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
    allerede ligger på enheden — retter overskrives ellers aldrig af data/. */
 const FJERNEDE = ["suppe","aeggekage","frikadeller","carbonara"];
+const FJERNEDE_BASIS = ["barberblade"];        // taget ud af basisvarerne (01-10)
 const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
                    "lasagne","chili","carbonara","suppe","aeggekage","gryde"];
 
@@ -255,7 +256,6 @@ const SEED_BASIS = [
   ["haandsaebe","Håndsæbe","Personlig pleje",30,"5070634","0,50 l / Grøn Balance"],
   ["badesaebe","Bad og sæbe","Personlig pleje",30,"5043017","Palmolive showergel 0,75 l"],
   ["deodorant","Deodorant","Personlig pleje",60,"5070806","Deospray 0,15 l"],
-  ["barberblade","Barberblade","Personlig pleje",60,"5071115","Gillette Venus / 4 stk."],
 ].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], nid:a[4], pakkenavn:a[5], butik:a[6] || null, sidst:null, est:true}));
 
 const SEED_RETTER = [
@@ -452,6 +452,10 @@ function load(){
 function migrer(d){
   d.uge = d.uge || {};
   d.basisValgt = d.basisValgt || {};
+  if(Array.isArray(d.basis)){                     // basisvarer taget ud fjernes også fra tabletten
+    d.basis = d.basis.filter(b => !FJERNEDE_BASIS.includes(b.id));
+    FJERNEDE_BASIS.forEach(id => { delete d.basisValgt[id]; });
+  }
   if(!Array.isArray(d.basis)) d.basis = SEED_BASIS;
   else { const har = new Set(d.basis.map(x => x.id));   // nye basisvarer lægges ind, dine egne røres ikke
          SEED_BASIS.forEach(x => { if(!har.has(x.id)) d.basis.push(x); });
