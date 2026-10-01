@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.15.0">
-<link rel="stylesheet" href="style.css?v=0.15.0">
+<link rel="stylesheet" href="tema.css?v=0.17.0">
+<link rel="stylesheet" href="style.css?v=0.17.0">
 </head>
 <body>
 
@@ -94,8 +94,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.15.0";
-const DATA_VERSION = 8;
+const VERSION = "0.17.0";
+const DATA_VERSION = 9;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -145,7 +145,7 @@ const SEED_RAAVARER = [
   ["lasagneplader","Lasagneplader","g",500,"500 g / Garofalo",31.50,90,0,"Kolonial","5065117",0],
   ["tortillas","Tortilla wraps","stk",6,"6 stk. / Taste of Nature",10.70,30,0,"Kolonial","5068766",0],
   ["karrypasta","Frisk rød karrypasta","g",25,"25 g / Thailand",10.00,7,0,"Kolonial","5033347",0],
-  ["bouillon","Hønsebouillon","stk",10,"10 stk. / Knorr",19.95,90,0,"Kolonial","911003",0],
+  ["bouillon","Hønsebouillon","stk",10,"10 stk. / 100 g / Knorr",19.95,90,0,"Kolonial","5605625",0],
   ["rasp","Hvederasp","g",500,"500 g / Struer",23.75,90,0,"Kolonial","5006584",0],
   ["olivenolie","Ekstra jomfru olivenolie","ml",500,"0,50 l / Casaneo",41.30,90,0,"Kolonial","5049714",0],
 
@@ -161,7 +161,7 @@ const SEED_RAAVARER = [
   ["ingefaer","Ingefær øko.","g",200,"200 g / Kina",14.00,21,0,"Grønt","5016560",1],
   ["blomkaalsris","Blomkålsris øko. (frost)","g",350,"350 g / frost / Frigodan",11.16,30,1,"Grønt","5042997",0],
   ["cornichoner","Cornichoner","g",190,"330 g glas / 190 g drænet",9.91,365,0,"Kolonial","5602898",1],
-  ["mayonnaise","Ægte mayonnaise","ml",250,"0,25 l / K-Salat",15.00,60,0,"Kolonial","5009601",1],
+  ["mayonnaise","Ægte mayonnaise","ml",250,"0,25 l / K-Salat",18.95,60,0,"Kolonial","5606181",1],
 
   // Haves altid — krydderier og basisvarer der aldrig skal på indkøbslisten
   ["karrykrydderi","Karry (krydderi)","g",40,"40 g (typisk)",0,365,0,"Krydderier","",1,1],
@@ -203,7 +203,7 @@ const SEED_RAAVARER = [
   ["agurkesalat","Agurkesalat (syltet)","g",405,"710 g glas / 405 g drænet",16.61,365,0,"Kolonial","5047370",1],
   ["ketchup","Ketchup","g",700,"700 g / Heinz",36.45,365,0,"Kolonial","5060954",1],
   ["dijon","Dijon sennep","g",250,"250 g / Bähncke",20.00,365,0,"Kolonial","101491",1],
-  ["gr_bouillon","Grøntsagsbouillon","stk",10,"10 stk. / Knorr",19.95,90,0,"Kolonial","911002",0],
+  ["gr_bouillon","Grøntsagsbouillon","stk",10,"10 stk. / 100 g / Knorr",19.95,90,0,"Kolonial","5605626",0],
   ["pizzasauce","Pizzasauce","g",390,"390 g / Cirio",16.25,90,0,"Kolonial","5066097",0],
   ["chokolade","Mørk chokolade 70% øko.","g",100,"100 g / Grøn Balance",26.95,365,0,"Kolonial","5059453",1],
 
@@ -220,7 +220,7 @@ const SEED_RAAVARER = [
 
   // Tilføjet til Mexicansk burgerfad, 24. august 2026. Nemlig-numrene er slået op,
   // men priserne er skøn — nemlig.com lukker af for automatisk prisopslag.
-  ["spidskaal","Spidskål","g",700,"1 stk. / ca. 700 g · pris anslået",15.00,10,0,"Grønt","5030670",1],
+  ["spidskaal","Spidskål øko.","g",700,"1 stk. / ca. 700 g",18.00,10,0,"Grønt","5028993",1],
   ["koriander","Koriander øko.","g",25,"1 potte / Rosborg · pris anslået",15.00,6,0,"Grønt","5027932",1],
   ["tacokrydderi","Taco kryddermix","g",28,"28 g brev / Santa Maria · pris anslået",9.00,365,0,"Kolonial","5021688",1],
   ["tacosauce","Taco sauce (medium)","g",230,"230 g / Santa Maria · pris anslået",18.00,90,0,"Kolonial","5021649",1],
@@ -561,8 +561,29 @@ async function hentFaelles(){
     }
     const ny = Math.max((raa && raa.version) || 0, (ret && ret.version) || 0);
     if(ny > nu){ S.dataVersion = ny; aendret = true; }
+    if(anvendPriser(await hent("data/priser.json"))) aendret = true;
   }catch(e){}
   if(aendret) tegn();
+}
+
+/* Ugens priser fra Nemlig. Pi'en henter dem hver søndag nat og skriver
+   data/priser.json (kun køkkenkopien har filen; findes den ikke, bruges
+   katalogets priser). Lægges oven på råvarerne hver gang, fordi en ny
+   version af appen lægger katalogets gamle priser ind igen. «pris» er
+   stykprisen; et flerstykstilbud («2 for 170») gemmes kun til senere brug. */
+function anvendPriser(p){
+  if(!p || !p.priser || typeof p.priser !== "object") return false;
+  let aendret = false;
+  S.raavarer.forEach(r => {
+    const np = p.priser[r.id];
+    if(!np || typeof np.pris !== "number" || np.pris <= 0) return;
+    if(r.pris !== np.pris){ r.pris = np.pris; aendret = true; }
+    if(r.pakkenavn && r.pakkenavn.includes(" · pris anslået")){
+      r.pakkenavn = r.pakkenavn.replace(" · pris anslået", ""); aendret = true;
+    }
+  });
+  if(S.priserHentet !== p.hentet){ S.priserHentet = p.hentet; aendret = true; }
+  return aendret;
 }
 
 /* Opdateringstjekket ligger i sin egen <script>-blok nederst i filen. */
@@ -1340,7 +1361,9 @@ function sListe(){
   tilbage.onclick = () => vis("plan");
   const hd = el("div","hint"); hd.style.marginBottom = "16px";
   const nv = el("span",null,"Indkøbsliste"); nv.style.fontSize = "20px"; nv.style.fontWeight = "700";
-  hd.append(tilbage, nv, el("span","sub", rows.length ? rows.length + " varer" : "Ingen varer endnu"));
+  const prisDato = S.priserHentet ? " · priser fra Nemlig " +
+    new Date(S.priserHentet).toLocaleDateString("da-DK",{day:"numeric",month:"short"}) : "";
+  hd.append(tilbage, nv, el("span","sub", rows.length ? rows.length + " varer" + prisDato : "Ingen varer endnu"));
   V.append(hd);
 
   if(!rows.length){
@@ -1418,7 +1441,48 @@ function sListe(){
        ["Pris pr. portion", port ? kr2(sum/port) : "–", "var(--ok)"]],
       [["Basisvarer" + (basisPaaTur() ? " (" + basisPaaTur() + " på tur)" : ""),"ghost", () => { basisFra = "liste"; vis("basis"); },
         'M3 3h18v4H3zM5 7v13h14V7'],
-       ["Kopiér liste","ghost", kopier, 'M9 9h11v11H9zM5 15V5a1 1 0 0 1 1-1h9']]);
+       ["Kopiér liste","ghost", kopier, 'M9 9h11v11H9zM5 15V5a1 1 0 0 1 1-1h9'],
+       // Kun køkkenkopien: Pi'en (port 8100) lægger listen hos Nemlig med køkkenets token
+       ...(HOS_HA && haToken() ? [["Send til Nemlig","", sendNemlig, 'M22 2L11 13M22 2l-7 20-4-9-9-4z']] : [])]);
+}
+
+/* ---------- Send til Nemlig ----------
+   Pi'en gør Nemlig-indkøbslisten «Madplan» til en kopi af denne liste: rigtigt
+   antal pakker af hver vare, og varer der ikke længere er på madplanen,
+   fjernes. Kurven røres ikke - man lægger selv listen i kurven og bestiller i
+   Nemlig-appen. Svaret fortæller ærligt, hvad der faktisk kom med. */
+const punktum = s => /[.!?]$/.test(s) ? s : s + ".";   // «Agurk øko.» skal ikke have to punktummer
+async function sendNemlig(e){
+  const b = e.currentTarget; if(b.disabled) return;
+  const tekst = b.lastChild, foer = tekst.textContent;
+  b.disabled = true; tekst.textContent = "Sender…";
+  let linjer, fejl = false;
+  try{
+    const r = await fetch(location.protocol + "//" + location.hostname + ":8100/api/nemlig/send", {
+      method: "POST", body: JSON.stringify(listeTilPi()),
+      headers: {"Authorization": "Bearer " + haToken(), "Content-Type": "application/json"}});
+    const s = await r.json().catch(() => ({}));
+    if(r.ok){
+      linjer = [s.pakker + " pakker (" + s.varer + " varer) ligger nu på listen «" + s.liste + "» hos Nemlig."];
+      if(s.fjernet) linjer.push(s.fjernet + (s.fjernet === 1 ? " gammel vare" : " gamle varer") + " er fjernet fra listen.");
+      if(s.udsolgt && s.udsolgt.length) linjer.push(punktum("Udsolgt hos Nemlig lige nu: " + s.udsolgt.join(", ")));
+      if(s.uden_nummer && s.uden_nummer.length) linjer.push("Ikke sendt (intet Nemlig-nummer): " + s.uden_nummer.join(", ") + " – tilføj dem selv.");
+      if(s.forkert && s.forkert.length){ fejl = true; linjer.push(punktum("Kom ikke rigtigt med: " + s.forkert.join(", "))); }
+      linjer.push("Åbn Nemlig-appen → Indkøbslister → Madplan, læg listen i kurven og bestil.");
+    }else{
+      fejl = true;
+      linjer = ["Kunne ikke sende til Nemlig: " + (s.detail || "fejl " + r.status)];
+    }
+  }catch(err){
+    fejl = true;
+    linjer = ["Kunne ikke nå Pi'en. Prøv igen om lidt."];
+  }
+  b.disabled = false; tekst.textContent = foer;
+  const gl = document.getElementById("nemligSvar"); if(gl) gl.remove();
+  const box = el("div","nemlig-svar" + (fejl ? " fejl" : "")); box.id = "nemligSvar";
+  linjer.forEach(t => box.append(el("p",null,t)));
+  V.prepend(box);
+  box.scrollIntoView({behavior: "smooth", block: "start"});
 }
 async function kopier(e){
   const rows = indkoeb(behov(S.valgt));
@@ -1999,6 +2063,7 @@ temaPaa();
 vis("plan");
 nulstilIdle();
 hentFaelles();
+setInterval(hentFaelles, 6 * 3600000);   // tabletten står tændt i ugevis: hent ugens Nemlig-priser igen
 hentVejr();
 setInterval(hentVejr, 30 * 60000);        // hver halve time
 hentEl();

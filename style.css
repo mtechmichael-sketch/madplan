@@ -457,3 +457,11 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 }
 .tg-ugeskille + .tg-dag{border-top-color:transparent}
 .tgfod{padding-top:14px}
+
+/* Svar fra «Send til Nemlig» øverst på indkøbslisten (v0.17.0) */
+.nemlig-svar{border:1px solid var(--accent);border-radius:14px;padding:14px 18px;margin-bottom:18px;background:var(--surface)}
+.nemlig-svar p{margin:0;font-size:15px;line-height:1.45}
+.nemlig-svar p + p{margin-top:6px;color:var(--muted);font-size:14px}
+.nemlig-svar.fejl{border-color:var(--crit)}
+.nemlig-svar.fejl p:first-child{color:var(--crit)}
+.btn:disabled{opacity:.6;cursor:wait}
