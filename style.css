@@ -470,3 +470,7 @@ dialog footer{padding:14px 18px;border-top:1px solid var(--line);display:flex;ga
 td.v small.tilbud{color:var(--accent);font-weight:600}
 .tilbudmaerke{font-size:11px;font-weight:700;color:var(--accent);margin-top:4px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Kalenderen en tand større (v0.18.5, 01-10): 14 → 16 px. Vejret bliver 14. */
+.tg-dag .vj .tg-kal,.tg-dag .vj .tg-kalflere{font-size:16px}
+.tg-dag .vj{line-height:19px}      /* holder rækken lige så høj som med 14 px (målt 68,1 punkter) */
