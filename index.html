@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.18.5">
-<link rel="stylesheet" href="style.css?v=0.18.5">
+<link rel="stylesheet" href="tema.css?v=0.19.0">
+<link rel="stylesheet" href="style.css?v=0.19.0">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.18.5";
+const VERSION = "0.19.0";
 const DATA_VERSION = 11;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1190,7 +1190,7 @@ const BAR = document.getElementById("bar");
 
 function vis(n, arg){
   visning = n;
-  if(n === "ret") aabenRet = arg;
+  if(n === "ret" || n === "kilde") aabenRet = arg;
   document.getElementById("tomgang").classList.toggle("vis", n === "tomgang");
   document.getElementById("tomgang").setAttribute("aria-hidden", String(n !== "tomgang"));
   document.getElementById("app").hidden = (n === "tomgang");
@@ -1208,7 +1208,7 @@ function tegn(){
   document.getElementById("fHjem").setAttribute("aria-current", String(visning === "hjem"));
   V.innerHTML = ""; BAR.innerHTML = ""; BAR.hidden = true; V.className = "view";
   ({plan:sPlan, ret:sRet, liste:sListe, mere:sMere, retter:sRetter, raavarer:sRaavarer,
-  basis:sBasis, hjem:sHjem}[visning] || sPlan)();
+  basis:sBasis, hjem:sHjem, kilde:sKilde}[visning] || sPlan)();
   save();
 }
 
@@ -1386,6 +1386,9 @@ function sRet(){
   if(d.kilde){
     const a = el("a",null,"Se den fulde opskrift hos kilden →");
     a.href = d.kilde; a.target = "_blank"; a.rel = "noopener";
+    // I køkkenet (Fully Kiosk) kan en anden hjemmeside ikke åbnes uden at forlade
+    // kiosken - så hentes opskriften i stedet via Pi'en og vises her i appen.
+    if(HOS_HA && haToken()) a.onclick = e => { e.preventDefault(); vis("kilde", d.id); };
     a.style.cssText = "display:inline-block;margin-top:12px;font-size:15px;font-weight:600;color:var(--accent)";
     oc.append(a);
     try{
@@ -1402,6 +1405,73 @@ function sRet(){
       n ? [["Fjern fra ugen","fare",() => { fjern(d.id); vis("ret", d.id); }],
            ["Én gang mere","",() => { S.valgt[d.id] = n+1; tegn(); }]]
         : [["Tilføj til ugen","",() => { S.valgt[d.id] = 1; tegn(); }]]);
+}
+
+/* ---------- Kildens opskrift (læsevisning) ----------
+   Pi'en (port 8100, /api/opskrift) henter opskriften fra kilden - kun
+   madbanditten.dk - og læser de strukturerede opskriftsdata. Her vises den
+   i appens egen stil: ingen reklamer, ingen cookie-banner, og man forlader
+   ikke Fully Kiosk. Svaret huskes kun i hukommelsen. */
+const KILDE_HUSK = {};
+async function hentKilde(d){
+  try{
+    const r = await fetch(location.protocol + "//" + location.hostname + ":8100/api/opskrift", {
+      method: "POST", body: JSON.stringify({url: d.kilde}),
+      headers: {"Authorization": "Bearer " + haToken(), "Content-Type": "application/json"}});
+    const s = await r.json().catch(() => ({}));
+    KILDE_HUSK[d.id] = r.ok ? s : {fejl: s.detail || "fejl " + r.status};
+  }catch(e){
+    KILDE_HUSK[d.id] = {fejl: "Kunne ikke nå Pi'en"};
+  }
+  if(visning === "kilde" && aabenRet === d.id) tegn();
+}
+function sKilde(){
+  const d = ret(aabenRet); if(!d || !d.kilde) return vis("plan");
+  let vaert = "kilden"; try{ vaert = new URL(d.kilde).hostname.replace(/^www\./,""); }catch(e){}
+  const tilbage = el("button","btn ghost");
+  tilbage.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>' + "Tilbage";
+  tilbage.onclick = () => vis("ret", d.id);
+  const hd = el("div","hint"); hd.style.marginBottom = "18px";
+  const nv = el("span",null, d.navn); nv.style.fontSize = "20px"; nv.style.fontWeight = "700";
+  hd.append(tilbage, nv, el("span","sub","Original opskrift · " + vaert));
+  V.append(hd);
+
+  const s = KILDE_HUSK[d.id];
+  if(!s){ V.append(el("p","tom","Henter opskriften fra " + vaert + " …")); hentKilde(d); return; }
+  if(s.fejl){
+    V.append(el("p","tom","Kunne ikke hente opskriften: " + s.fejl));
+    const igen = el("button","btn ghost","Prøv igen");
+    igen.onclick = () => { delete KILDE_HUSK[d.id]; tegn(); };
+    V.append(igen);
+    return;
+  }
+  const w = el("div","kilde");
+  const top = el("div","kilde-top");
+  top.append(el("div","kilde-navn", s.navn || d.navn));
+  const meta = [];
+  if(s.portioner) meta.push(/^\d+$/.test(s.portioner) ? s.portioner + " personer" : s.portioner);
+  if(s.minutter) meta.push(s.minutter + " min");
+  if(meta.length) top.append(el("div","kilde-meta", meta.join(" · ")));
+  if(s.beskrivelse) top.append(el("p","kilde-beskriv", s.beskrivelse));
+  w.append(top);
+
+  const sp = el("div","spalter");
+  const ic = el("div");
+  ic.append(el("div","eyebrow","Ingredienser"));
+  (s.ingredienser || []).forEach(t => { const r = el("div","ing"); r.append(el("span","n", t)); ic.append(r); });
+  const oc = el("div");
+  oc.append(el("div","eyebrow","Sådan gør du"));
+  let afsnit = null, nr = 0;
+  (s.trin || []).forEach(x => {
+    if(x.afsnit && x.afsnit !== afsnit){ afsnit = x.afsnit; oc.append(el("div","kilde-afsnit", afsnit)); }
+    const r = el("div","trin");
+    r.append(el("span","nr num", String(++nr)), el("span","t", x.tekst));
+    oc.append(r);
+  });
+  sp.append(ic, oc); w.append(sp);
+  w.append(el("p","note","Opskriften er hentet fra " + vaert + " og tilhører dem."));
+  V.append(w);
+  V.append(Object.assign(el("div"),{style:"height:24px"}));
 }
 
 /* ---------- Indkøbslisten ---------- */

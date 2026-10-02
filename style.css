@@ -474,3 +474,12 @@ td.v small.tilbud{color:var(--accent);font-weight:600}
 /* Kalenderen en tand større (v0.18.5, 01-10): 14 → 16 px. Vejret bliver 14. */
 .tg-dag .vj .tg-kal,.tg-dag .vj .tg-kalflere{font-size:16px}
 .tg-dag .vj{line-height:19px}      /* holder rækken lige så høj som med 14 px (målt 68,1 punkter) */
+
+/* Læsevisning af kildens opskrift (v0.19.0) */
+.kilde-top{margin-bottom:22px}
+.kilde-navn{font-size:24px;font-weight:700;line-height:1.25}
+.kilde-meta{margin-top:6px;font-size:15px;font-weight:600;color:var(--accent)}
+.kilde-beskriv{margin:10px 0 0;font-size:16px;line-height:1.5;color:var(--muted);max-width:70ch}
+.kilde .ing .n{font-weight:500;font-size:17px}
+.kilde-afsnit{margin:18px 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.kilde .note{margin-top:20px}
