@@ -483,3 +483,10 @@ td.v small.tilbud{color:var(--accent);font-weight:600}
 .kilde .ing .n{font-weight:500;font-size:17px}
 .kilde-afsnit{margin:18px 0 10px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .kilde .note{margin-top:20px}
+
+/* «−» på valgte retter (v0.19.1): fjerner én igen. Samme runde form som «i»-knappen. */
+.antal{position:absolute;top:6px;left:6px;display:flex;align-items:center;gap:6px}
+.antal .pil{position:static}
+.minus{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;
+  display:grid;place-items:center;font-size:24px;font-weight:700;line-height:1;cursor:pointer}
+.minus:active{background:var(--crit)}

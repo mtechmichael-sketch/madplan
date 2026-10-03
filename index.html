@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.19.0">
-<link rel="stylesheet" href="style.css?v=0.19.0">
+<link rel="stylesheet" href="tema.css?v=0.19.2">
+<link rel="stylesheet" href="style.css?v=0.19.2">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.19.0";
+const VERSION = "0.19.2";
 const DATA_VERSION = 11;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1219,7 +1219,7 @@ function sPlan(){
 
   const h = el("div","hint");
   h.append(el("span","eyebrow","Tryk for at vælge"),
-           el("span","sub","Tryk prikken for opskrift og ingredienser"));
+           el("span","sub","Tryk − for at fjerne igen · prikken for opskrift og ingredienser"));
   h.lastChild.style.marginLeft = "auto";
   V.append(h);
 
@@ -1231,7 +1231,14 @@ function sPlan(){
     const b = el("button","flise"); b.dataset.on = n ? "1" : "0";
     const t = el("div","top-t"); t.style.background = tileBg(d.id);
     t.append(flisemotiv(d)); fotoOver(t, d); b.append(t);
-    if(n){ const p = el("span","pil", n + "×"); b.append(p); }
+    if(n){
+      // «−» fjerner én igen - et højreklik (som før) findes ikke på tabletten (03-10)
+      const a = el("div","antal");
+      const m = el("span","minus","−");
+      m.setAttribute("role","button"); m.setAttribute("aria-label","Fjern én " + d.navn);
+      m.onclick = e => { e.stopPropagation(); fjern(d.id); };
+      a.append(m, el("span","pil", n + "×")); b.append(a);
+    }
     const i = el("span","info");
     i.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.5"/></svg>';
     i.onclick = e => { e.stopPropagation(); vis("ret", d.id); };
@@ -1644,9 +1651,34 @@ function basisMrk(b){
 const basisPaaTur = () => S.basis.filter(b => { const d = basisTil(b); return d !== null && d <= 3; }).length;
 const basisValgte = () => S.basis.filter(b => S.basisValgt[b.id]);
 
+/* Rytmen lærer af «Købt» (v0.19.2, 03-10). Hver vare husker de sidste
+   KOEB_HUSK købsdatoer i `koeb`. Fra andet køb bliver intervallet midten
+   (medianen) af mellemrummene - midten frem for gennemsnittet, så ét tidligt
+   eller sent køb ikke trækker skævt. Køb med under 2 dages mellemrum er samme
+   indkøb (dobbelttryk). Grænser 3-180 dage. Før v0.19.2 blev kun det seneste
+   køb gemt; det bliver første punkt i historikken. */
+const KOEB_HUSK = 6;
+function laerInterval(koeb){
+  const t = koeb.map(x => new Date(x + "T12:00:00").getTime());
+  const gab = [];
+  for(let i = 1; i < t.length; i++){ const g = Math.round((t[i] - t[i-1]) / DAG); if(g >= 2) gab.push(g); }
+  if(!gab.length) return null;
+  const s = [...gab].sort((a, b) => a - b), h = s.length / 2;
+  const midt = s.length % 2 ? s[Math.floor(h)] : (s[h - 1] + s[h]) / 2;
+  return {dage: Math.max(3, Math.min(180, Math.round(midt))), koeb: koeb.length};
+}
+function noterKoeb(b){
+  const d = idag();
+  const koeb = (b.koeb || (b.sidst ? [b.sidst] : [])).filter(x => x !== d);
+  koeb.push(d); koeb.sort();
+  b.koeb = koeb.slice(-KOEB_HUSK);
+  b.sidst = d;
+  const l = laerInterval(b.koeb);
+  if(l){ b.interval = l.dage; b.laert = l.koeb; b.est = false; }
+}
 function basisKoebt(id){
   const b = S.basis.find(x => x.id === id); if(!b) return;
-  b.sidst = idag();
+  noterKoeb(b);
   delete S.basisValgt[id];
   tegn();
 }
@@ -1662,7 +1694,7 @@ function sBasis(){
   V.append(hd);
 
   V.append(Object.assign(el("p","note",
-    "Sæt flueben ved det der skal med. Intervallerne er skøn til at starte med — tryk «Købt» når du har handlet, så tæller den forfra derfra."),
+    "Sæt flueben ved det der skal med, og tryk «Købt» når du har handlet. Intervallerne er skøn til at starte med — fra andet køb lærer appen selv, hvor længe varen holder."),
     {style:"margin:0 0 18px;max-width:620px"}));
 
   const box = el("div");
@@ -1677,7 +1709,7 @@ function sBasis(){
     lab.append(c, el("span",null,b.navn));
     const [cls, txt] = basisMrk(b);
     row.append(lab, el("span", cls ? "mrk " + cls : "d", txt),
-      el("span","d", b.kategori + " · hver " + b.interval + ". dag" +
+      el("span","d", b.kategori + " · hver " + b.interval + ". dag" + (b.laert ? " (lært af " + b.laert + " køb)" : "") +
         (b.sidst ? " · sidst " + new Date(b.sidst + "T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"short"}) : " · aldrig købt")));
     const kn2 = el("div"); kn2.style.cssText = "display:flex;gap:8px;flex:none";
     const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); kn2.append(k);
@@ -1692,7 +1724,7 @@ function sBasis(){
   const valgte = basisValgte();
   if(valgte.length){
     const ab = el("button","btn ghost","Markér de " + valgte.length + " valgte som købt");
-    ab.onclick = () => { valgte.forEach(b => { b.sidst = idag(); delete S.basisValgt[b.id]; }); tegn(); };
+    ab.onclick = () => { valgte.forEach(b => { noterKoeb(b); delete S.basisValgt[b.id]; }); tegn(); };
     kn.append(ab);
   }
   V.append(kn);
