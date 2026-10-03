@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.19.2">
-<link rel="stylesheet" href="style.css?v=0.19.2">
+<link rel="stylesheet" href="tema.css?v=0.20.1">
+<link rel="stylesheet" href="style.css?v=0.20.1">
 </head>
 <body>
 
@@ -94,8 +94,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.19.2";
-const DATA_VERSION = 11;
+const VERSION = "0.20.1";
+const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -109,6 +109,12 @@ const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
    SEED-DATA — hentet fra nemlig.com 23. august 2026.
    nid = Nemligs produkt-ID. est = holdbarheden er et skøn.
    ============================================================ */
+/* Godkendte alternativer pr. råvare (03-10): [Nemlig-nr, pakke, pakkenavn].
+   KETO: kun samme råvare og intet tilsat sukker/stivelse (Graasten-mayo har
+   dextrose og er derfor ikke med). Tjek varedeklarationen hos Nemlig først.
+   Appen vælger det billigste på lager for det, der skal bruges (se vaelgProdukt). */
+const SEED_ALT = {"jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
+
 const SEED_RAAVARER = [
   ["kyllingebryst","Kyllingebrystfilet","g",1100,"1,10 kg / Danpo",85.00,3,1,"Kød & fisk","5602318",0],
   ["hakket_okse","Hakket oksekød 8-12%","g",500,"500 g / Danish Crown",49.94,3,1,"Kød & fisk","5063170",0],
@@ -143,7 +149,7 @@ const SEED_RAAVARER = [
   ["kidneybonner","Kidneybønner","g",250,"410 g dåse / 250 g drænet / Meyers",23.25,90,0,"Kolonial","5600738",0],
   ["ris","Jasminris","g",1000,"1 kg",15.02,90,0,"Kolonial","5603865",0],
   ["pasta","Spaghetti øko.","g",500,"500 g / De Cecco",31.50,90,0,"Kolonial","5049578",0],
-  ["lasagneplader","Lasagneplader","g",500,"500 g / Garofalo",31.50,90,0,"Kolonial","5065117",0],
+  ["lasagneplader","Lasagneplader","g",500,"500 g øko. / Grøn Balance",23.95,90,0,"Kolonial","5046423",0],
   ["tortillas","Tortilla wraps","stk",6,"6 stk. / Taste of Nature",10.70,30,0,"Kolonial","5068766",0],
   ["karrypasta","Frisk rød karrypasta","g",25,"25 g / Thailand",10.00,7,0,"Kolonial","5033347",0],
   ["bouillon","Hønsebouillon","stk",10,"10 stk. / 100 g / Knorr",19.95,90,0,"Kolonial","5605625",0],
@@ -162,7 +168,7 @@ const SEED_RAAVARER = [
   ["ingefaer","Ingefær øko.","g",200,"200 g / Kina",14.00,21,0,"Grønt","5016560",1],
   ["blomkaalsris","Blomkålsris øko. (frost)","g",350,"350 g / frost / Frigodan",11.16,30,1,"Grønt","5042997",0],
   ["cornichoner","Cornichoner","g",190,"330 g glas / 190 g drænet",9.91,365,0,"Kolonial","5602898",1],
-  ["mayonnaise","Ægte mayonnaise","ml",250,"0,25 l / K-Salat",18.95,60,0,"Kolonial","5606181",1],
+  ["mayonnaise","Mayonnaise","ml",400,"400 g / First Price",12.12,60,0,"Kolonial","2301033",1],
 
   // Haves altid — krydderier og basisvarer der aldrig skal på indkøbslisten
   ["karrykrydderi","Karry (krydderi)","g",40,"40 g (typisk)",0,365,0,"Krydderier","",1,1],
@@ -203,7 +209,7 @@ const SEED_RAAVARER = [
   ["rodkaal","Rødkål (syltet)","g",580,"580 g / Samsø Syltefabrik",20.95,365,0,"Kolonial","5042137",1],
   ["agurkesalat","Agurkesalat (syltet)","g",405,"710 g glas / 405 g drænet",16.61,365,0,"Kolonial","5047370",1],
   ["ketchup","Ketchup","g",700,"700 g / Heinz",36.45,365,0,"Kolonial","5060954",1],
-  ["dijon","Dijon sennep","g",250,"250 g / Bähncke",20.00,365,0,"Kolonial","101491",1],
+  ["dijon","Dijon sennep","g",370,"370 g / Chatel",12.95,365,0,"Kolonial","5029075",1],
   ["gr_bouillon","Grøntsagsbouillon","stk",10,"10 stk. / 100 g / Knorr",19.95,90,0,"Kolonial","5605626",0],
   ["pizzasauce","Pizzasauce","g",390,"390 g / Cirio",16.25,90,0,"Kolonial","5066097",0],
   ["chokolade","Mørk chokolade 70% øko.","g",100,"100 g / Grøn Balance",26.95,365,0,"Kolonial","5059453",1],
@@ -225,9 +231,10 @@ const SEED_RAAVARER = [
   ["koriander","Koriander øko.","g",25,"1 potte / Rosborg · pris anslået",15.00,6,0,"Grønt","5027932",1],
   ["tacokrydderi","Taco kryddermix","g",40,"40 g / Banderos",5.25,365,0,"Kolonial","5046477",1],
   ["tacosauce","Taco sauce (medium)","g",230,"230 g / Santa Maria · pris anslået",18.00,90,0,"Kolonial","5021649",1],
-  ["jalapenos","Jalapeños (syltede)","g",215,"215 g glas / Santa Maria · pris anslået",19.00,365,0,"Kolonial","5500850",1]
+  ["jalapenos","Jalapeños (syltede)","g",250,"250 g / 127 g drænet / Old El Paso",24.75,365,0,"Kolonial","5053687",1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
-             holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11]}));
+             holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11],
+             alt:(SEED_ALT[a[0]] || []).map(([nid,pakke,pakkenavn]) => ({nid, pakke, pakkenavn}))}));
 
 /* ============================================================
    BASISVARER — det der slipper op med tiden i stedet for at høre til en ret.
@@ -523,8 +530,9 @@ function listeTilPi(){
     retter: Object.entries(S.valgt).filter(([, n]) => n).map(([id, n]) =>
       ({id, navn: ret(id)?.navn || id, antal: n, portioner: ret(id)?.portioner || 0})),
     plan: S.uge,
-    varer: rows.map(x => ({id: x.r.id, navn: x.r.navn, nid: x.r.nid || null,
-      pakkenavn: x.r.pakkenavn || null, pakker: x.pakker, kraevet: x.kraevet, koebt: x.koebt,
+    varer: rows.map(x => ({id: x.r.id, navn: x.r.navn, nid: x.produkt.nid || null,
+      pakkenavn: x.produkt.pakkenavn || null,
+      reserver: x.reserver.filter(c => c.nid).map(c => ({nid: c.nid, pakke: c.pakke, pakkenavn: c.pakkenavn || null})), pakker: x.pakker, kraevet: x.kraevet, koebt: x.koebt,
       enhed: x.r.enhed, pris: x.pris, kategori: x.r.kategori || ""})),
     basis: basisValgte().map(b => ({id: b.id, navn: b.navn, kategori: b.kategori || "", nid: b.nid || null, pakkenavn: b.pakkenavn || null, butik: b.butik || null}))
   };
@@ -599,6 +607,15 @@ function anvendPriser(p){
     if(r.pakkenavn && r.pakkenavn.includes(" · pris anslået")){
       r.pakkenavn = r.pakkenavn.replace(" · pris anslået", ""); aendret = true;
     }
+    if(typeof np.lager === "boolean" && r.lager !== np.lager){ r.lager = np.lager; aendret = true; }
+    (r.alt || []).forEach(a => {                 // godkendte alternativer (03-10)
+      const ap = (p.alt || {})[a.nid];
+      if(!ap || typeof ap.pris !== "number" || ap.pris <= 0) return;
+      const ny = {pris: ap.pris, tilbud: ap.tilbud || null, lager: ap.lager !== false};
+      if(JSON.stringify({pris: a.pris, tilbud: a.tilbud || null, lager: a.lager}) !== JSON.stringify(ny)){
+        Object.assign(a, ny); aendret = true;
+      }
+    });
   });
   if(S.priserHentet !== p.hentet){ S.priserHentet = p.hentet; aendret = true; }
   return aendret;
@@ -939,22 +956,44 @@ function bedsteTilbud(d){
   }
   return bedst;
 }
+/* ---------- Billigste på lager (03-10) ----------
+   En råvare kan have godkendte alternativer (`alt`). Til det, der skal bruges,
+   regnes prisen ud for hver af dem (med tilbud), og den billigste, der var på
+   lager ved nattens opslag, vælges. Er ingen på lager, vælges hovedvaren, og
+   den markeres udsolgt. De øvrige sendes med til Pi'en som reserver i
+   prisorden, hvis varen viser sig udsolgt ved afsendelsen. Ukendt lager
+   (ingen data endnu) regnes som på lager. */
+function prisFor(c, kraevet){
+  const pakker = Math.ceil(kraevet / c.pakke - 1e-9);
+  const t = tilbudFor({pris: c.pris, tilbud: c.tilbud});
+  let pris = pakker * (c.pris || 0), sparet = 0;
+  if(t){                                     // hele «2 for 170» til tilbudspris, resten til stykpris
+    const g = Math.floor(pakker / t.antal);
+    const medTilbud = g * t.pris + (pakker - g * t.antal) * c.pris;
+    sparet = pris - medTilbud; pris = medTilbud;
+  }
+  return {produkt: c, pakker, koebt: pakker * c.pakke, pris, tilbud: t, sparet};
+}
+function vaelgProdukt(r, kraevet){
+  const kandidater = [{nid: r.nid, pakke: r.pakke, pakkenavn: r.pakkenavn, pris: r.pris,
+                       tilbud: r.tilbud, lager: r.lager, hoved: true}]
+    .concat((r.alt || []).filter(a => a.pris > 0 && a.pakke > 0).map(a => ({...a, hoved: false})));
+  const regnet = kandidater.map(c => prisFor(c, kraevet))
+    .sort((a, b) => (a.pris - b.pris) || (b.produkt.hoved - a.produkt.hoved));
+  const paaLager = regnet.filter(x => x.produkt.lager !== false);
+  const valgt = paaLager[0] || regnet.find(x => x.produkt.hoved);
+  return {...valgt, udsolgt: valgt.produkt.lager === false,
+          reserver: paaLager.filter(x => x !== valgt).map(x => x.produkt)};
+}
 function indkoeb(b){
   const rows = [];
   for(const [vid, kraevet] of Object.entries(b)){
     const r = raa(vid);
     if(!r || r.altid) continue;   // krydderier og basisvarer købes ikke pr. ret
-    const pakker = Math.ceil(kraevet / r.pakke - 1e-9);
-    const koebt = pakker * r.pakke;
-    // Nemlig-tilbud: hele «2 for 170» regnes til tilbudspris, resten til stykpris
-    const t = tilbudFor(r);
-    let pris = pakker * (r.pris || 0), sparet = 0;
-    if(t){
-      const g = Math.floor(pakker / t.antal);
-      const medTilbud = g * t.pris + (pakker - g * t.antal) * r.pris;
-      sparet = pris - medTilbud; pris = medTilbud;
-    }
-    rows.push({r, kraevet, pakker, koebt, over: koebt - kraevet, pris, tilbud: t, sparet});
+    const v = vaelgProdukt(r, kraevet);
+    rows.push({r, kraevet, pakker: v.pakker, koebt: v.koebt, over: v.koebt - kraevet,
+               pris: v.pris, tilbud: v.tilbud, sparet: v.sparet,
+               produkt: v.produkt, hoved: v.produkt.hoved, udsolgt: v.udsolgt, reserver: v.reserver});
   }
   rows.sort((a,b2) => a.r.kategori === b2.r.kategori
     ? a.r.navn.localeCompare(b2.r.navn,"da") : a.r.kategori.localeCompare(b2.r.kategori,"da"));
@@ -1516,7 +1555,9 @@ function sListe(){
       }
       const tr = el("tr");
       const v = el("td","v"); v.append(el("span",null,x.r.navn),
-        el("small",null, x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed))));
+        el("small",null, x.pakker + " × " + (x.produkt.pakkenavn || maengde(x.produkt.pakke, x.r.enhed)) +
+          (x.hoved ? "" : " · billigst på lager")));
+      if(x.udsolgt) v.append(el("small","udsolgt","Udsolgt hos Nemlig i nat"));
       if(x.tilbud) v.append(el("small","tilbud", tilbudTekst(x.tilbud) + (x.sparet > 0.005
         ? " · sparer " + kr2(x.sparet)
         : " · køb " + x.tilbud.antal + " og spar " + kr2(x.tilbud.spar))));
@@ -1598,6 +1639,7 @@ async function sendNemlig(e){
     if(r.ok){
       linjer = [s.pakker + " pakker (" + s.varer + " varer) ligger nu på listen «" + s.liste + "» hos Nemlig."];
       if(s.fjernet) linjer.push(s.fjernet + (s.fjernet === 1 ? " gammel vare" : " gamle varer") + " er fjernet fra listen.");
+      if(s.erstattet && s.erstattet.length) linjer.push(punktum("Udsolgt – lagt på i stedet: " + s.erstattet.join(", ")));
       if(s.udsolgt && s.udsolgt.length) linjer.push(punktum("Udsolgt hos Nemlig lige nu: " + s.udsolgt.join(", ")));
       if(s.andet_sted && s.andet_sted.length) linjer.push(punktum("Købes et andet sted: " + s.andet_sted.join(", ")));
       if(s.uden_nummer && s.uden_nummer.length) linjer.push("Ikke sendt (intet Nemlig-nummer): " + s.uden_nummer.join(", ") + " – tilføj dem selv.");
@@ -1620,7 +1662,7 @@ async function sendNemlig(e){
 }
 async function kopier(e){
   const rows = indkoeb(behov(S.valgt));
-  let txt = rows.map(x => x.pakker + " × " + (x.r.pakkenavn || maengde(x.r.pakke, x.r.enhed)) + " " + x.r.navn).join("\n");
+  let txt = rows.map(x => x.pakker + " × " + (x.produkt.pakkenavn || maengde(x.produkt.pakke, x.r.enhed)) + " " + x.r.navn).join("\n");
   const bv = basisValgte();
   if(bv.length) txt += "\n\nBasisvarer\n" + bv.map(b => "· " + b.navn).join("\n");
   const b = e.currentTarget;

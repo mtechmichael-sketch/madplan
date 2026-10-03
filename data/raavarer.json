@@ -1,5 +1,5 @@
 {
- "version": 11,
+ "version": 13,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -209,7 +209,19 @@
    "kategori": "Grønt",
    "nid": "5037675",
    "est": true,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5006090",
+     "pakke": 2000,
+     "pakkenavn": "2 kg"
+    },
+    {
+     "nid": "5014541",
+     "pakke": 1000,
+     "pakkenavn": "1 kg øko."
+    }
+   ]
   },
   {
    "id": "broccoli",
@@ -426,14 +438,26 @@
    "navn": "Lasagneplader",
    "enhed": "g",
    "pakke": 500,
-   "pakkenavn": "500 g / Garofalo",
-   "pris": 31.5,
+   "pakkenavn": "500 g øko. / Grøn Balance",
+   "pris": 23.95,
    "holdbar": 90,
    "frys": false,
    "kategori": "Kolonial",
-   "nid": "5065117",
+   "nid": "5046423",
    "est": false,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5065117",
+     "pakke": 500,
+     "pakkenavn": "500 g / Garofalo"
+    },
+    {
+     "nid": "5009449",
+     "pakke": 500,
+     "pakkenavn": "500 g / De Cecco"
+    }
+   ]
   },
   {
    "id": "tortillas",
@@ -661,17 +685,29 @@
   },
   {
    "id": "mayonnaise",
-   "navn": "Ægte mayonnaise",
+   "navn": "Mayonnaise",
    "enhed": "ml",
-   "pakke": 250,
-   "pakkenavn": "0,25 l / K-Salat",
-   "pris": 18.95,
+   "pakke": 400,
+   "pakkenavn": "400 g / First Price",
+   "pris": 12.12,
    "holdbar": 60,
    "frys": false,
    "kategori": "Kolonial",
-   "nid": "5606181",
+   "nid": "2301033",
    "est": true,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5003502",
+     "pakke": 375,
+     "pakkenavn": "375 g / K-Salat"
+    },
+    {
+     "nid": "5606181",
+     "pakke": 250,
+     "pakkenavn": "0,25 l / K-Salat (ægte)"
+    }
+   ]
   },
   {
    "id": "karrykrydderi",
@@ -1091,7 +1127,19 @@
    "kategori": "Grønt",
    "nid": "106499",
    "est": true,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5053303",
+     "pakke": 330,
+     "pakkenavn": "330 g Snackmix"
+    },
+    {
+     "nid": "5014547",
+     "pakke": 200,
+     "pakkenavn": "200 g Snackmix"
+    }
+   ]
   },
   {
    "id": "aeble",
@@ -1181,15 +1229,32 @@
    "id": "dijon",
    "navn": "Dijon sennep",
    "enhed": "g",
-   "pakke": 250,
-   "pakkenavn": "250 g / Bähncke",
-   "pris": 20,
+   "pakke": 370,
+   "pakkenavn": "370 g / Chatel",
+   "pris": 12.95,
    "holdbar": 365,
    "frys": false,
    "kategori": "Kolonial",
-   "nid": "101491",
+   "nid": "5029075",
    "est": true,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5071674",
+     "pakke": 370,
+     "pakkenavn": "370 g øko. / Chatel"
+    },
+    {
+     "nid": "101491",
+     "pakke": 250,
+     "pakkenavn": "250 g / Bähncke"
+    },
+    {
+     "nid": "105322",
+     "pakke": 380,
+     "pakkenavn": "380 g / Maille"
+    }
+   ]
   },
   {
    "id": "gr_bouillon",
@@ -1433,15 +1498,27 @@
    "id": "jalapenos",
    "navn": "Jalapeños (syltede)",
    "enhed": "g",
-   "pakke": 215,
-   "pakkenavn": "215 g glas / Santa Maria · pris anslået",
-   "pris": 19.0,
+   "pakke": 250,
+   "pakkenavn": "250 g / 127 g drænet / Old El Paso",
+   "pris": 24.75,
    "holdbar": 365,
    "frys": false,
    "kategori": "Kolonial",
-   "nid": "5500850",
+   "nid": "5053687",
    "est": true,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5021643",
+     "pakke": 215,
+     "pakkenavn": "215 g / 110 g drænet / Santa Maria (røde)"
+    },
+    {
+     "nid": "5500850",
+     "pakke": 215,
+     "pakkenavn": "215 g glas / Santa Maria"
+    }
+   ]
   }
  ]
 }

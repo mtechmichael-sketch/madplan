@@ -490,3 +490,6 @@ td.v small.tilbud{color:var(--accent);font-weight:600}
 .minus{width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;
   display:grid;place-items:center;font-size:24px;font-weight:700;line-height:1;cursor:pointer}
 .minus:active{background:var(--crit)}
+
+/* Billigste på lager (v0.20.0): udsolgt-markering på indkøbslisten */
+td.v small.udsolgt{color:var(--crit);font-weight:700}
