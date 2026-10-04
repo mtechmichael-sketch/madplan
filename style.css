@@ -493,3 +493,16 @@ td.v small.tilbud{color:var(--accent);font-weight:600}
 
 /* Billigste på lager (v0.20.0): udsolgt-markering på indkøbslisten */
 td.v small.udsolgt{color:var(--crit);font-weight:700}
+
+/* Dagvælger over 3 uger og flueben på planlagte retter (v0.21.0) */
+.dagvalg-uge{margin-top:12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.dagvalg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:6px}
+.dagvalg button{min-width:0;height:52px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1}
+.dagvalg button .dk{font-size:12px;font-weight:600}
+.dagvalg button .dn{font-size:16px;font-weight:700}
+.dagvalg button:disabled{opacity:.3;cursor:default}
+.dagvalg button.optaget{border-style:dashed;border-color:var(--accent)}
+.flueben{position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;
+  background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;
+  font-size:18px;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.dagmaerke{text-transform:none;letter-spacing:0;font-size:12px}

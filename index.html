@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.20.1">
-<link rel="stylesheet" href="style.css?v=0.20.1">
+<link rel="stylesheet" href="tema.css?v=0.21.0">
+<link rel="stylesheet" href="style.css?v=0.21.0">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.20.1";
+const VERSION = "0.21.0";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1263,13 +1263,16 @@ function sPlan(){
   V.append(h);
 
   const g = el("div","gitter");
-  const dagFor = {};
-  Object.entries(S.uge).forEach(([d,r]) => { dagFor[r] = d; });
+  // Planlagte dage pr. ret - kun fra i dag og frem (04-10)
+  const idagK = iso(new Date()), dageFor = {};
+  Object.entries(S.uge).filter(([k]) => k >= idagK).sort()
+    .forEach(([k, r]) => { (dageFor[r] = dageFor[r] || []).push(k); });
   [...S.retter].sort((a,b) => a.navn.localeCompare(b.navn,"da")).forEach(d => {
     const n = S.valgt[d.id] || 0;
     const b = el("button","flise"); b.dataset.on = n ? "1" : "0";
     const t = el("div","top-t"); t.style.background = tileBg(d.id);
     t.append(flisemotiv(d)); fotoOver(t, d); b.append(t);
+    if(dageFor[d.id]) t.append(Object.assign(el("span","flueben","✓"), {title: "Lagt på en dag"}));
     if(n){
       // «−» fjerner én igen - et højreklik (som før) findes ikke på tabletten (03-10)
       const a = el("div","antal");
@@ -1286,9 +1289,11 @@ function sPlan(){
     k.append(el("div","n", d.navn), el("div","m", d.portioner + " portioner"));
     const bt = bedsteTilbud(d);
     if(bt) k.append(el("div","tilbudmaerke", "Tilbud på " + bt.r.navn));
-    if(dagFor[d.id]){
-      const dt = new Date(dagFor[d.id] + "T12:00:00");
-      k.append(el("div","dagmaerke", DAGE[(dt.getDay()+6)%7]));
+    if(dageFor[d.id]){
+      k.append(el("div","dagmaerke", "✓ " + dageFor[d.id].map(x => {
+        const dt = new Date(x + "T12:00:00");
+        return DAGK[(dt.getDay()+6)%7] + " " + dt.getDate() + ".";
+      }).join(" · ")));
     }
     b.append(k);
     b.onclick = () => { S.valgt[d.id] = (S.valgt[d.id]||0) + 1; tegn(); };
@@ -1374,21 +1379,39 @@ function sRet(){
       : "Ingenting af det ligger i forvejen i resterne"),{style:"margin-top:8px"}));
   v.append(t, nb, pk);
 
-  // dage
+  // dage: denne uge og de to næste - samme 3 uger som tomgangsskærmen (04-10).
+  // Dage der er gået, kan ikke vælges. En dag med en anden ret har stiplet kant;
+  // vælges den, erstattes den anden ret (som før).
   const dv = el("div");
   dv.append(el("div","eyebrow","Læg på en dag"));
-  const rk = el("div","dagvalg");
-  ugensDage().forEach((dt,i) => {
-    const k = iso(dt), b = el("button",null,DAGK[i]);
-    b.setAttribute("aria-pressed", String(S.uge[k] === d.id));
-    b.onclick = () => {
-      if(S.uge[k] === d.id) delete S.uge[k];
-      else { S.uge[k] = d.id; if(!S.valgt[d.id]) S.valgt[d.id] = 1; }
-      tegn();
-    };
-    rk.append(b);
-  });
-  dv.append(rk); v.append(dv);
+  const idagK = iso(new Date()), man0 = ugensDage()[0];
+  for(let u = 0; u < 3; u++){
+    const uge = Array.from({length:7}, (_,i) => { const x = new Date(man0); x.setDate(man0.getDate() + u*7 + i); return x; });
+    dv.append(el("div","dagvalg-uge", u === 0 ? "Denne uge" : u === 1 ? "Næste uge" : "Uge " + ugeNr(uge[0])));
+    const rk = el("div","dagvalg");
+    uge.forEach((dt,i) => {
+      const k = iso(dt), mig = S.uge[k] === d.id;
+      const anden = S.uge[k] && !mig ? ret(S.uge[k]) : null;
+      const b = el("button", anden ? "optaget" : null);
+      b.append(el("span","dk", DAGK[i]), el("span","dn", String(dt.getDate())));
+      b.setAttribute("aria-pressed", String(mig));
+      b.setAttribute("aria-label", DAGE[i] + " " + dt.getDate() + "." + (anden ? " – " + anden.navn + " ligger her" : ""));
+      if(k < idagK) b.disabled = true;
+      b.onclick = () => {
+        if(mig) delete S.uge[k];
+        else {
+          S.uge[k] = d.id;
+          // samme ret på flere dage: køb ind til dem alle
+          const gange = Object.entries(S.uge).filter(([kk, r]) => r === d.id && kk >= idagK).length;
+          S.valgt[d.id] = Math.max(S.valgt[d.id] || 0, gange);
+        }
+        tegn();
+      };
+      rk.append(b);
+    });
+    dv.append(rk);
+  }
+  v.append(dv);
   wrap.append(v);
 
   // ingredienser
