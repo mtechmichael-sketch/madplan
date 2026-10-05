@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.21.0">
-<link rel="stylesheet" href="style.css?v=0.21.0">
+<link rel="stylesheet" href="tema.css?v=0.21.1">
+<link rel="stylesheet" href="style.css?v=0.21.1">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.21.0";
+const VERSION = "0.21.1";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -300,8 +300,8 @@ const SEED_RETTER = [
      "Byg sliderne med parmesanchips som bund og låg."],
     "https://www.madbanditten.dk/sproede-parmesan-sliders/"],
 
-  ["koedboller","Kødboller i svampesauce",4,
-    {hakket_blandet:500,log:75,hvidlog:1,aeg:1,loppefro:3,champignon:500,svampemix:200,piskeflode:250,bouillon:1,parmesan:10,persille:10,timian:2,rosmarin:2,soja:15,eddike:15},
+  ["koedboller","Kødboller i svampesauce",8,     // laves til 8 (05-10) - dobbelt op ift. kilden
+    {hakket_blandet:1000,log:150,hvidlog:2,aeg:2,loppefro:6,champignon:1000,svampemix:400,piskeflode:500,bouillon:2,parmesan:20,persille:20,timian:4,rosmarin:4,soja:30,eddike:30},
     ["Rør farsen med revet løg, hvidløg, æg, loppefrøskaller og krydderier, og lad den hvile.",
      "Form kødboller og brun dem hele vejen rundt.",
      "Steg svampene gyldne i samme pande sammen med løg og hvidløg.",
@@ -490,8 +490,14 @@ function migrer(d){
   vaek.forEach(id => { delete d.valgt[id];
     Object.keys(d.uge).forEach(dag => { if(d.uge[dag] === id) delete d.uge[dag]; }); });
   const ret2 = {karry:{karrypasta:50}, chili:{kidneybonner:500}, wok:{squash:1},
-               koedboller:{champignon:500, svampemix:200}};
+               };
   const opsk = Object.fromEntries(SEED_RETTER.filter(x => x.opskrift).map(x => [x.id, x.opskrift]));
+  // Kødboller i svampesauce laves til 8 (05-10): skift den gemte 4-personers udgave
+  // ud med katalogets - kun hvis den ikke er rettet i hånden.
+  const kb = d.retter.find(x => x.id === "koedboller"), kbNy = SEED_RETTER.find(x => x.id === "koedboller");
+  if(kb && kbNy && kb.portioner === 4 && kb.ing && kb.ing.hakket_blandet === 500){
+    kb.portioner = kbNy.portioner; kb.ing = {...kbNy.ing};
+  }
   d.retter.forEach(x => {
     if(ret2[x.id]) Object.assign(x.ing, ret2[x.id]);
     if(!x.opskrift && opsk[x.id]) x.opskrift = opsk[x.id];
