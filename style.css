@@ -506,3 +506,12 @@ td.v small.udsolgt{color:var(--crit);font-weight:700}
   background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;
   font-size:18px;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .dagmaerke{text-transform:none;letter-spacing:0;font-size:12px}
+
+/* Flere aftaler samme dag: hver på sin egen linje (v0.21.2) */
+.tg-dag .vj.tg-kalekstra{margin-top:2px}
+.tg-kalekstra .tg-kal::before{margin-left:0}
+
+/* Antal personer på opskriften (v0.22.0) */
+.personvalg{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:15px;color:var(--muted)}
+.personvalg .btn{height:42px;width:46px;padding:0;justify-content:center;font-size:24px;font-weight:700}
+.personvalg .num{font-size:22px;font-weight:700;min-width:2ch;text-align:center;color:var(--ink)}

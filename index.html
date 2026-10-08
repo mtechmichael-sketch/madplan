@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.21.1">
-<link rel="stylesheet" href="style.css?v=0.21.1">
+<link rel="stylesheet" href="tema.css?v=0.22.1">
+<link rel="stylesheet" href="style.css?v=0.22.1">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.21.1";
+const VERSION = "0.22.1";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -451,7 +451,7 @@ function load(){
     }
   }catch(e){ /* korrupt data — start forfra frem for at gå i stå */ }
   return {v:VERSION, dataVersion:DATA_VERSION, raavarer:SEED_RAAVARER, retter:SEED_RETTER,
-          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, basis:SEED_BASIS, basisValgt:{},
+          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, basis:SEED_BASIS, basisValgt:{}, personer:{koedboller:8}, migr:{personer1:true},
           haUrl:"", tomgangMin:3, tema:"auto"};
 }
 
@@ -459,6 +459,9 @@ function load(){
 function migrer(d){
   d.uge = d.uge || {};
   d.basisValgt = d.basisValgt || {};
+  d.personer = d.personer || {};
+  d.migr = d.migr || {};
+  if(!d.migr.personer1){ if(d.personer.koedboller == null) d.personer.koedboller = 8; d.migr.personer1 = true; }   // laves til 8 (05-10)
   if(Array.isArray(d.basis)){                     // basisvarer taget ud fjernes også fra tabletten
     d.basis = d.basis.filter(b => !FJERNEDE_BASIS.includes(b.id));
     FJERNEDE_BASIS.forEach(id => { delete d.basisValgt[id]; });
@@ -534,7 +537,7 @@ function listeTilPi(){
   return {
     version: VERSION,
     retter: Object.entries(S.valgt).filter(([, n]) => n).map(([id, n]) =>
-      ({id, navn: ret(id)?.navn || id, antal: n, portioner: ret(id)?.portioner || 0})),
+      ({id, navn: ret(id)?.navn || id, antal: n, portioner: ret(id) ? personer(ret(id)) : 0})),
     plan: S.uge,
     varer: rows.map(x => ({id: x.r.id, navn: x.r.navn, nid: x.produkt.nid || null,
       pakkenavn: x.produkt.pakkenavn || null,
@@ -931,11 +934,19 @@ function hast(r){
   if(r.frys) f *= 0.5;
   return f;
 }
+/* ---------- Antal personer (07-10) ----------
+   Standard 4 personer på alle retter; hver ret kan sættes til andet på
+   opskriften («Til − 4 + personer»), og valget huskes i S.personer.
+   Mængderne i en ret er skrevet til d.portioner personer og skaleres. */
+const PERSONER_STD = 4;
+const personer = d => (S.personer && S.personer[d.id]) || PERSONER_STD;
+const skala = d => personer(d) / (d.portioner || PERSONER_STD);
 function behov(valgt){
   const b = {};
   for(const [rid, antal] of Object.entries(valgt)){
     const d = ret(rid); if(!d || !antal) continue;
-    for(const [vid, m] of Object.entries(d.ing)) b[vid] = (b[vid] || 0) + m * antal;
+    const f = skala(d);                         // valgt antal personer / rettens eget antal
+    for(const [vid, m] of Object.entries(d.ing)) b[vid] = (b[vid] || 0) + m * antal * f;
   }
   return b;
 }
@@ -1292,7 +1303,7 @@ function sPlan(){
     i.onclick = e => { e.stopPropagation(); vis("ret", d.id); };
     b.append(i);
     const k = el("div","krop");
-    k.append(el("div","n", d.navn), el("div","m", d.portioner + " portioner"));
+    k.append(el("div","n", d.navn), el("div","m", personer(d) + " personer"));
     const bt = bedsteTilbud(d);
     if(bt) k.append(el("div","tilbudmaerke", "Tilbud på " + bt.r.navn));
     if(dageFor[d.id]){
@@ -1335,7 +1346,7 @@ function sPlan(){
   V.append(Object.assign(el("div"),{style:"height:24px"}));
 
   const antal = Object.values(S.valgt).reduce((a,b) => a+b, 0);
-  const port = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id)?.portioner || 0), 0);
+  const port = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id) ? personer(ret(id)) : 0), 0);
   bar([["Indkøb i alt", kr(sum), null],
        ["I risiko for at ryge ud", kr(risiko(rows)), "var(--warn)"],
        ["Valgt", antal ? antal + " retter · " + port + " portioner" : "Ingen endnu", null, true]],
@@ -1350,6 +1361,20 @@ function fjern(id){
 }
 
 /* ---------- Ret-detalje ---------- */
+function personVaelger(d){
+  const ps = el("div","personvalg");
+  const minus = el("button","btn ghost","−"), plus = el("button","btn ghost","+");
+  minus.setAttribute("aria-label","Én person færre"); plus.setAttribute("aria-label","Én person mere");
+  const saet = n => {
+    n = Math.max(1, Math.min(20, n));
+    if(n === PERSONER_STD) delete S.personer[d.id]; else S.personer[d.id] = n;
+    tegn();
+  };
+  minus.onclick = () => saet(personer(d) - 1);
+  plus.onclick = () => saet(personer(d) + 1);
+  ps.append(el("span",null,"Til"), minus, el("span","num", String(personer(d))), plus, el("span",null,"personer"));
+  return ps;
+}
 function sRet(){
   const d = ret(aabenRet); if(!d) return vis("plan");
   const tilbage = el("button","btn ghost");
@@ -1368,7 +1393,7 @@ function sRet(){
   t.append(flisemotiv(d)); fotoOver(t, d);
   const nb = el("div");
   nb.append(Object.assign(el("div",null,d.navn),{style:"font-size:22px;font-weight:700;line-height:1.2"}),
-            Object.assign(el("div","sub", d.portioner + " portioner"),{style:"margin-top:5px;font-size:15px"}));
+            personVaelger(d));
   const pk = el("div","kort");
   const alene = indkoeb(behov({[d.id]:1})).reduce((s,x) => s + x.pris, 0);
   pk.append(el("div","eyebrow","Koster alene"),
@@ -1426,7 +1451,7 @@ function sRet(){
   Object.entries(d.ing).forEach(([vid,m]) => {
     const r = raa(vid); if(!r) return;
     const row = el("div","ing");
-    row.append(el("span","n", r.navn), el("span","num", maengde(m, r.enhed)));
+    row.append(el("span","n", r.navn), el("span","num", maengde(m * skala(d), r.enhed)));
     row.lastChild.style.fontSize = "17px";
     if(r.altid){
       row.style.opacity = ".62";
@@ -1637,7 +1662,7 @@ function sListe(){
   V.append(Object.assign(el("div"),{style:"height:24px"}));
 
   const sum = rows.reduce((s,x) => s + x.pris, 0);
-  const port = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id)?.portioner || 0), 0);
+  const port = Object.entries(S.valgt).reduce((a,[id,n]) => a + n * (ret(id) ? personer(ret(id)) : 0), 0);
   const sparet = rows.reduce((s,x) => s + (x.sparet || 0), 0);
   bar([["I alt", kr2(sum), null],
        ["Pris pr. portion", port ? kr2(sum/port) : "–", "var(--ok)"],
@@ -2073,7 +2098,7 @@ function tegnTomgang(){
     // linje med portioner, og tid hvis retten har fået et minuttal
     const meta = el("div","tg-meta");
     if(iaften.tid) meta.append(el("span",null, iaften.tid + " min"));
-    meta.append(el("span",null, iaften.portioner + " pers."));
+    meta.append(el("span",null, personer(iaften) + " pers."));
     tx.append(meta);
     const se = el("div"); se.style.cssText = "display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--accent);font-size:15px;font-weight:600";
     se.append(el("span",null,"Se opskriften"));
@@ -2127,13 +2152,21 @@ function tegnTomgang(){
           el("span","tg-vejrtekst", grader(w.hoej) + " / " + grader(w.lav) + " · " + vejrord(w.tilstand) +
             (w.regn > 0 ? " · " + String(Math.round(w.regn * 10) / 10).replace(".", ",") + " mm" : "")));
       }
-      if(aft.length){
-        const f = aft[0];
-        const tid = f.heleDagen ? "" : tidsrum(f, d);
-        vl.append(el("span","tg-kal", (tid ? tid + " " : "") + f.titel));
-        if(aft.length > 1) vl.append(el("span","tg-kalflere", "+" + (aft.length - 1)));
-      }
+      const aftTekst = f => { const tid = f.heleDagen ? "" : tidsrum(f, d); return (tid ? tid + " " : "") + f.titel; };
+      if(aft.length) vl.append(el("span","tg-kal", aftTekst(aft[0])));
       indhold.append(vl);
+      // Flere aftaler samme dag: hver på sin egen linje (07-10). «+1» viste ikke,
+      // hvad den anden aftale var - og listen kan rulles, så der er plads.
+      aft.slice(1, 5).forEach(f => {
+        const ekstra = el("div","vj tg-kalekstra");
+        ekstra.append(el("span","tg-kal", aftTekst(f)));
+        indhold.append(ekstra);
+      });
+      if(aft.length > 5){                        // usædvanligt mange: resten som tal
+        const ekstra = el("div","vj tg-kalekstra");
+        ekstra.append(el("span","tg-kalflere", "+ " + (aft.length - 5) + " mere"));
+        indhold.append(ekstra);
+      }
     }
     row.append(lab, indhold);
     if(r){                                     // lille foto yderst til højre
