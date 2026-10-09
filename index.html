@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.22.1">
-<link rel="stylesheet" href="style.css?v=0.22.1">
+<link rel="stylesheet" href="tema.css?v=0.23.0">
+<link rel="stylesheet" href="style.css?v=0.23.0">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.22.1";
+const VERSION = "0.23.0";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -749,6 +749,7 @@ async function hentKalender(){
         hvem: k.entity_id === KAL_UDEN_NAVN ? "" : String(k.name || "").replace(/^aula\s+/i, "").trim(),
         aftaler: liste.map(a => ({
           titel: a.summary || "(uden titel)",
+          beskrivelse: a.description || "",
           fra: tidspunkt(a.start),
           til: tidspunkt(a.end),
           heleDagen: !a.start.dateTime
@@ -1246,6 +1247,7 @@ const BAR = document.getElementById("bar");
 
 function vis(n, arg){
   visning = n;
+  if(n !== "tomgang") konfetti(false);
   if(n === "ret" || n === "kilde") aabenRet = arg;
   document.getElementById("tomgang").classList.toggle("vis", n === "tomgang");
   document.getElementById("tomgang").setAttribute("aria-hidden", String(n !== "tomgang"));
@@ -2036,6 +2038,41 @@ function bar(kpis, knapper){
    TOMGANGSSKÆRM
    ============================================================ */
 let urTimer;
+/* ---------- Fødselsdage (09-10) ----------
+   En heldagsaftale med «fødselsdag» i titlen gør tomgangsskærmen festlig den dag:
+   lykønskning i topbjælken, konfetti og 🎂 i ugelisten. Navnet tages fra titlen
+   («Annas fødselsdag» → «Anna»), alderen fra «født 2014» i beskrivelsen (eller
+   «12 år» i titlen). Intet navn står i koden - alt kommer fra kalenderen. */
+function fodselsdage(dag){
+  return aftalerPaa(dag, false).filter(a => a.heleDagen && /fødselsdag/i.test(a.titel)).map(a => {
+    const titel = a.titel.replace(/^[^:]*:\s*/, "");             // «Navn: …» fra Aula
+    const nm = titel.match(/^(.+?)(?:'s|s|')?\s+fødselsdag/i);
+    const navn = nm ? nm[1].trim() : null;
+    const fy = (a.beskrivelse || "").match(/f[øo]dt\s+(\d{4})/i);
+    const ty = titel.match(/(\d{1,3})\s*år/i);
+    const alder = fy ? new Date(dag).getFullYear() - +fy[1] : ty ? +ty[1] : null;
+    if(navn && alder) return "Tillykke med de " + alder + " år, " + navn + "!";
+    if(navn) return "Tillykke med fødselsdagen, " + navn + "!";
+    return "Tillykke med fødselsdagen!";
+  });
+}
+function konfetti(til){
+  let k = document.getElementById("konfetti");
+  if(!til){ if(k) k.remove(); return; }
+  if(k) return;                                   // kører allerede - start ikke forfra hvert minut
+  k = el("div"); k.id = "konfetti"; k.setAttribute("aria-hidden", "true");
+  const farver = ["#F3C86A", "#8FD0A5", "#E8D9A8", "#E07A5F", "#7FB3D5", "#F5F1E8"];
+  for(let i = 0; i < 36; i++){
+    const s = el("span");
+    s.style.left = (Math.random() * 100).toFixed(1) + "%";
+    s.style.background = farver[i % farver.length];
+    s.style.animationDelay = (Math.random() * 12).toFixed(1) + "s";
+    s.style.animationDuration = (8 + Math.random() * 8).toFixed(1) + "s";
+    s.style.setProperty("--drej", Math.round(Math.random() * 720 - 360) + "deg");
+    k.append(s);
+  }
+  document.body.append(k);
+}
 function tegnTomgang(){
   const T = document.getElementById("tomgang");
   const gammel = T.querySelector(".tg-dage");   // husk hvor langt listen var rullet
@@ -2052,9 +2089,12 @@ function tegnTomgang(){
   // topbjælke: navn og undertitel. Ingen knapper - skærmen forsvinder ved berøring.
   const bj = el("div","tg-top");
   const mrk = el("div","tg-brand");
-  mrk.append(el("span","tg-navn","Madplan"), el("span","tg-slogan","Ugens mad i huset"));
+  const fest = fodselsdage(nu);
+  if(fest.length) mrk.append(el("span","tg-fest-tekst", "🎉 " + fest.join(" · ") + " 🎉"));
+  else mrk.append(el("span","tg-navn","Madplan"), el("span","tg-slogan","Ugens mad i huset"));
   bj.append(mrk);
   T.append(bj);
+  konfetti(fest.length > 0);
 
   const v = el("div","tg-v");
   const ur = el("div","ur num", nu.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"}));
@@ -2139,7 +2179,7 @@ function tegnTomgang(){
     const row = el("div","tg-dag" + (k === idagK ? " idag" : ""));
     const lab = el("div","lab");
     const ud = (d.getDay() + 6) % 7;            // mandag = 0, som DAGE og DAGK
-    lab.append(el("b",null, k === idagK ? "I dag" : (i === 1 ? "I morgen" : DAGE[ud])),
+    lab.append(el("b",null, (k === idagK ? "I dag" : (i === 1 ? "I morgen" : DAGE[ud])) + (fodselsdage(d).length ? " 🎂" : "")),
                el("i",null, DAGK[ud] + " " + d.getDate()));
     const indhold = el("div","r" + (r ? "" : " fri"), r ? r.navn : "—");
     const w = visVejr ? VEJR.dage[k] : null;
