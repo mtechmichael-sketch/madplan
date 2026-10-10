@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.23.0">
-<link rel="stylesheet" href="style.css?v=0.23.0">
+<link rel="stylesheet" href="tema.css?v=0.24.0">
+<link rel="stylesheet" href="style.css?v=0.24.0">
 </head>
 <body>
 
@@ -70,6 +70,12 @@
 </form></dialog>
 <datalist id="bkats"><option value="Husholdning"><option value="Personlig pleje"></datalist>
 
+<dialog id="dlgRyd"><form method="dialog">
+  <header>Ryd kurven?</header>
+  <div class="krop"><p class="note" id="rydTekst" style="margin:0"></p></div>
+  <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Ryd kurv</button></footer>
+</form></dialog>
+
 <dialog id="dlgRet"><form method="dialog">
   <header id="tRet">Ret</header>
   <div class="krop">
@@ -94,7 +100,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.23.0";
+const VERSION = "0.24.0";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -451,13 +457,17 @@ function load(){
     }
   }catch(e){ /* korrupt data — start forfra frem for at gå i stå */ }
   return {v:VERSION, dataVersion:DATA_VERSION, raavarer:SEED_RAAVARER, retter:SEED_RETTER,
-          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, basis:SEED_BASIS, basisValgt:{}, personer:{koedboller:8}, migr:{personer1:true},
+          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, koebt:{}, basis:SEED_BASIS, basisValgt:{}, personer:{koedboller:8}, migr:{personer1:true},
           haUrl:"", tomgangMin:3, tema:"auto"};
 }
 
 /* Opdaterer gemte data uden at røre det du selv har lavet. */
 function migrer(d){
   d.uge = d.uge || {};
+  // Dage der er købt ind til (v0.24.0): «Ryd kurv» tømmer kurven, men lader
+  // de planlagte dage stå. En dag uden ret kan ikke være købt ind.
+  d.koebt = d.koebt || {};
+  Object.keys(d.koebt).forEach(dag => { if(!d.uge[dag]) delete d.koebt[dag]; });
   d.basisValgt = d.basisValgt || {};
   d.personer = d.personer || {};
   d.migr = d.migr || {};
@@ -491,7 +501,7 @@ function migrer(d){
   const vaek = new Set(FJERNEDE);
   d.retter = d.retter.filter(x => !vaek.has(x.id));
   vaek.forEach(id => { delete d.valgt[id];
-    Object.keys(d.uge).forEach(dag => { if(d.uge[dag] === id) delete d.uge[dag]; }); });
+    Object.keys(d.uge).forEach(dag => { if(d.uge[dag] === id){ delete d.uge[dag]; delete d.koebt[dag]; } }); });
   const ret2 = {karry:{karrypasta:50}, chili:{kidneybonner:500}, wok:{squash:1},
                };
   const opsk = Object.fromEntries(SEED_RETTER.filter(x => x.opskrift).map(x => [x.id, x.opskrift]));
@@ -1309,10 +1319,16 @@ function sPlan(){
     const bt = bedsteTilbud(d);
     if(bt) k.append(el("div","tilbudmaerke", "Tilbud på " + bt.r.navn));
     if(dageFor[d.id]){
-      k.append(el("div","dagmaerke", "✓ " + dageFor[d.id].map(x => {
-        const dt = new Date(x + "T12:00:00");
-        return DAGK[(dt.getDay()+6)%7] + " " + dt.getDate() + ".";
-      }).join(" · ")));
+      // Dage der er købt ind til, står først («Købt ind · man 5. · ✓ ons 7.»), så
+      // man kan se forskel på det, der er bestilt, og det, der ligger i kurven.
+      // Én linje (valgt 10-10) - den ombrydes selv på de smalle fliser.
+      const dagtekst = x => { const dt = new Date(x + "T12:00:00");
+        return DAGK[(dt.getDay()+6)%7] + " " + dt.getDate() + "."; };
+      const koebte = dageFor[d.id].filter(x => S.koebt[x]), nye = dageFor[d.id].filter(x => !S.koebt[x]);
+      const dele = [];
+      if(koebte.length) dele.push("Købt ind · " + koebte.map(dagtekst).join(" · "));
+      if(nye.length) dele.push("✓ " + nye.map(dagtekst).join(" · "));
+      k.append(el("div","dagmaerke", dele.join(" · ")));
     }
     b.append(k);
     b.onclick = () => { S.valgt[d.id] = (S.valgt[d.id]||0) + 1; tegn(); };
@@ -1352,13 +1368,37 @@ function sPlan(){
   bar([["Indkøb i alt", kr(sum), null],
        ["I risiko for at ryge ud", kr(risiko(rows)), "var(--warn)"],
        ["Valgt", antal ? antal + " retter · " + port + " portioner" : "Ingen endnu", null, true]],
-      [["Ryd ugen","ghost",() => { S.valgt = {}; S.uge = {}; tegn(); }],
+      [["Ryd kurv","ghost",spoergRyd],
        ["Se indkøbslisten","",() => vis("liste"), 'M3 5h2l2.4 10.4a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.55L20.5 8H6']]);
+}
+/* «Ryd kurv» (v0.24.0): kurven tømmes, når der er bestilt, men de planlagte
+   retter bliver stående på deres dage - de skal jo stadig laves. Dagene mærkes
+   som købt ind, så de ikke tælles med, næste gang samme ret lægges på en dag.
+   Før tømte knappen («Ryd ugen») også dagene, og hele ugens plan forsvandt. */
+function rydKurv(){
+  const idagK = iso(new Date());
+  Object.keys(S.uge).forEach(k => { if(k >= idagK) S.koebt[k] = true; });
+  S.valgt = {};
+  tegn();
+}
+/* Knappen spørger først, så et fejltryk kan fortrydes. Er kurven tom, er der
+   intet at rydde - og så skal dagene heller ikke mærkes som købt ind. */
+function spoergRyd(){
+  const antal = Object.values(S.valgt).reduce((a,b) => a+b, 0);
+  if(!antal) return;
+  const idagK = iso(new Date());
+  const dage = Object.keys(S.uge).filter(k => k >= idagK).length;
+  rydTekst.textContent = "Kurven tømmes for " + antal + (antal === 1 ? " ret" : " retter") + ". "
+    + (dage ? (dage === 1 ? "Den planlagte dag bliver stående og mærkes" : "De " + dage + " planlagte dage bliver stående og mærkes") + " som købt ind."
+            : "Der ligger ingen retter på en dag.");
+  dlgRyd.returnValue = "";   // ellers husker dialogen «ok» fra sidst, hvis den lukkes uden et tryk
+  dlgRyd.showModal();
 }
 function fjern(id){
   if(!S.valgt[id]) return;
   S.valgt[id]--;
-  if(!S.valgt[id]){ delete S.valgt[id]; Object.keys(S.uge).forEach(d => { if(S.uge[d] === id) delete S.uge[d]; }); }
+  // sidste i kurven fjernet: retten tages af de dage, der ikke er købt ind til
+  if(!S.valgt[id]){ delete S.valgt[id]; Object.keys(S.uge).forEach(d => { if(S.uge[d] === id && !S.koebt[d]) delete S.uge[d]; }); }
   tegn();
 }
 
@@ -1431,11 +1471,12 @@ function sRet(){
       b.setAttribute("aria-label", DAGE[i] + " " + dt.getDate() + "." + (anden ? " – " + anden.navn + " ligger her" : ""));
       if(k < idagK) b.disabled = true;
       b.onclick = () => {
-        if(mig) delete S.uge[k];
+        if(mig){ delete S.uge[k]; delete S.koebt[k]; }
         else {
-          S.uge[k] = d.id;
-          // samme ret på flere dage: køb ind til dem alle
-          const gange = Object.entries(S.uge).filter(([kk, r]) => r === d.id && kk >= idagK).length;
+          S.uge[k] = d.id; delete S.koebt[k];   // en ny ret på dagen er ikke købt ind endnu
+          // samme ret på flere dage: køb ind til dem alle - men ikke til de dage,
+          // der allerede er købt ind til
+          const gange = Object.entries(S.uge).filter(([kk, r]) => r === d.id && kk >= idagK && !S.koebt[kk]).length;
           S.valgt[d.id] = Math.max(S.valgt[d.id] || 0, gange);
         }
         tegn();
@@ -1974,7 +2015,7 @@ function sRetter(){
     const e1 = el("button","btn ghost","Ret"); e1.onclick = () => editRet(d);
     const e2 = el("button","btn ghost","Slet");
     e2.onclick = () => { S.retter = S.retter.filter(x => x.id !== d.id); delete S.valgt[d.id];
-      Object.keys(S.uge).forEach(k => { if(S.uge[k] === d.id) delete S.uge[k]; }); tegn(); };
+      Object.keys(S.uge).forEach(k => { if(S.uge[k] === d.id){ delete S.uge[k]; delete S.koebt[k]; } }); tegn(); };
     r.append(e1, e2); box.append(r);
   });
   V.append(box);
@@ -2291,6 +2332,9 @@ dlgBasis.addEventListener("close", () => {
   if(basisEdit) Object.assign(basisEdit, o); else S.basis.push(o);
   tegn();
 });
+
+const dlgRyd = document.getElementById("dlgRyd"), rydTekst = document.getElementById("rydTekst");
+dlgRyd.addEventListener("close", () => { if(dlgRyd.returnValue === "ok") rydKurv(); });
 
 const dlgRet = document.getElementById("dlgRet");
 let retEdit = null;
