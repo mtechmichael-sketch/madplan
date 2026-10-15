@@ -522,3 +522,23 @@ td.v small.udsolgt{color:var(--crit);font-weight:700}
 #konfetti span{position:absolute;top:-24px;width:9px;height:14px;border-radius:2px;opacity:.85;
   animation-name:konfettifald;animation-timing-function:linear;animation-iteration-count:infinite}
 @keyframes konfettifald{from{transform:translateY(-24px) rotate(0)}to{transform:translateY(105vh) rotate(var(--drej))}}
+
+/* Køleskabet (v0.25.0): hvad en råvare er til, og hvad der er til overs */
+.ing.med-til{flex-wrap:wrap;row-gap:4px}
+.ing-til{flex-basis:100%;font-size:14px;line-height:1.45;color:var(--muted)}
+.ing-til b{color:var(--ink);font-weight:600}
+.ing-rest{color:var(--warn);font-weight:700}
+.ing-brugt{margin-left:10px;padding:3px 12px;border:1px solid var(--line-strong);border-radius:20px;font-size:13px;font-weight:600;color:var(--muted);background:none}
+.koel-ret{background:none;border:0;padding:0;text-align:left;font:inherit;font-weight:600;color:var(--ink);cursor:pointer}
+.koel-vare{padding:10px 0;border-top:1px solid var(--line)}
+.koel-top{display:flex;gap:12px;align-items:baseline}
+.koel-top .n{flex:1;font-weight:600}
+.koel-til{font-size:14px;color:var(--muted);margin-top:2px}
+.koel-til.overs{color:var(--warn);font-weight:600}
+.rest .btn{height:42px}
+
+/* Knapper på tomgangsskærmen og tre faner i topbjælken (v0.25.0) */
+.tg-knapper{margin-left:auto;display:flex;gap:10px;align-self:center}
+.tg-knap{padding:9px 18px;border-radius:10px;border:1px solid rgba(245,241,232,.28);color:#F5F1E8;
+  background:rgba(245,241,232,.06);font-size:15px;font-weight:600;min-height:44px}
+@media (max-width:760px){.seg button{padding:10px 12px}}

@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.24.0">
-<link rel="stylesheet" href="style.css?v=0.24.0">
+<link rel="stylesheet" href="tema.css?v=0.25.0">
+<link rel="stylesheet" href="style.css?v=0.25.0">
 </head>
 <body>
 
@@ -24,9 +24,14 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16M4 8v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M4 8l2-4h12l2 4"/><path d="M9 13h6"/></svg>
         <span>Mad</span>
       </button>
-      <button id="fHjem">
+      <!-- Hjem = tomgangsskærmen, Home Assistant = husets skærm i en fane (v0.25.0) -->
+      <button id="fTomgang">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
         <span>Hjem</span>
+      </button>
+      <button id="fHjem">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.2"/></svg>
+        <span>Home Assistant</span>
       </button>
     </div>
     <button class="icnbtn" id="bMere" title="Mere">
@@ -71,9 +76,9 @@
 <datalist id="bkats"><option value="Husholdning"><option value="Personlig pleje"></datalist>
 
 <dialog id="dlgRyd"><form method="dialog">
-  <header>Ryd kurven?</header>
+  <header>Er maden bestilt?</header>
   <div class="krop"><p class="note" id="rydTekst" style="margin:0"></p></div>
-  <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Ryd kurv</button></footer>
+  <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Ja, bestilt</button></footer>
 </form></dialog>
 
 <dialog id="dlgRet"><form method="dialog">
@@ -100,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.24.0";
+const VERSION = "0.25.0";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -457,7 +462,7 @@ function load(){
     }
   }catch(e){ /* korrupt data — start forfra frem for at gå i stå */ }
   return {v:VERSION, dataVersion:DATA_VERSION, raavarer:SEED_RAAVARER, retter:SEED_RETTER,
-          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, koebt:{}, basis:SEED_BASIS, basisValgt:{}, personer:{koedboller:8}, migr:{personer1:true},
+          seedSet:SEED_RETTER.map(x => x.id), valgt:{}, uge:{}, koebt:{}, koebtInd:[], rester:[], basis:SEED_BASIS, basisValgt:{}, personer:{koedboller:8}, migr:{personer1:true},
           haUrl:"", tomgangMin:3, tema:"auto"};
 }
 
@@ -468,6 +473,20 @@ function migrer(d){
   // de planlagte dage stå. En dag uden ret kan ikke være købt ind.
   d.koebt = d.koebt || {};
   Object.keys(d.koebt).forEach(dag => { if(!d.uge[dag]) delete d.koebt[dag]; });
+  // Køleskabet (v0.25.0): bestilte retter og rester. Første gang bliver de
+  // kommende dage, der allerede er købt ind til, til bestilte retter.
+  // OBS: migrer() kører før iso() og PERSONER_STD findes (de står længere
+  // nede). En fejl her ville slette alle gemte data, så intet herinde må
+  // kunne kaste - derfor try/catch og ingen af de to.
+  if(!Array.isArray(d.rester)) d.rester = [];
+  if(!Array.isArray(d.koebtInd)){
+    d.koebtInd = [];
+    try{
+      const n = new Date(), idagK = n.getFullYear() + "-" + String(n.getMonth()+1).padStart(2,"0") + "-" + String(n.getDate()).padStart(2,"0");
+      Object.keys(d.koebt).filter(k => k >= idagK && d.uge[k]).sort().forEach(k =>
+        d.koebtInd.push({id: d.uge[k], p: (d.personer && d.personer[d.uge[k]]) || 4, dag: k, dato: idagK}));
+    }catch(e){ d.koebtInd = []; }
+  }
   d.basisValgt = d.basisValgt || {};
   d.personer = d.personer || {};
   d.migr = d.migr || {};
@@ -1276,7 +1295,7 @@ function tegn(){
   document.getElementById("fHjem").setAttribute("aria-current", String(visning === "hjem"));
   V.innerHTML = ""; BAR.innerHTML = ""; BAR.hidden = true; V.className = "view";
   ({plan:sPlan, ret:sRet, liste:sListe, mere:sMere, retter:sRetter, raavarer:sRaavarer,
-  basis:sBasis, hjem:sHjem, kilde:sKilde}[visning] || sPlan)();
+  basis:sBasis, hjem:sHjem, kilde:sKilde, koeleskab:sKoeleskab}[visning] || sPlan)();
   save();
 }
 
@@ -1368,18 +1387,154 @@ function sPlan(){
   bar([["Indkøb i alt", kr(sum), null],
        ["I risiko for at ryge ud", kr(risiko(rows)), "var(--warn)"],
        ["Valgt", antal ? antal + " retter · " + port + " portioner" : "Ingen endnu", null, true]],
-      [["Ryd kurv","ghost",spoergRyd],
+      [["Bestilt","ghost",spoergRyd],
+       ["Køleskab" + (S.koebtInd.length || S.rester.length ? " (" + (S.koebtInd.length + S.rester.length) + ")" : ""),"ghost",() => vis("koeleskab"),
+        'M6 2h12a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM5 10h14M8 6v1M8 13v3'],
        ["Se indkøbslisten","",() => vis("liste"), 'M3 5h2l2.4 10.4a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.55L20.5 8H6']]);
 }
-/* «Ryd kurv» (v0.24.0): kurven tømmes, når der er bestilt, men de planlagte
-   retter bliver stående på deres dage - de skal jo stadig laves. Dagene mærkes
-   som købt ind, så de ikke tælles med, næste gang samme ret lægges på en dag.
-   Før tømte knappen («Ryd ugen») også dagene, og hele ugens plan forsvandt. */
-function rydKurv(){
+/* «Bestilt» (v0.25.0, hed «Ryd kurv» i v0.24.0): kurven tømmes, når der er
+   bestilt, men de planlagte retter bliver stående på deres dage - de skal jo
+   stadig laves. Dagene mærkes som købt ind, så de ikke tælles med, næste gang
+   samme ret lægges på en dag.
+   Samtidig lægges det bestilte i køleskabet: hver ret i kurven bliver en post
+   i S.koebtInd - én pr. gang den er bestilt, på de dage den ligger på (eller
+   uden dag) - og det der bliver til overs efter planen, kommer i S.rester. */
+function bestilt(){
   const idagK = iso(new Date());
+  for(const [id, n] of Object.entries(S.valgt)){
+    const d = ret(id); if(!d || !n) continue;
+    const dage = Object.keys(S.uge).filter(k => k >= idagK && S.uge[k] === id && !S.koebt[k]).sort();
+    for(let i = 0; i < n; i++) S.koebtInd.push({id, p: personer(d), dag: dage[i] || null, dato: idagK});
+  }
+  indkoeb(behov(S.valgt)).forEach(x => laegIRester(x.r.id, x.over, idagK));
   Object.keys(S.uge).forEach(k => { if(k >= idagK) S.koebt[k] = true; });
   S.valgt = {};
   tegn();
+}
+
+/* ---------- Køleskabet (v0.25.0, 15-10) ----------
+   Køkkenet ville kunne se, hvilken ret en indkøbt råvare er til, og om resten af
+   pakken skal bruges til en anden ret - fx 150 g bacon, hvor retten kun
+   bruger 100 g. Appen husker derfor det bestilte:
+     S.koebtInd  [{id, p, dag, dato}]  én bestilt ret: ret-id, antal personer
+                                       den blev købt til, dagen den ligger på
+                                       (null = ingen dag endnu), bestillingsdato
+     S.rester    [{v, m, dato}]        det der blev til overs: råvare-id,
+                                       mængde, bestillingsdato
+   En ret forlader køleskabet, når der trykkes «Lavet» - ikke af sig selv, når
+   dagen er gået (valgt 15-10). «Laves ikke» lægger rettens råvarer i resterne.
+   Mængderne er det, opskrifterne bruger - ikke vejet. Krydderier og andet,
+   der «haves altid», tælles ikke med. */
+const dagKort = k => { const dt = new Date(k + "T12:00:00"); return DAGK[(dt.getDay()+6)%7] + " " + dt.getDate() + "."; };
+function postMaengder(p){             // {råvare: mængde} for én bestilt ret
+  const d = ret(p.id), o = {}; if(!d) return o;
+  const f = (p.p || PERSONER_STD) / (d.portioner || PERSONER_STD);
+  for(const [vid, m] of Object.entries(d.ing)){ const r = raa(vid); if(r && !r.altid) o[vid] = m * f; }
+  return o;
+}
+// Dag først (ingen dag sidst), så bestillingsdato
+const postNoegle = p => (p.dag || "9999-99-99") + p.dato;
+const posterFor = id => S.koebtInd.filter(p => p.id === id && ret(p.id))
+  .sort((a, b) => postNoegle(a).localeCompare(postNoegle(b)));
+const restAf = vid => S.rester.filter(x => x.v === vid).reduce((s, x) => s + x.m, 0);
+function laegIRester(vid, m, dato){
+  if(!(m > 1e-9)) return;
+  const x = S.rester.find(x => x.v === vid && x.dato === dato);
+  if(x) x.m += m; else S.rester.push({v: vid, m, dato});
+}
+function lavet(post){ S.koebtInd = S.koebtInd.filter(p => p !== post); tegn(); }
+function lavesIkke(post){
+  for(const [vid, m] of Object.entries(postMaengder(post))) laegIRester(vid, m, post.dato);
+  S.koebtInd = S.koebtInd.filter(p => p !== post);
+  if(post.dag && S.uge[post.dag] === post.id){ delete S.uge[post.dag]; delete S.koebt[post.dag]; }
+  tegn();
+}
+function brugtRest(vid){ S.rester = S.rester.filter(x => x.v !== vid); tegn(); }
+const postTekst = p => p.dag ? DAGE[(new Date(p.dag + "T12:00:00").getDay()+6)%7].toLowerCase() + " " + new Date(p.dag + "T12:00:00").getDate() + "." : "ingen dag";
+/* Hvor god er en rest? Samme mærker som «Det bliver til overs» på listen,
+   men regnet fra bestillingsdagen. */
+function restMrk(x){
+  const r = raa(x.v), h = (r && r.holdbar) || 365;
+  if(r && r.frys) return ["m-ok", "kan fryses"];
+  if(h > 90) return ["m-ok", "holder længe"];
+  const til = h - dageSiden(x.dato);
+  if(til < 0) return ["m-crit", "for gammel?"];
+  const t = new Date(x.dato + "T12:00:00"); t.setDate(t.getDate() + h);
+  return [til <= 2 ? "m-crit" : til <= 5 ? "m-warn" : "m-ok", "brug inden " + dagKort(iso(t))];
+}
+
+function sKoeleskab(){
+  const tilbage = el("button","btn ghost");
+  tilbage.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Ugens plan';
+  tilbage.onclick = () => vis("plan");
+  const poster = S.koebtInd.filter(p => ret(p.id)).sort((a, b) => postNoegle(a).localeCompare(postNoegle(b)));
+  const rester = S.rester.filter(x => raa(x.v));
+  const hd = el("div","hint"); hd.style.marginBottom = "16px";
+  const nv = el("span",null,"Køleskab"); nv.style.fontSize = "20px"; nv.style.fontWeight = "700";
+  hd.append(tilbage, nv, el("span","sub", poster.length + (poster.length === 1 ? " ret" : " retter") + " bestilt · " +
+    rester.length + (rester.length === 1 ? " rest" : " rester")));
+  V.append(hd);
+
+  if(!poster.length && !rester.length){
+    V.append(el("p","tom","Køleskabet er tomt. Når I trykker «Bestilt» på Mad-siden, lægges det bestilte herind."));
+    return;
+  }
+
+  const sp = el("div","spalter");
+  // venstre: de bestilte retter
+  const vb = el("div");
+  vb.append(el("div","eyebrow","Bestilt til"));
+  if(!poster.length) vb.append(el("p","tom","Ingen bestilte retter, der ikke er lavet."));
+  const idagK = iso(new Date());
+  poster.forEach(p => {
+    const d = ret(p.id), row = el("div","raekke");
+    const n = el("button","n koel-ret", d.navn); n.onclick = () => vis("ret", d.id);
+    row.append(n);
+    const gaaet = p.dag && p.dag < idagK;
+    row.append(el("span", gaaet ? "mrk m-warn" : p.dag ? "d" : "mrk m-ok", gaaet ? postTekst(p) + " · lavet?" : postTekst(p)));
+    const l = el("button","btn","Lavet"); l.onclick = () => lavet(p);
+    const ik = el("button","btn ghost","Laves ikke"); ik.onclick = () => lavesIkke(p);
+    row.append(l, ik); vb.append(row);
+  });
+  sp.append(vb);
+
+  // højre: råvarerne, og hvad de er til
+  const hb = el("div");
+  hb.append(el("div","eyebrow","Råvarerne · hvad er de til?"));
+  const pr = {};       // råvare -> [{tekst, m}]
+  poster.forEach(p => Object.entries(postMaengder(p)).forEach(([vid, m]) =>
+    (pr[vid] = pr[vid] || []).push({tekst: ret(p.id).navn + " · " + postTekst(p), m})));
+  rester.forEach(x => (pr[x.v] = pr[x.v] || []).push({tekst: "til overs", m: x.m, rest: true}));
+  const vids = Object.keys(pr).sort((a, b) => { const ra = raa(a), rb = raa(b);
+    return ra.kategori === rb.kategori ? ra.navn.localeCompare(rb.navn,"da") : ra.kategori.localeCompare(rb.kategori,"da"); });
+  let kat = null;
+  vids.forEach(vid => {
+    const r = raa(vid);
+    if(r.kategori !== kat){ kat = r.kategori; hb.append(Object.assign(el("div","eyebrow", kat),{style:"margin-top:14px"})); }
+    const row = el("div","koel-vare");
+    const top = el("div","koel-top");
+    top.append(el("span","n", r.navn), el("span","num", maengde(pr[vid].reduce((s, x) => s + x.m, 0), r.enhed)));
+    row.append(top);
+    pr[vid].forEach(x => row.append(el("div","koel-til" + (x.rest ? " overs" : ""), maengde(x.m, r.enhed) + " · " + x.tekst)));
+    hb.append(row);
+  });
+  sp.append(hb);
+  V.append(sp);
+
+  // nederst: resterne, med slet
+  const rh = el("div","hint"); rh.style.marginTop = "26px";
+  rh.append(el("span","eyebrow adv","Til overs"),
+            el("span","sub", rester.length ? "Det der blev til overs, da I bestilte. Slet det, når det er brugt eller smidt ud." : "Ingen rester"));
+  V.append(rh);
+  [...rester].sort((a, b) => a.dato.localeCompare(b.dato) || raa(a.v).navn.localeCompare(raa(b.v).navn,"da")).forEach(x => {
+    const r = raa(x.v), row = el("div","rest");
+    const [cls, txt] = restMrk(x);
+    row.append(el("span","n", r.navn), el("span","num", maengde(x.m, r.enhed)),
+               el("span","sub", "bestilt " + dagKort(x.dato)), el("span","mrk " + cls, txt));
+    const s = el("button","btn ghost","Slet"); s.onclick = () => { S.rester = S.rester.filter(y => y !== x); tegn(); };
+    row.append(s); V.append(row);
+  });
+  V.append(Object.assign(el("div"),{style:"height:24px"}));
 }
 /* Knappen spørger først, så et fejltryk kan fortrydes. Er kurven tom, er der
    intet at rydde - og så skal dagene heller ikke mærkes som købt ind. */
@@ -1388,9 +1543,11 @@ function spoergRyd(){
   if(!antal) return;
   const idagK = iso(new Date());
   const dage = Object.keys(S.uge).filter(k => k >= idagK).length;
-  rydTekst.textContent = "Kurven tømmes for " + antal + (antal === 1 ? " ret" : " retter") + ". "
+  rydTekst.textContent = "Tryk kun, når ordren er afgivet hos Nemlig. "
+    + (antal === 1 ? "Retten flyttes" : "De " + antal + " retter flyttes") + " fra kurven til Køleskab, "
+    + "og det der bliver til overs, kommer på listen over rester. "
     + (dage ? (dage === 1 ? "Den planlagte dag bliver stående og mærkes" : "De " + dage + " planlagte dage bliver stående og mærkes") + " som købt ind."
-            : "Der ligger ingen retter på en dag.");
+            : "Ingen af retterne ligger på en dag endnu - det kan I gøre bagefter.");
   dlgRyd.returnValue = "";   // ellers husker dialogen «ok» fra sidst, hvis den lukkes uden et tryk
   dlgRyd.showModal();
 }
@@ -1448,8 +1605,8 @@ function sRet(){
     if(b > 0) brugt.push(maengde(b, r.enhed) + " " + r.navn.toLowerCase());
   });
   pk.append(Object.assign(el("div","note", brugt.length
-      ? "Bruger " + brugt.slice(0,3).join(", ") + " af dine rester"
-      : "Ingenting af det ligger i forvejen i resterne"),{style:"margin-top:8px"}));
+      ? "Bruger " + brugt.slice(0,3).join(", ") + " af det, kurven giver til overs"
+      : "Bruger intet af det, kurven giver til overs"),{style:"margin-top:8px"}));
   v.append(t, nb, pk);
 
   // dage: denne uge og de to næste - samme 3 uger som tomgangsskærmen (04-10).
@@ -1471,13 +1628,21 @@ function sRet(){
       b.setAttribute("aria-label", DAGE[i] + " " + dt.getDate() + "." + (anden ? " – " + anden.navn + " ligger her" : ""));
       if(k < idagK) b.disabled = true;
       b.onclick = () => {
-        if(mig){ delete S.uge[k]; delete S.koebt[k]; }
+        // En bestilt ret, der tages af sin dag, er stadig i køleskabet - bare uden dag (v0.25.0)
+        const afDagen = id => S.koebtInd.forEach(p => { if(p.id === id && p.dag === k) p.dag = null; });
+        if(mig){ afDagen(d.id); delete S.uge[k]; delete S.koebt[k]; }
         else {
+          if(anden) afDagen(anden.id);
           S.uge[k] = d.id; delete S.koebt[k];   // en ny ret på dagen er ikke købt ind endnu
-          // samme ret på flere dage: køb ind til dem alle - men ikke til de dage,
-          // der allerede er købt ind til
-          const gange = Object.entries(S.uge).filter(([kk, r]) => r === d.id && kk >= idagK && !S.koebt[kk]).length;
-          S.valgt[d.id] = Math.max(S.valgt[d.id] || 0, gange);
+          // ... medmindre retten er bestilt uden dag: så får den dagen og skal ikke købes igen
+          const fri = posterFor(d.id).find(p => !p.dag);
+          if(fri){ fri.dag = k; S.koebt[k] = true; }
+          else {
+            // samme ret på flere dage: køb ind til dem alle - men ikke til de dage,
+            // der allerede er købt ind til
+            const gange = Object.entries(S.uge).filter(([kk, r]) => r === d.id && kk >= idagK && !S.koebt[kk]).length;
+            S.valgt[d.id] = Math.max(S.valgt[d.id] || 0, gange);
+          }
         }
         tegn();
       };
@@ -1489,6 +1654,11 @@ function sRet(){
   wrap.append(v);
 
   // ingredienser
+  // Køleskabet (v0.25.0): ved hver råvare står, om noget af den skal bruges til
+  // en anden bestilt ret, og om der er rester - så man ved, om man kan bruge
+  // hele pakken. «Denne» er den første bestilte gang af retten (tidligste dag).
+  const poster = posterFor(d.id), denne = poster[0] || null;
+  const andre = S.koebtInd.filter(p => p !== denne && ret(p.id));
   const ic = el("div");
   ic.append(el("div","eyebrow","Ingredienser"));
   Object.entries(d.ing).forEach(([vid,m]) => {
@@ -1499,6 +1669,27 @@ function sRet(){
     if(r.altid){
       row.style.opacity = ".62";
       row.insertBefore(el("span","mrk m-ok","haves altid"), row.lastChild);
+    }else{
+      const til = andre.map(p => ({p, m: postMaengder(p)[vid]})).filter(x => x.m > 1e-9)
+        .sort((a, b) => postNoegle(a.p).localeCompare(postNoegle(b.p)));
+      const rest = restAf(vid);
+      const info = el("div","ing-til");
+      if(til.length){
+        info.append(document.createTextNode("Også til "));
+        til.forEach((x, i) => {
+          if(i) info.append(document.createTextNode(", "));
+          info.append(el("b", null, ret(x.p.id).navn + " · " + postTekst(x.p)), document.createTextNode(" (" + maengde(x.m, r.enhed) + ")"));
+        });
+      }
+      if(rest > 1e-9){
+        if(til.length) info.append(document.createTextNode(" · "));
+        info.append(el("span","ing-rest", maengde(rest, r.enhed) + " til overs"));
+        const bb = el("button","ing-brugt","Brugt"); bb.onclick = () => brugtRest(vid);
+        bb.setAttribute("aria-label", "Resten af " + r.navn + " er brugt");
+        info.append(bb);
+      }
+      if(!til.length && rest <= 1e-9 && denne) info.append(document.createTextNode("Kun til denne ret"));
+      if(info.childNodes.length){ row.classList.add("med-til"); row.append(info); }
     }
     ic.append(row);
   });
@@ -1544,10 +1735,13 @@ function sRet(){
   V.append(Object.assign(el("div"),{style:"height:24px"}));
 
   const n = S.valgt[d.id] || 0;
-  bar([["På ugens plan", n ? n + " gang" + (n>1?"e":"") : "Ikke valgt", null, true]],
+  const kpi = [["På ugens plan", n ? n + " gang" + (n>1?"e":"") : "Ikke valgt", null, true]];
+  if(denne) kpi.push(["I køleskabet", poster.length > 1 ? poster.length + " gange" : postTekst(denne), "var(--accent)", true]);
+  bar(kpi,
+      (denne ? [["Lavet","ghost",() => lavet(denne),'M5 12l5 5L20 7']] : []).concat(
       n ? [["Fjern fra ugen","fare",() => { fjern(d.id); vis("ret", d.id); }],
            ["Én gang mere","",() => { S.valgt[d.id] = n+1; tegn(); }]]
-        : [["Tilføj til ugen","",() => { S.valgt[d.id] = 1; tegn(); }]]);
+        : [["Tilføj til ugen","",() => { S.valgt[d.id] = 1; tegn(); }]]));
 }
 
 /* ---------- Kildens opskrift (læsevisning) ----------
@@ -1890,6 +2084,11 @@ function sHjem(){
     V.className = "view pad0";
     const f = el("iframe");
     f.src = S.haUrl; f.style.cssText = "width:100%;height:100%;border:0;display:block";
+    // Berøring inde i Home Assistant når ikke appen selv, og så ville tomgangs-
+    // skærmen dukke op midt i brugen. Samme adresse (port 8123) - så kan appen
+    // lytte med inde i rammen. Lykkes det ikke, sker der intet værre end før.
+    f.onload = () => { try{ ["pointerdown","keydown","wheel"].forEach(e =>
+      f.contentWindow.addEventListener(e, nulstilIdle, {passive:true})); }catch(e){} };
     V.append(f);
     return;
   }
@@ -1914,7 +2113,7 @@ function sMere(){
   hd.append(tilbage); V.append(hd);
 
   const nav = el("div","knaprad"); nav.style.marginTop = "0";
-  [["Retter","retter"],["Råvarer","raavarer"],["Basisvarer","basis"]].forEach(([t,n]) => {
+  [["Retter","retter"],["Råvarer","raavarer"],["Basisvarer","basis"],["Køleskab","koeleskab"]].forEach(([t,n]) => {
     const b = el("button","btn ghost",t); b.onclick = () => { if(n === "basis") basisFra = "mere"; vis(n); }; nav.append(b);
   });
   V.append(nav);
@@ -2015,6 +2214,7 @@ function sRetter(){
     const e1 = el("button","btn ghost","Ret"); e1.onclick = () => editRet(d);
     const e2 = el("button","btn ghost","Slet");
     e2.onclick = () => { S.retter = S.retter.filter(x => x.id !== d.id); delete S.valgt[d.id];
+      S.koebtInd = S.koebtInd.filter(p => p.id !== d.id);
       Object.keys(S.uge).forEach(k => { if(S.uge[k] === d.id){ delete S.uge[k]; delete S.koebt[k]; } }); tegn(); };
     r.append(e1, e2); box.append(r);
   });
@@ -2127,13 +2327,19 @@ function tegnTomgang(){
   const idagK = iso(nu);
   const iaften = S.uge[idagK] ? ret(S.uge[idagK]) : null;
 
-  // topbjælke: navn og undertitel. Ingen knapper - skærmen forsvinder ved berøring.
+  // topbjælke: navn og undertitel. Skærmen forsvinder ved berøring (til Mad);
+  // knapperne til højre går til Mad eller Home Assistant (v0.25.0).
   const bj = el("div","tg-top");
   const mrk = el("div","tg-brand");
   const fest = fodselsdage(nu);
   if(fest.length) mrk.append(el("span","tg-fest-tekst", "🎉 " + fest.join(" · ") + " 🎉"));
   else mrk.append(el("span","tg-navn","Madplan"), el("span","tg-slogan","Ugens mad i huset"));
   bj.append(mrk);
+  const kn = el("div","tg-knapper");
+  [["Mad","plan"], ...(S.haUrl ? [["Home Assistant","hjem"]] : [])].forEach(([t, n]) => {
+    const b = el("button","tg-knap", t); b.onclick = () => vis(n); kn.append(b);
+  });
+  bj.append(kn);
   T.append(bj);
   konfetti(fest.length > 0);
 
@@ -2294,7 +2500,7 @@ function tgRulRoert(){
   }, TG_RUL_TILBAGE);
 }
 ["pointerdown","keydown","wheel"].forEach(e => addEventListener(e, ev => {
-  if(visning === "tomgang" && !ev.target.closest(".iaften .kort, .tg-dage")) vis("plan");
+  if(visning === "tomgang" && !ev.target.closest(".iaften .kort, .tg-dage, .tg-knap")) vis("plan");
   nulstilIdle();
 }, {passive:true}));
 
@@ -2334,7 +2540,7 @@ dlgBasis.addEventListener("close", () => {
 });
 
 const dlgRyd = document.getElementById("dlgRyd"), rydTekst = document.getElementById("rydTekst");
-dlgRyd.addEventListener("close", () => { if(dlgRyd.returnValue === "ok") rydKurv(); });
+dlgRyd.addEventListener("close", () => { if(dlgRyd.returnValue === "ok") bestilt(); });
 
 const dlgRet = document.getElementById("dlgRet");
 let retEdit = null;
@@ -2403,6 +2609,7 @@ document.getElementById("importFile").onchange = function(){
    ============================================================ */
 document.getElementById("fMad").onclick = () => vis("plan");
 document.getElementById("fHjem").onclick = () => vis("hjem");
+document.getElementById("fTomgang").onclick = () => vis("tomgang");
 document.getElementById("bMere").onclick = () => vis("mere");
 addEventListener("resize", nulstilIdle);
 
