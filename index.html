@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.25.0">
-<link rel="stylesheet" href="style.css?v=0.25.0">
+<link rel="stylesheet" href="tema.css?v=0.27.1">
+<link rel="stylesheet" href="style.css?v=0.27.1">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.25.0";
+const VERSION = "0.27.1";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -2000,15 +2000,52 @@ function laerInterval(koeb){
   const midt = s.length % 2 ? s[Math.floor(h)] : (s[h - 1] + s[h]) / 2;
   return {dage: Math.max(3, Math.min(180, Math.round(midt))), koeb: koeb.length};
 }
-function noterKoeb(b){
-  const d = idag();
+/* dato: når købet skete en anden dag end i dag - fx leveringsdagen for en
+   Nemlig-ordre (v0.26.0). «sidst» er altid det nyeste køb. */
+function noterKoeb(b, dato){
+  const d = dato || idag();
   const koeb = (b.koeb || (b.sidst ? [b.sidst] : [])).filter(x => x !== d);
   koeb.push(d); koeb.sort();
   b.koeb = koeb.slice(-KOEB_HUSK);
-  b.sidst = d;
+  b.sidst = koeb[koeb.length - 1];
   const l = laerInterval(b.koeb);
   if(l){ b.interval = l.dage; b.laert = l.koeb; b.est = false; }
 }
+/* ---------- Basisvarer købt hos Nemlig (v0.26.0, 16-10) ----------
+   Pi'en (port 8100, /api/nemlig/koeb) læser de seneste leverede Nemlig-ordrer
+   og sender varenumre og leveringsdatoer - intet andet. Har en basisvare
+   samme varenummer, registreres købet på leveringsdagen, præcis som et tryk
+   på «Købt»: rytmen lærer, og varen tages af listen. Hvert køb (varenummer +
+   dato) bruges kun én gang (S.nemligSet), så en vare, man har sat flueben ved
+   igen efter leveringen, ikke bliver fjernet ved næste opslag. */
+async function hentNemligKoeb(){
+  if(!(HOS_HA && haToken())) return;
+  let s;
+  try{
+    const r = await fetch(location.protocol + "//" + location.hostname + ":8100/api/nemlig/koeb", {
+      method: "POST", headers: {"Authorization": "Bearer " + haToken()}});
+    if(!r.ok) return;
+    s = await r.json();
+  }catch(e){ return; }
+  if(!s || !Array.isArray(s.koeb)) return;
+  S.nemligSet = S.nemligSet || {};
+  let aendret = false;
+  s.koeb.forEach(k => {
+    const b = S.basis.find(x => x.nid && (x.nid === k.nid || x.nid === k.org));
+    const noegle = b && (b.nid + "@" + k.dato);
+    if(!b || S.nemligSet[noegle]) return;
+    S.nemligSet[noegle] = k.dato;
+    noterKoeb(b, k.dato);
+    b.nemlig = k.dato > (b.nemlig || "") ? k.dato : b.nemlig;
+    delete S.basisValgt[b.id];
+    aendret = true;
+  });
+  // glem nøgler, der er ældre end 120 dage - Pi'en sender kun de seneste 60
+  const graense = iso(new Date(Date.now() - 120 * DAG));
+  Object.keys(S.nemligSet).forEach(n => { if(S.nemligSet[n] < graense) delete S.nemligSet[n]; });
+  if(aendret){ if(visning !== "tomgang") tegn(); else save(); }
+}
+
 function basisKoebt(id){
   const b = S.basis.find(x => x.id === id); if(!b) return;
   noterKoeb(b);
@@ -2043,7 +2080,8 @@ function sBasis(){
     const [cls, txt] = basisMrk(b);
     row.append(lab, el("span", cls ? "mrk " + cls : "d", txt),
       el("span","d", b.kategori + " · hver " + b.interval + ". dag" + (b.laert ? " (lært af " + b.laert + " køb)" : "") +
-        (b.sidst ? " · sidst " + new Date(b.sidst + "T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"short"}) : " · aldrig købt")));
+        (b.sidst ? " · sidst " + new Date(b.sidst + "T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"short"}) +
+                   (b.nemlig === b.sidst ? " (Nemlig)" : "") : " · aldrig købt")));
     const kn2 = el("div"); kn2.style.cssText = "display:flex;gap:8px;flex:none";
     const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); kn2.append(k);
     const e2 = el("button","btn ghost","Ret"); e2.onclick = () => editBasis(b); kn2.append(e2);
@@ -2335,6 +2373,22 @@ function tegnTomgang(){
   if(fest.length) mrk.append(el("span","tg-fest-tekst", "🎉 " + fest.join(" · ") + " 🎉"));
   else mrk.append(el("span","tg-navn","Madplan"), el("span","tg-slogan","Ugens mad i huset"));
   bj.append(mrk);
+  // Basisvarer på tur (v0.27.0, 16-10): samme grænse som «på tur» på Basisvarer
+  // (3 dage eller mindre, eller over tid). Varer der allerede er krydset af til
+  // næste indkøb, og varer uden rytme endnu (aldrig købt), nævnes ikke.
+  // Ligger i topbjælken: i venstre kolonne skubbede den «I aften» ud af
+  // skærmen, når vejr og elpris også står der. Et tryk åbner Basisvarer.
+  const tur = S.basis.map(b => ({b, d: basisTil(b)}))
+    .filter(x => x.d !== null && x.d <= 3 && !S.basisValgt[x.b.id])
+    .sort((a, b) => a.d - b.d || a.b.navn.localeCompare(b.b.navn,"da"));
+  if(tur.length){
+    const bl = el("button","tg-basis");
+    bl.append(el("span","tg-basis-t", "Snart tid til at bestille"));
+    bl.append(el("span","tg-basis-v", tur.slice(0, 3).map(x => x.b.navn).join(" · ") +
+      (tur.length > 3 ? " · + " + (tur.length - 3) + " mere" : "")));
+    bl.onclick = () => { basisFra = "plan"; vis("basis"); };
+    bj.append(bl);
+  }
   const kn = el("div","tg-knapper");
   [["Mad","plan"], ...(S.haUrl ? [["Home Assistant","hjem"]] : [])].forEach(([t, n]) => {
     const b = el("button","tg-knap", t); b.onclick = () => vis(n); kn.append(b);
@@ -2500,7 +2554,7 @@ function tgRulRoert(){
   }, TG_RUL_TILBAGE);
 }
 ["pointerdown","keydown","wheel"].forEach(e => addEventListener(e, ev => {
-  if(visning === "tomgang" && !ev.target.closest(".iaften .kort, .tg-dage, .tg-knap")) vis("plan");
+  if(visning === "tomgang" && !ev.target.closest(".iaften .kort, .tg-dage, .tg-knap, .tg-basis")) vis("plan");
   nulstilIdle();
 }, {passive:true}));
 
@@ -2624,6 +2678,8 @@ hentEl();
 setInterval(hentEl, 15 * 60000);          // hvert kvarter, som priserne skifter
 hentKalender();
 setInterval(hentKalender, 5 * 60000);     // HA henter fra Google hvert kvarter; vi spørger HA oftere
+hentNemligKoeb();
+setInterval(hentNemligKoeb, 3 * 3600000); // Pi'en husker svaret en time; ordrer kommer et par gange om ugen
 </script>
 
 <script>

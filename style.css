@@ -542,3 +542,12 @@ td.v small.udsolgt{color:var(--crit);font-weight:700}
 .tg-knap{padding:9px 18px;border-radius:10px;border:1px solid rgba(245,241,232,.28);color:#F5F1E8;
   background:rgba(245,241,232,.06);font-size:15px;font-weight:600;min-height:44px}
 @media (max-width:760px){.seg button{padding:10px 12px}}
+
+/* Basisvarer på tur, i tomgangsskærmens topbjælke (v0.27.0) */
+.tg-basis{margin-left:auto;align-self:center;display:flex;align-items:baseline;gap:10px;
+  padding:9px 16px;border-radius:999px;background:#3A2F17;border:1px solid #5E4A22;
+  font-size:15px;color:#F5F1E8;font-weight:600;min-height:44px;max-width:60%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg-basis-t{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#F3C86A;flex:none}
+.tg-basis-v{overflow:hidden;text-overflow:ellipsis}
+.tg-basis + .tg-knapper{margin-left:10px}
