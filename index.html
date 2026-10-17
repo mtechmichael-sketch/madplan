@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.27.1">
-<link rel="stylesheet" href="style.css?v=0.27.1">
+<link rel="stylesheet" href="tema.css?v=0.27.2">
+<link rel="stylesheet" href="style.css?v=0.27.2">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.27.1";
+const VERSION = "0.27.2";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -385,8 +385,8 @@ const SEED_RETTER = [
     ["Bland kødet med smuldret feta, hakket persille og græsk krydderi.","Form fire bøffer og steg dem i smør.","Skær tomat og rødløg i skiver.","Servér på salatblade med rigeligt tzatziki."],
     "https://www.madbanditten.dk/graeske-burgere/"],
 
-  ["bigmac","Big Mac tacos",4,
-    {blomkaal:1,revet_ost:50,aeg:1,hakket_okse:200,cheddar:80,iceberg:1,cornichoner:50,mayonnaise:45,ketchup:30,dijon:5,smor:20,pofiber:8,worcestershire:5,hvidlogspulver:2,eddike:10,paprika:2},
+  ["bigmac","Big Mac tacos",2,
+    {blomkaal:0.5,revet_ost:50,aeg:1,hakket_okse:200,cheddar:80,iceberg:0.5,cornichoner:50,mayonnaise:45,ketchup:30,dijon:5,smor:20,pofiber:8,worcestershire:5,hvidlogspulver:2,eddike:10,paprika:2},
     ["Riv blomkålen, damp den og pres alt vandet fra.","Bland den med revet ost, æg og pofiber, og bag små taco-skaller sprøde.","Brun kødet og smelt cheddar over.","Rør dressing af mayonnaise, ketchup, dijon, eddike og krydderier.","Fyld skallerne med kød, salat, cornichoner og dressing."],
     "https://www.madbanditten.dk/big-mac-tacos/"],
 
@@ -529,6 +529,12 @@ function migrer(d){
   const kb = d.retter.find(x => x.id === "koedboller"), kbNy = SEED_RETTER.find(x => x.id === "koedboller");
   if(kb && kbNy && kb.portioner === 4 && kb.ing && kb.ing.hakket_blandet === 500){
     kb.portioner = kbNy.portioner; kb.ing = {...kbNy.ing};
+  }
+  // Big Mac tacos (17-10): kildens "4" er 4 tacos, ikke 4 personer - mængderne
+  // rækker til 2. Skift den gemte udgave ud, kun hvis den ikke er rettet i hånden.
+  const bm = d.retter.find(x => x.id === "bigmac"), bmNy = SEED_RETTER.find(x => x.id === "bigmac");
+  if(bm && bmNy && bm.portioner === 4 && bm.ing && bm.ing.hakket_okse === 200){
+    bm.portioner = bmNy.portioner; bm.ing = {...bmNy.ing};
   }
   d.retter.forEach(x => {
     if(ret2[x.id]) Object.assign(x.ing, ret2[x.id]);

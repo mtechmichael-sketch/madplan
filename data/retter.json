@@ -484,14 +484,14 @@
   {
    "id": "bigmac",
    "navn": "Big Mac tacos",
-   "portioner": 4,
+   "portioner": 2,
    "ing": {
-    "blomkaal": 1,
+    "blomkaal": 0.5,
     "revet_ost": 50,
     "aeg": 1,
     "hakket_okse": 200,
     "cheddar": 80,
-    "iceberg": 1,
+    "iceberg": 0.5,
     "cornichoner": 50,
     "mayonnaise": 45,
     "ketchup": 30,
