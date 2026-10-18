@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.27.2">
-<link rel="stylesheet" href="style.css?v=0.27.2">
+<link rel="stylesheet" href="tema.css?v=0.27.3">
+<link rel="stylesheet" href="style.css?v=0.27.3">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.27.2";
+const VERSION = "0.27.3";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1196,6 +1196,13 @@ function motivFor(d){
    kræver derfor en ny VERSION; udrulningsscriptet nægter ellers. */
 const MANGLER_FOTO = new Set();
 setInterval(() => MANGLER_FOTO.clear(), 60 * 60000);  // prøv igen hver time (fx efter et netudfald)
+/* Et nyt forsøg skal have en NY adresse (&f=<antal fejl>). Ellers kan browseren
+   bare vise et husket fejlsvar igen: 17-10 kl. 20.10 genstartede Home Assistant,
+   og næste morgen viste køkkenet stadig motiver i stedet for fotos, selvom
+   fotoene lå der og svarede fint. En ret uden foto koster ét forsøg i timen. */
+const FOTO_FEJL = {};
+const fotoSrc = d => "billeder/" + d.id + ".jpg?v=" + VERSION + (FOTO_FEJL[d.id] ? "&f=" + FOTO_FEJL[d.id] : "");
+const fotoFejl = d => { FOTO_FEJL[d.id] = (FOTO_FEJL[d.id] || 0) + 1; MANGLER_FOTO.add(d.id); };
 function motivIStedet(d, klasse){
   const erstat = el("span", (klasse || "foto") + " uden");
   erstat.style.background = tileBg(d.id);
@@ -1208,20 +1215,20 @@ function motivIStedet(d, klasse){
 function fotoOver(boks, d){
   if(MANGLER_FOTO.has(d.id)) return;
   const b = el("img", "flisefoto");
-  b.src = "billeder/" + d.id + ".jpg?v=" + VERSION;
+  b.src = fotoSrc(d);
   b.alt = "";
   b.loading = "lazy";
-  b.onerror = () => { MANGLER_FOTO.add(d.id); b.remove(); };
+  b.onerror = () => { fotoFejl(d); b.remove(); };
   boks.append(b);
 }
 function retFoto(d, klasse){
   if(MANGLER_FOTO.has(d.id)) return motivIStedet(d, klasse);
   const b = el("img", klasse || "foto");
-  b.src = "billeder/" + d.id + ".jpg?v=" + VERSION;
+  b.src = fotoSrc(d);
   b.alt = "";                                   // pynt, ikke information
   b.loading = "lazy";
   b.onerror = () => {                           // intet foto: husk det, og brug motivet
-    MANGLER_FOTO.add(d.id);
+    fotoFejl(d);
     b.replaceWith(motivIStedet(d, klasse));
   };
   return b;
