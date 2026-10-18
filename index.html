@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.27.3">
-<link rel="stylesheet" href="style.css?v=0.27.3">
+<link rel="stylesheet" href="tema.css?v=0.27.4">
+<link rel="stylesheet" href="style.css?v=0.27.4">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.27.3";
+const VERSION = "0.27.4";
 const DATA_VERSION = 13;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -612,7 +612,8 @@ function temaPaa(){
 async function hentFaelles(){
   if(location.protocol === "file:") return;   // lokal fil — kør på det indbyggede uden at støje
   let aendret = false;
-  const hent = p => fetch(p, {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
+  // ?t= : ny adresse hver gang, så HA's service worker ikke svarer med en gammel kopi (18-10)
+  const hent = p => fetch(p + "?t=" + Date.now(), {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null);
   try{
     const [raa, ret] = await Promise.all([hent("data/raavarer.json"), hent("data/retter.json")]);
     const nu = S.dataVersion || 0;
@@ -2714,15 +2715,31 @@ setInterval(hentNemligKoeb, 3 * 3600000); // Pi'en husker svaret en time; ordrer
   if(location.protocol === "file:") return;
   const moenster = new RegExp("const VERSION = " + '"' + "([0-9.]+)" + '"');
   const koerer = (document.documentElement.innerHTML.match(moenster) || [])[1] || "";
+  /* 18-10: tabletten blev hængende på 0.27.2 i over en time, også efter
+     genindlæsning, selvom Pi'en udleverede 0.27.3. Home Assistants service
+     worker (installeret, når HA åbnes i appens HA-fane) gælder for hele
+     adressen og svarer på /local/ med sin gemte kopi først - {cache:"no-store"}
+     hjælper ikke mod den. Derfor spørges der nu med en adresse, der er ny hver
+     gang (?t=), som intet mellemlager kan have gemt. version.json skrives af
+     udrulningsscriptet og er lille; findes den ikke, læses selve siden. */
+  async function nyesteVersion(){
+    const t = "?t=" + Date.now();
+    try{
+      const r = await fetch("version.json" + t, {cache:"no-store"});
+      if(r.ok){ const j = await r.json(); if(j && j.version) return String(j.version); }
+    }catch(e){}
+    const r = await fetch(location.pathname + t, {cache:"no-store"});
+    if(!r.ok) return null;
+    const m = (await r.text()).match(moenster);
+    return m ? m[1] : null;
+  }
   async function tjek(){
     try{
-      const r = await fetch(location.pathname, {cache:"no-store"});
-      if(!r.ok) return;
-      const m = (await r.text()).match(moenster);
-      if(!m || m[1] === koerer) return;
-      if(new URLSearchParams(location.search).get("v") === m[1]) return;   // allerede forsøgt — gå ikke i ring
+      const ny = await nyesteVersion();
+      if(!ny || ny === koerer) return;
+      if(new URLSearchParams(location.search).get("v") === ny) return;   // allerede forsøgt — gå ikke i ring
       try{ if(typeof save === "function") save(); }catch(e){}
-      location.replace(location.pathname + "?v=" + encodeURIComponent(m[1]));
+      location.replace(location.pathname + "?v=" + encodeURIComponent(ny) + "&t=" + Date.now());
     }catch(e){}
   }
   /* Hvert tiende minut, ikke hver time. En time lyder af lidt, men uret
