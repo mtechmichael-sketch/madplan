@@ -1,5 +1,5 @@
 {
- "version": 17,
+ "version": 18,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -527,7 +527,7 @@
    "kategori": "Kolonial",
    "nid": "5049714",
    "est": false,
-   "altid": false
+   "altid": true
   },
   {
    "id": "hakket_kylling",
