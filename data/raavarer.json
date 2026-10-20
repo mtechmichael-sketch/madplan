@@ -1,5 +1,5 @@
 {
- "version": 14,
+ "version": 15,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -1554,6 +1554,62 @@
    "nid": "5602934",
    "est": false,
    "altid": true
+  },
+  {
+   "id": "koriander_stoedt",
+   "navn": "Koriander (stødt)",
+   "enhed": "g",
+   "pakke": 45,
+   "pakkenavn": "45 g øko. / Dava",
+   "pris": 21.17,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Krydderier",
+   "nid": "5602925",
+   "est": false,
+   "altid": true
+  },
+  {
+   "id": "cayenne",
+   "navn": "Cayennepeber",
+   "enhed": "g",
+   "pakke": 50,
+   "pakkenavn": "50 g / Krydderispecialisten",
+   "pris": 10.5,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Krydderier",
+   "nid": "5055609",
+   "est": false,
+   "altid": true
+  },
+  {
+   "id": "lime",
+   "navn": "Lime øko.",
+   "enhed": "stk",
+   "pakke": 1,
+   "pakkenavn": "1 stk.",
+   "pris": 4.5,
+   "holdbar": 14,
+   "frys": false,
+   "kategori": "Grønt",
+   "nid": "5004542",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "fiskesauce",
+   "navn": "Fiskesauce",
+   "enhed": "ml",
+   "pakke": 150,
+   "pakkenavn": "0,15 l / Panda Expressen",
+   "pris": 16.95,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5060436",
+   "est": false,
+   "altid": false
   }
  ]
 }

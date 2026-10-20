@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.28.0">
-<link rel="stylesheet" href="style.css?v=0.28.0">
+<link rel="stylesheet" href="tema.css?v=0.28.1">
+<link rel="stylesheet" href="style.css?v=0.28.1">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.28.0";
-const DATA_VERSION = 14;
+const VERSION = "0.28.1";
+const DATA_VERSION = 15;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -194,6 +194,8 @@ const SEED_RAAVARER = [
   ["rosmarin","Tørret rosmarin","g",20,"20 g (typisk)",0,365,0,"Krydderier","",1,1],
   ["hvidlogspulver","Hvidløgspulver","g",50,"50 g (typisk)",0,365,0,"Krydderier","",1,1],
   ["logpulver","Løgpulver","g",50,"50 g øko. / Dava",15.97,365,0,"Krydderier","5602934",0,1],
+  ["koriander_stoedt","Koriander (stødt)","g",45,"45 g øko. / Dava",21.17,365,0,"Krydderier","5602925",0,1],
+  ["cayenne","Cayennepeber","g",50,"50 g / Krydderispecialisten",10.50,365,0,"Krydderier","5055609",0,1],
   ["loppefro","Loppefrøskaller","g",200,"200 g / Urtekram øko.",73.50,365,0,"Krydderier","5603230",0,1],
   ["eddike","Eddike (æblecider / rødvin)","ml",500,"500 ml (typisk)",0,365,0,"Krydderier","",1,1],
   ["soja","Soja eller tamari","ml",500,"500 ml (typisk)",0,365,0,"Krydderier","",1,1],
@@ -245,7 +247,12 @@ const SEED_RAAVARER = [
   ["koriander","Koriander øko.","g",25,"1 potte / Rosborg · pris anslået",15.00,6,0,"Grønt","5027932",1],
   ["tacokrydderi","Taco kryddermix","g",40,"40 g / Banderos",5.25,365,0,"Kolonial","5046477",1],
   ["tacosauce","Taco sauce (medium)","g",230,"230 g / Santa Maria · pris anslået",18.00,90,0,"Kolonial","5021649",1],
-  ["jalapenos","Jalapeños (syltede)","g",250,"250 g / 127 g drænet / Old El Paso",24.75,365,0,"Kolonial","5053687",1]
+  ["jalapenos","Jalapeños (syltede)","g",250,"250 g / 127 g drænet / Old El Paso",24.75,365,0,"Kolonial","5053687",1],
+
+  // Til kylling i ingefærsauce (20-10). Fiskesaucen er Pandas: kun ansjoser og
+  // salt. Santa Marias indeholder sukker og må ikke bruges som alternativ (keto).
+  ["lime","Lime øko.","stk",1,"1 stk.",4.50,14,0,"Grønt","5004542",0],
+  ["fiskesauce","Fiskesauce","ml",150,"0,15 l / Panda Expressen",16.95,365,0,"Kolonial","5060436",0]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
              holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11],
              alt:(SEED_ALT[a[0]] || []).map(([nid,pakke,pakkenavn]) => ({nid, pakke, pakkenavn}))}));
@@ -454,7 +461,20 @@ const SEED_RETTER = [
      "Rul farsen om fyldet ved hjælp af bagepapiret, og læg rullen over på en bageplade.",
      "Læg serranoskinken rundt om rullen, og bag den ca. 30 minutter.",
      "Imens: skær gulerødder og agurk i stave og broccolien i små buketter. Rør creme fraiche med salt og peber til dip."],
-    "https://www.madbanditten.dk/kyllingeroulade/"]
+    "https://www.madbanditten.dk/kyllingeroulade/"],
+
+  // Tilføjet 20-10. Grøn chili findes ikke hos Nemlig - rød øko. bruges.
+  // Blomkål 600 g = ca. 3/4 af et hoved på 800 g.
+  ["ingefaerkylling","Kylling i ingefærsauce m. blomkålsris",4,
+    {kyllingebryst:600,olivenolie:30,lime:3,ingefaer:20,koriander_stoedt:4,soja:60,fiskesauce:10,sukrin:15,chili:1,kokosmaelk:400,cayenne:1,koriander:25,blomkaal:0.75},
+    ["Rør marinaden af skal og saft fra 2 lime, olivenolie, revet ingefær, stødt koriander, soja, fiskesauce, salt, Sukrin, hakket chili, kokosmælk, cayenne og halvdelen af den hakkede koriander.",
+     "Læg kyllingen i marinaden, og lad den trække nogle timer i køleskabet.",
+     "Tænd ovnen på 200 grader. Tag kyllingen op, dup den let, og gem marinaden.",
+     "Steg kyllingen i et ovnfast fad i 15–20 minutter, til den er gennemstegt (eller 16 minutter i airfryer ved 180 grader).",
+     "Lad imens marinaden småsimre 10 minutter i en kasserolle.",
+     "Riv blomkålen til ris i foodprocessoren, og overhæld den evt. kort med kogende vand.",
+     "Servér kyllingen med saucen og blomkålsrisen, drys med koriander, og læg limebåde ved."],
+    "https://www.madbanditten.dk/kylling-i-ingefaersauce/"]
 ].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
 
 /* ============================================================

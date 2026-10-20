@@ -1,5 +1,5 @@
 {
- "version": 14,
+ "version": 15,
  "retter": [
   {
    "id": "karry",
@@ -796,6 +796,36 @@
     "Imens: skær gulerødder og agurk i stave og broccolien i små buketter. Rør creme fraiche med salt og peber til dip."
    ],
    "kilde": "https://www.madbanditten.dk/kyllingeroulade/"
+  },
+  {
+   "id": "ingefaerkylling",
+   "navn": "Kylling i ingefærsauce m. blomkålsris",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 600,
+    "olivenolie": 30,
+    "lime": 3,
+    "ingefaer": 20,
+    "koriander_stoedt": 4,
+    "soja": 60,
+    "fiskesauce": 10,
+    "sukrin": 15,
+    "chili": 1,
+    "kokosmaelk": 400,
+    "cayenne": 1,
+    "koriander": 25,
+    "blomkaal": 0.75
+   },
+   "opskrift": [
+    "Rør marinaden af skal og saft fra 2 lime, olivenolie, revet ingefær, stødt koriander, soja, fiskesauce, salt, Sukrin, hakket chili, kokosmælk, cayenne og halvdelen af den hakkede koriander.",
+    "Læg kyllingen i marinaden, og lad den trække nogle timer i køleskabet.",
+    "Tænd ovnen på 200 grader. Tag kyllingen op, dup den let, og gem marinaden.",
+    "Steg kyllingen i et ovnfast fad i 15–20 minutter, til den er gennemstegt (eller 16 minutter i airfryer ved 180 grader).",
+    "Lad imens marinaden småsimre 10 minutter i en kasserolle.",
+    "Riv blomkålen til ris i foodprocessoren, og overhæld den evt. kort med kogende vand.",
+    "Servér kyllingen med saucen og blomkålsrisen, drys med koriander, og læg limebåde ved."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-ingefaersauce/"
   }
  ]
 }
