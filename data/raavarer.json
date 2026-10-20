@@ -1,5 +1,5 @@
 {
- "version": 18,
+ "version": 19,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -1734,6 +1734,139 @@
    "frys": false,
    "kategori": "Kolonial",
    "nid": "5062975",
+   "est": false,
+   "altid": true
+  },
+  {
+   "id": "oksestrimler",
+   "navn": "Oksestrimler (stroganoff)",
+   "enhed": "g",
+   "pakke": 500,
+   "pakkenavn": "475-500 g / Irish Nature",
+   "pris": 114.5,
+   "holdbar": 3,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5029215",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5063670",
+     "pakke": 400,
+     "pakkenavn": "400 g øko. / Jyske gårde"
+    }
+   ]
+  },
+  {
+   "id": "hakket_gris",
+   "navn": "Hakket grisekød 8-12%",
+   "enhed": "g",
+   "pakke": 1000,
+   "pakkenavn": "1 kg / Danish Crown",
+   "pris": 50.03,
+   "holdbar": 3,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5026540",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5058405",
+     "pakke": 400,
+     "pakkenavn": "400 g / Danske Egnsgårde"
+    }
+   ]
+  },
+  {
+   "id": "moerbrad",
+   "navn": "Mørbrad af gris øko.",
+   "enhed": "g",
+   "pakke": 650,
+   "pakkenavn": "500-700 g / Friland",
+   "pris": 119.82,
+   "holdbar": 4,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5042206",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "pancetta",
+   "navn": "Pancetta i tern øko.",
+   "enhed": "g",
+   "pakke": 100,
+   "pakkenavn": "100 g / Pedrazzoli",
+   "pris": 44.95,
+   "holdbar": 21,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5070111",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "kyllingelaar",
+   "navn": "Kyllinge lårmix",
+   "enhed": "g",
+   "pakke": 600,
+   "pakkenavn": "600 g / Gårdkylling",
+   "pris": 42.95,
+   "holdbar": 3,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5031746",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5068833",
+     "pakke": 1000,
+     "pakkenavn": "1 kg / Danske Familiegårde"
+    }
+   ]
+  },
+  {
+   "id": "tun",
+   "navn": "Tun i vand",
+   "enhed": "g",
+   "pakke": 140,
+   "pakkenavn": "185 g / 140 g drænet / Taste of Nature",
+   "pris": 9.95,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5066137",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "mandelmel",
+   "navn": "Mandelmel",
+   "enhed": "g",
+   "pakke": 150,
+   "pakkenavn": "150 g / Svansø",
+   "pris": 40.95,
+   "holdbar": 180,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5036108",
+   "est": false,
+   "altid": true
+  },
+  {
+   "id": "peanutbutter",
+   "navn": "Peanutbutter (kun jordnødder og salt)",
+   "enhed": "g",
+   "pakke": 300,
+   "pakkenavn": "300 g / Peanutbutter Pusheren",
+   "pris": 31.5,
+   "holdbar": 180,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5062996",
    "est": false,
    "altid": true
   }

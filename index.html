@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.29.2">
-<link rel="stylesheet" href="style.css?v=0.29.2">
+<link rel="stylesheet" href="tema.css?v=0.30.0">
+<link rel="stylesheet" href="style.css?v=0.30.0">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.29.2";
-const DATA_VERSION = 18;
+const VERSION = "0.30.0";
+const DATA_VERSION = 19;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -124,7 +124,7 @@ const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
    KETO: kun samme råvare og intet tilsat sukker/stivelse (Graasten-mayo har
    dextrose og er derfor ikke med). Tjek varedeklarationen hos Nemlig først.
    Appen vælger det billigste på lager for det, der skal bruges (se vaelgProdukt). */
-const SEED_ALT = {"passata": [["5064169", 680, "680 g / Taste of Nature"]], "flanksteak": [["5071240", 800, "700-900 g øko. / frost / Angus"]], "serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
+const SEED_ALT = {"oksestrimler": [["5063670", 400, "400 g øko. / Jyske gårde"]], "hakket_gris": [["5058405", 400, "400 g / Danske Egnsgårde"]], "kyllingelaar": [["5068833", 1000, "1 kg / Danske Familiegårde"]], "passata": [["5064169", 680, "680 g / Taste of Nature"]], "flanksteak": [["5071240", 800, "700-900 g øko. / frost / Angus"]], "serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
 
 const SEED_RAAVARER = [
   ["kyllingebryst","Kyllingebrystfilet","g",1100,"1,10 kg / Danpo",85.00,3,1,"Kød & fisk","5602318",0],
@@ -267,7 +267,19 @@ const SEED_RAAVARER = [
   ["sambal","Sambal oelek","g",200,"200 g / Santa Maria",30.45,365,0,"Krydderier","5021463",0,1],
   ["italiensk","Italiensk krydderiblanding øko.","g",45,"45 g / Urtekram",38.95,365,0,"Krydderier","5064332",0,1],
   ["basilikum_toerret","Tørret basilikum","g",15,"15 g (typisk)",0.00,365,0,"Krydderier","",1,1],
-  ["tequila","Tequila","ml",700,"0,70 l / Polini Silver",152.25,3650,0,"Kolonial","5062975",0,1]
+  ["tequila","Tequila","ml",700,"0,70 l / Polini Silver",152.25,3650,0,"Kolonial","5062975",0,1],
+
+  // Til retterne fra ChatGPT-listen (21-10). Keto-tjekket i Nemligs deklarationer:
+  // AL kogt skinke har dextrose/glukosesirup, så tærte og æggemuffins bruger
+  // pancetta (kun svinebryst, salt, krydderier). Peanutbutter: kun jordnødder og salt.
+  ["oksestrimler","Oksestrimler (stroganoff)","g",500,"475-500 g / Irish Nature",114.50,3,1,"Kød & fisk","5029215",0],
+  ["hakket_gris","Hakket grisekød 8-12%","g",1000,"1 kg / Danish Crown",50.03,3,1,"Kød & fisk","5026540",0],
+  ["moerbrad","Mørbrad af gris øko.","g",650,"500-700 g / Friland",119.82,4,1,"Kød & fisk","5042206",0],
+  ["pancetta","Pancetta i tern øko.","g",100,"100 g / Pedrazzoli",44.95,21,1,"Kød & fisk","5070111",0],
+  ["kyllingelaar","Kyllinge lårmix","g",600,"600 g / Gårdkylling",42.95,3,1,"Kød & fisk","5031746",0],
+  ["tun","Tun i vand","g",140,"185 g / 140 g drænet / Taste of Nature",9.95,365,0,"Kolonial","5066137",0],
+  ["mandelmel","Mandelmel","g",150,"150 g / Svansø",40.95,180,0,"Kolonial","5036108",0,1],
+  ["peanutbutter","Peanutbutter (kun jordnødder og salt)","g",300,"300 g / Peanutbutter Pusheren",31.50,180,0,"Kolonial","5062996",0,1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
              holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11],
              alt:(SEED_ALT[a[0]] || []).map(([nid,pakke,pakkenavn]) => ({nid, pakke, pakkenavn}))}));
@@ -569,7 +581,108 @@ const SEED_RETTER = [
      "Hæld 2 dl vand på, lad det koge op, smag til, og hæld løgene over kyllingen.",
      "Tænd ovnen på 180 grader. Drys den revne ost over, og bag fadet 10–15 minutter.",
      "Kog bønnerne 4–5 minutter i letsaltet vand, og servér dem til."],
-    "https://www.madbanditten.dk/kylling-i-loegsauce/"]
+    "https://www.madbanditten.dk/kylling-i-loegsauce/"],
+
+  // 13 retter fra listen «KETO-01-TIL-25» (ChatGPT, 21-10), alle til 4. Navnene er
+  // fotoenes filnavne, så klargoer-fotos.ps1 finder dem. 11 af de 25 er sprunget
+  // over, fordi de ligner retter vi har; medister venter (al medister har stivelse).
+  ["oksegryde_squash","Cremet oksekødsgryde med squash og flødeost",4,
+    {hakket_okse:600,squash:2,champignon:250,log:100,hvidlog:1,flodeost:150,bouillon:1,paprika:4,olivenolie:5},
+    ["Brun kødet i olien.",
+     "Steg hakket løg, hvidløg og champignon med.",
+     "Tilsæt squash i halve skiver og paprika.",
+     "Hæld 1 dl bouillon på, rør flødeosten ud, og lad det simre 6–8 minutter. Smag til med salt og peber.",
+     "Servér med blomkålsris eller grøn salat. Til familien: ris."]],
+
+  ["gyroskylling","Gyros-kylling med græsk salat og tzatziki",4,
+    {kyllingebryst:650,oregano:2,paprika:2,spidskommen:1,olivenolie:15,agurk:1,tomat:400,rodlog:100,feta:100,graesk_yoghurt:200,hvidlog:0.5,citron:0.5},
+    ["Vend kyllingestrimler med oregano, paprika, spidskommen og olie, og steg dem gennem.",
+     "Skær tomater, rødløg og halvdelen af agurken til salat, og smuldr feta over.",
+     "Tzatziki: riv resten af agurken, pres væden ud, og bland med yoghurt, hvidløg og citronsaft.",
+     "Til familien: pitabrød."]],
+
+  ["stroganoff","Oksekød Stroganoff med champignon",4,
+    {oksestrimler:600,champignon:300,log:100,paprika:4,tomatpure:15,dijon:5,flodeost:150,bouillon:1,gronne_bonner:300,olivenolie:5},
+    ["Brun oksekødet hurtigt, og tag det op.",
+     "Steg løg og champignon.",
+     "Tilsæt paprika og tomatpuré, derefter 2 dl bouillon, flødeost og sennep, og lad saucen simre 5 minutter.",
+     "Vend kødet i, og varm det igennem.",
+     "Servér med kogte grønne bønner. Til familien: kartoffelmos."]],
+
+  ["asiatisk_gris","Asiatisk svinekød med spidskål",4,
+    {hakket_gris:600,spidskaal:500,gulerodder:160,log:100,hvidlog:1,ingefaer:10,soja:45,lime:0.5,olivenolie:5},
+    ["Brun kødet i olien.",
+     "Tilsæt løg, hvidløg og revet ingefær.",
+     "Snit kålen og riv gulerødderne, og steg dem med 4–5 minutter.",
+     "Vend soja og limesaft i, og smag til – evt. med chili.",
+     "Til familien: nudler."]],
+
+  ["moerbrad_porre","Svinemørbrad i porre-sennepssauce",4,
+    {moerbrad:650,porre:2,champignon:250,flodeost:150,bouillon:1,dijon:15,gronne_bonner:300,olivenolie:5},
+    ["Skær mørbraden i medaljoner, brun dem i olie, og tag dem op.",
+     "Steg skyllede porrer og champignon.",
+     "Rør 2 dl bouillon, flødeost og sennep i.",
+     "Læg kødet tilbage, og lad det simre, til det er gennemstegt.",
+     "Servér med kogte grønne bønner. Til familien: kartofler."]],
+
+  ["moussaka","Moussaka-inspireret auberginefad",4,
+    {aubergine:2,hakket_okse:600,log:100,hvidlog:1,hakkede_tomater:400,oregano:2,graesk_yoghurt:150,aeg:2,feta:80},
+    ["Skær auberginerne i skiver, og forbag dem 10 minutter ved 200 grader varmluft.",
+     "Brun kødet med løg og hvidløg, og tilsæt tomater og oregano.",
+     "Læg kødsauce og aubergine i lag i et fad.",
+     "Pisk yoghurt og æg, hæld det over, og smuldr feta på.",
+     "Bag 20–25 minutter, til toppen er fast. Servér med grøn salat. Til familien: brød."]],
+
+  ["porretaerte","Porre- og skinketærte uden bund",4,
+    {aeg:6,pancetta:250,porre:2,champignon:200,hytteost:150,revet_ost:100,maelk:100,dijon:5},
+    ["Steg skyllede porrer og champignon, til væden er fordampet.",
+     "Fordel dem med pancettaen i et tærtefad. (Pancetta, fordi al kogt skinke hos Nemlig har dextrose.)",
+     "Pisk æg, hytteost, mælk og sennep, krydr med salt og peber, og hæld det over.",
+     "Top med revet ost.",
+     "Bag ved 200 grader varmluft 22–28 minutter, til midten er fast. Servér med salat. Til familien: rugbrød."]],
+
+  ["tunfrikadeller","Tunfrikadeller med broccolisalat",4,
+    {tun:420,aeg:3,hytteost:100,log:50,mandelmel:15,citron:1,broccoli:900,graesk_yoghurt:150,mayonnaise:15,dijon:5},
+    ["Dræn tunen grundigt, og bland den med æg, hytteost, finthakket løg, mandelmel og revet citronskal.",
+     "Form små frikadeller, og steg dem gyldne og gennemstegte.",
+     "Blanchér broccoli i små buketter 2 minutter, køl dem af, og vend dem med yoghurt, mayonnaise, sennep og citronsaft.",
+     "Til familien: rugbrød."]],
+
+  ["piccata","Kylling piccata med citron og kapers",4,
+    {kyllingebryst:650,citron:1,kapers:20,bouillon:1,smor:15,olivenolie:5,gronne_bonner:300,squash:1},
+    ["Skær kyllingen i tynde fileter, krydr og steg dem gennem i olie, og tag dem op.",
+     "Hæld 2 dl bouillon, citronsaft og kapers på panden, og kog det lidt ind.",
+     "Pisk smørret i, og læg kyllingen tilbage.",
+     "Steg squash i skiver og kog bønnerne som tilbehør. Til familien: kartofler."]],
+
+  ["paprikafrikadeller","Paprikafrikadeller i tomatsauce med mozzarella",4,
+    {hakket_gris:600,aeg:1,log:100,paprika:4,hakkede_tomater:400,squash:1,revet_ost:125,hvidlog:0.5,oregano:1},
+    ["Rør kødet med æg, revet løg og paprika, og form små frikadeller.",
+     "Brun dem på en pande.",
+     "Tilsæt tomater, hvidløg, oregano og squash i tern, og lad det simre, til frikadellerne er gennemstegte.",
+     "Fordel osten over, og lad den smelte under låg. Servér med salat. Til familien: pasta."]],
+
+  ["peanutkylling","Kylling med peanut-lime og sprød kålsalat",4,
+    {kyllingebryst:650,spidskaal:350,gulerodder:160,agurk:1,peanutbutter:30,soja:30,lime:1,ingefaer:5,olivenolie:5},
+    ["Steg kyllingen i strimler gennem i olie.",
+     "Snit kålen, riv gulerødderne, og skær agurken i stave.",
+     "Rør peanutbutter, soja, limesaft, revet ingefær og 2–3 spsk vand til dressing.",
+     "Vend halvdelen i grøntsagerne, og servér kyllingen ovenpå med resten. Til familien: nudler."]],
+
+  ["aeggemuffins","Æggemuffins med skinke, broccoli og ost",4,
+    {aeg:8,pancetta:200,broccoli:250,revet_ost:100,peberfrugt:1,maelk:50},
+    ["Del broccolien i små buketter, og blanchér dem 2 minutter.",
+     "Fordel broccoli, pancetta og peberfrugt i smurte muffinforme. (Pancetta, fordi al kogt skinke hos Nemlig har dextrose.)",
+     "Pisk æg, mælk, salt og peber, og hæld det over.",
+     "Drys osten på.",
+     "Bag ved 190 grader varmluft 15–20 minutter, til æggene er faste. Servér med en stor grøn salat. Til familien: rugbrød."]],
+
+  ["ovnkyllingelaar","Ovnbagte kyllingelår med citron og rosmarin",4,
+    {kyllingelaar:1200,squash:2,rodlog:200,peberfrugt:1,citron:1,hvidlog:1,rosmarin:2,olivenolie:15,graesk_yoghurt:150},
+    ["Vend kyllingelårene med olie, rosmarin, hvidløg, citron, salt og peber.",
+     "Bag dem på en plade ved 200 grader varmluft 30–40 minutter, til de er gennemstegte.",
+     "Læg grøntsagerne i grove stykker på pladen efter de første 15 minutter.",
+     "Servér med græsk yoghurt. Til familien: ovnkartofler."]]
 ].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
 
 /* ============================================================
