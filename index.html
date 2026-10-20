@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.29.0">
-<link rel="stylesheet" href="style.css?v=0.29.0">
+<link rel="stylesheet" href="tema.css?v=0.29.1">
+<link rel="stylesheet" href="style.css?v=0.29.1">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.29.0";
-const DATA_VERSION = 16;
+const VERSION = "0.29.1";
+const DATA_VERSION = 17;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -205,7 +205,6 @@ const SEED_RAAVARER = [
   // Tilføjet til resten af Madbanditten-opskrifterne, hentet 23. august 2026
   ["grisekod_tern","Grisekød i tern øko.","g",400,"400 g / Jyske gårde",74.50,4,1,"Kød & fisk","5063650",0],
   ["ribbensteg","Ribbensteg øko.","g",1000,"0,80–1,20 kg / Jyske gårde",137.95,6,1,"Kød & fisk","5063956",0],
-  ["chorizo","Chorizo extra","g",75,"75 g / Valent",10.59,7,1,"Kød & fisk","5028974",0],
   ["flodeost","Flødeost naturel øko.","g",150,"150 g / Buko",19.00,14,0,"Mejeri","5020050",0],
   ["pikantost","Flødeost pikant","g",200,"200 g / Buko",14.95,14,0,"Mejeri","707011",0],
   ["feta","Fetaost","g",150,"150 g / Salakis",30.25,14,0,"Mejeri","5047128",0],
@@ -257,14 +256,14 @@ const SEED_RAAVARER = [
   // Til de otte retter 20-10. Keto-tjekket i Nemligs deklarationer: chorizo_ren er
   // Olmedas (kun kød, spæk, krydderier) - den gamle «chorizo» har laktose og dextrose.
   // Bouillon/fond er IKKE med: alle 14 slags hos Nemlig har sukker, stivelse eller
-  // maltodextrin, så de retter bruger vand. Mango er udeladt (keto). Grøn chili findes
+  // maltodextrin, så de retter bruger vand. De ældre retter beholder deres bouillon
+  // (valgt 20-10: «behold bouillonen»), men den gamle chorizo er skiftet ud. Mango er udeladt (keto). Grøn chili findes
   // ikke hos Nemlig - rød bruges.
   ["aubergine","Aubergine øko.","stk",1,"1 stk.",13.50,7,0,"Grønt","5002545",0],
   ["passata","Tomatpassata øko.","g",500,"500 g / Taste of Nature",10.50,365,0,"Kolonial","5064168",0],
   ["kapers","Kapers","g",60,"100 g / 60 g drænet / Taste of Nature",7.89,365,0,"Kolonial","5065559",0],
   ["flanksteak","Flanksteak (frost)","g",500,"400-600 g / frost / Irish Nature",126.00,90,1,"Kød & fisk","5027322",0],
   ["chorizo_ren","Chorizo til stegning (mini)","g",300,"300 g / Olmeda Origenes",59.95,30,1,"Kød & fisk","5025339",0],
-  ["gruyere","Gruyère Reserve","g",200,"200 g / Le Gourmand",95.95,30,0,"Mejeri","5030555",0],
   ["sambal","Sambal oelek","g",200,"200 g / Santa Maria",30.45,365,0,"Krydderier","5021463",0,1],
   ["italiensk","Italiensk krydderiblanding øko.","g",45,"45 g / Urtekram",38.95,365,0,"Krydderier","5064332",0,1],
   ["basilikum_toerret","Tørret basilikum","g",15,"15 g (typisk)",0.00,365,0,"Krydderier","",1,1],
@@ -397,7 +396,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/kylling-i-hvidloegssovs/"],
 
   ["ketoburger2","Keto-burger m. chorizo og guacamole",4,
-    {hakket_okse:600,chorizo:100,cheddar:80,avokado:2,rodlog:50,salat:100,mayonnaise:60,worcestershire:4,spidskommen:1,chiliflager:1},
+    {hakket_okse:600,chorizo_ren:100,cheddar:80,avokado:2,rodlog:50,salat:100,mayonnaise:60,worcestershire:4,spidskommen:1,chiliflager:1},
     ["Bland kødet med worcestershiresauce og form fire bøffer.","Steg chorizoen sprød og tag den fra.","Steg bøfferne og læg cheddar på til sidst.","Mos avokado med rødløg, spidskommen og chili til guacamole.","Byg burgeren på salatblade med guacamole og chorizo."],
     "https://www.madbanditten.dk/keto-burger/"],
 
@@ -563,12 +562,12 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/tequila-lime-kylling/"],
 
   ["loegkylling","Kylling i løgsauce m. grønne bønner",4,
-    {kyllingebryst:600,log:200,hvidlog:1,timian:2,gruyere:140,smor:40,gronne_bonner:600},
+    {kyllingebryst:600,log:200,hvidlog:1,timian:2,revet_ost:140,smor:40,gronne_bonner:600},
     ["Snit løgene, og hak hvidløget fint.",
      "Brun kyllingebrysterne godt i smør, krydr med salt og peber, og læg dem i et ovnfast fad.",
      "Sauter løg, hvidløg og timian i lidt mere smør 10–15 minutter, til løgene er gyldne og karamelliserede.",
      "Hæld 2 dl vand på, lad det koge op, smag til, og hæld løgene over kyllingen.",
-     "Tænd ovnen på 180 grader. Riv osten over, og bag fadet 10–15 minutter.",
+     "Tænd ovnen på 180 grader. Drys den revne ost over, og bag fadet 10–15 minutter.",
      "Kog bønnerne 4–5 minutter i letsaltet vand, og servér dem til."],
     "https://www.madbanditten.dk/kylling-i-loegsauce/"]
 ].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
@@ -668,6 +667,12 @@ function migrer(d){
   if(bm && bmNy && bm.portioner === 4 && bm.ing && bm.ing.hakket_okse === 200){
     bm.portioner = bmNy.portioner; bm.ing = {...bmNy.ing};
   }
+  // 20-10 (valgt i køkkenet): chorizo uden dextrose og laktose i burgeren, og mozzarella
+  // i stedet for gruyère i løgkyllingen. Kun hvis retten ikke er rettet i hånden.
+  const kb2 = d.retter.find(x => x.id === "ketoburger2");
+  if(kb2 && kb2.ing && kb2.ing.chorizo === 100 && kb2.ing.chorizo_ren == null){ kb2.ing.chorizo_ren = 100; delete kb2.ing.chorizo; }
+  const lk = d.retter.find(x => x.id === "loegkylling"), lkNy = SEED_RETTER.find(x => x.id === "loegkylling");
+  if(lk && lkNy && lk.ing && lk.ing.gruyere === 140){ lk.ing = {...lkNy.ing}; lk.opskrift = [...lkNy.opskrift]; }
   d.retter.forEach(x => {
     if(ret2[x.id]) Object.assign(x.ing, ret2[x.id]);
     if(!x.opskrift && opsk[x.id]) x.opskrift = opsk[x.id];

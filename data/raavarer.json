@@ -1,5 +1,5 @@
 {
- "version": 16,
+ "version": 17,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -934,20 +934,6 @@
    "altid": false
   },
   {
-   "id": "chorizo",
-   "navn": "Chorizo extra",
-   "enhed": "g",
-   "pakke": 75,
-   "pakkenavn": "75 g / Valent",
-   "pris": 10.59,
-   "holdbar": 7,
-   "frys": true,
-   "kategori": "Kød & fisk",
-   "nid": "5028974",
-   "est": false,
-   "altid": false
-  },
-  {
    "id": "flodeost",
    "navn": "Flødeost naturel øko.",
    "enhed": "g",
@@ -1692,20 +1678,6 @@
    "frys": true,
    "kategori": "Kød & fisk",
    "nid": "5025339",
-   "est": false,
-   "altid": false
-  },
-  {
-   "id": "gruyere",
-   "navn": "Gruyère Reserve",
-   "enhed": "g",
-   "pakke": 200,
-   "pakkenavn": "200 g / Le Gourmand",
-   "pris": 95.95,
-   "holdbar": 30,
-   "frys": false,
-   "kategori": "Mejeri",
-   "nid": "5030555",
    "est": false,
    "altid": false
   },

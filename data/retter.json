@@ -1,5 +1,5 @@
 {
- "version": 16,
+ "version": 17,
  "retter": [
   {
    "id": "karry",
@@ -418,7 +418,7 @@
    "portioner": 4,
    "ing": {
     "hakket_okse": 600,
-    "chorizo": 100,
+    "chorizo_ren": 100,
     "cheddar": 80,
     "avokado": 2,
     "rodlog": 50,
@@ -1034,7 +1034,7 @@
     "log": 200,
     "hvidlog": 1,
     "timian": 2,
-    "gruyere": 140,
+    "revet_ost": 140,
     "smor": 40,
     "gronne_bonner": 600
    },
@@ -1043,7 +1043,7 @@
     "Brun kyllingebrysterne godt i smør, krydr med salt og peber, og læg dem i et ovnfast fad.",
     "Sauter løg, hvidløg og timian i lidt mere smør 10–15 minutter, til løgene er gyldne og karamelliserede.",
     "Hæld 2 dl vand på, lad det koge op, smag til, og hæld løgene over kyllingen.",
-    "Tænd ovnen på 180 grader. Riv osten over, og bag fadet 10–15 minutter.",
+    "Tænd ovnen på 180 grader. Drys den revne ost over, og bag fadet 10–15 minutter.",
     "Kog bønnerne 4–5 minutter i letsaltet vand, og servér dem til."
    ],
    "kilde": "https://www.madbanditten.dk/kylling-i-loegsauce/"
