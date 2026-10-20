@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.27.4">
-<link rel="stylesheet" href="style.css?v=0.27.4">
+<link rel="stylesheet" href="tema.css?v=0.28.0">
+<link rel="stylesheet" href="style.css?v=0.28.0">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.27.4";
-const DATA_VERSION = 13;
+const VERSION = "0.28.0";
+const DATA_VERSION = 14;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -124,13 +124,15 @@ const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
    KETO: kun samme råvare og intet tilsat sukker/stivelse (Graasten-mayo har
    dextrose og er derfor ikke med). Tjek varedeklarationen hos Nemlig først.
    Appen vælger det billigste på lager for det, der skal bruges (se vaelgProdukt). */
-const SEED_ALT = {"jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
+const SEED_ALT = {"serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
 
 const SEED_RAAVARER = [
   ["kyllingebryst","Kyllingebrystfilet","g",1100,"1,10 kg / Danpo",85.00,3,1,"Kød & fisk","5602318",0],
   ["hakket_okse","Hakket oksekød 8-12%","g",500,"500 g / Danish Crown",49.94,3,1,"Kød & fisk","5063170",0],
   ["hakket_blandet","Hakket grise- og kalvekød 8-12%","g",500,"500 g / Danish Crown",29.95,3,1,"Kød & fisk","5026536",0],
   ["bacon_tern","Bacon i tern (røget)","g",200,"200 g / Gestus",12.95,7,1,"Kød & fisk","5071453",0],
+  // Til kyllingerouladen (20-10). Kun svinekød og salt - intet sukker (keto, tjekket i deklarationen)
+  ["serrano","Serranoskinke","g",60,"60 g / Valent",9.95,14,0,"Kød & fisk","5028973",0],
   ["laksefilet","Lakseportioner m. skind","g",225,"225 g / Glyngøre",43.95,2,1,"Kød & fisk","5046333",0],
 
   ["aeg","Skrabeæg str. M/L","stk",10,"10 stk. / Danæg",31.95,28,0,"Mejeri","5003310",1],
@@ -191,6 +193,7 @@ const SEED_RAAVARER = [
   ["timian","Tørret timian","g",20,"20 g (typisk)",0,365,0,"Krydderier","",1,1],
   ["rosmarin","Tørret rosmarin","g",20,"20 g (typisk)",0,365,0,"Krydderier","",1,1],
   ["hvidlogspulver","Hvidløgspulver","g",50,"50 g (typisk)",0,365,0,"Krydderier","",1,1],
+  ["logpulver","Løgpulver","g",50,"50 g øko. / Dava",15.97,365,0,"Krydderier","5602934",0,1],
   ["loppefro","Loppefrøskaller","g",200,"200 g / Urtekram øko.",73.50,365,0,"Krydderier","5603230",0,1],
   ["eddike","Eddike (æblecider / rødvin)","ml",500,"500 ml (typisk)",0,365,0,"Krydderier","",1,1],
   ["soja","Soja eller tamari","ml",500,"500 ml (typisk)",0,365,0,"Krydderier","",1,1],
@@ -438,7 +441,20 @@ const SEED_RETTER = [
   ["mexiburgerfad","Mexicansk burgerfad",4,
     {hakket_okse:550,log:70,hvidlog:1,spidskaal:270,tacokrydderi:16,tacosauce:135,jalapenos:30,aeg:1,revet_ost:100,koriander:10,smor:20},
     ["Hak løget og snit spidskålen fint.","Sveds løget klart i smør på en stor pande, og brun kødet med.","Kom kål og tacokrydderi i, og lad det simre 5–10 minutter.","Hæld det i et smurt fad og tænd ovnen på 180 grader.","Rør tacosauce, jalapeños og æg sammen, og hæld det over kødet.","Drys revet ost og jalapeños på, og bag 15–20 minutter til osten er gylden.","Top med frisk koriander før servering."],
-    "https://www.madbanditten.dk/mexicansk-burgerfad/"]
+    "https://www.madbanditten.dk/mexicansk-burgerfad/"],
+
+  // Tilføjet 20-10. Kildens rulle til 4; tilbehøret (dip af creme fraiche og
+  // stave af gulerod, agurk og broccoli) er husets eget og står ikke hos kilden.
+  ["kyllingeroulade","Kyllingeroulade m. dip og grønt",4,
+    {hakket_kylling:800,aeg:1,logpulver:6,hvidlogspulver:3,loppefro:6,porre:1,spinat:75,pikantost:50,revet_ost:50,serrano:75,smor:15,
+     cremefraiche:250,gulerodder:300,agurk:1,broccoli:450},
+    ["Rør kyllingefarsen med æg, løgpulver, hvidløgspulver, loppefrøskaller, salt og peber, og lad den hvile.",
+     "Tænd ovnen på 210 grader. Snit porren i ringe, steg den i smør, og lad spinaten falde sammen i den.",
+     "Bred farsen ud på bagepapir, ca. 25 × 35 cm. Smør pikantosten ud på midten, og fordel porre, spinat og revet ost ovenpå.",
+     "Rul farsen om fyldet ved hjælp af bagepapiret, og læg rullen over på en bageplade.",
+     "Læg serranoskinken rundt om rullen, og bag den ca. 30 minutter.",
+     "Imens: skær gulerødder og agurk i stave og broccolien i små buketter. Rør creme fraiche med salt og peber til dip."],
+    "https://www.madbanditten.dk/kyllingeroulade/"]
 ].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
 
 /* ============================================================

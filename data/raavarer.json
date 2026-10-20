@@ -1,5 +1,5 @@
 {
- "version": 13,
+ "version": 14,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -1519,6 +1519,41 @@
      "pakkenavn": "215 g glas / Santa Maria"
     }
    ]
+  },
+  {
+   "id": "serrano",
+   "navn": "Serranoskinke",
+   "enhed": "g",
+   "pakke": 60,
+   "pakkenavn": "60 g / Valent",
+   "pris": 9.95,
+   "holdbar": 14,
+   "frys": false,
+   "kategori": "Kød & fisk",
+   "nid": "5028973",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5044878",
+     "pakke": 70,
+     "pakkenavn": "70 g / Valent Reserva"
+    }
+   ]
+  },
+  {
+   "id": "logpulver",
+   "navn": "Løgpulver",
+   "enhed": "g",
+   "pakke": 50,
+   "pakkenavn": "50 g øko. / Dava",
+   "pris": 15.97,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Krydderier",
+   "nid": "5602934",
+   "est": false,
+   "altid": true
   }
  ]
 }

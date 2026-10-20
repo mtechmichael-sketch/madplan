@@ -1,5 +1,5 @@
 {
- "version": 8,
+ "version": 14,
  "retter": [
   {
    "id": "karry",
@@ -765,6 +765,37 @@
     "Top med frisk koriander før servering."
    ],
    "kilde": "https://www.madbanditten.dk/mexicansk-burgerfad/"
+  },
+  {
+   "id": "kyllingeroulade",
+   "navn": "Kyllingeroulade m. dip og grønt",
+   "portioner": 4,
+   "ing": {
+    "hakket_kylling": 800,
+    "aeg": 1,
+    "logpulver": 6,
+    "hvidlogspulver": 3,
+    "loppefro": 6,
+    "porre": 1,
+    "spinat": 75,
+    "pikantost": 50,
+    "revet_ost": 50,
+    "serrano": 75,
+    "smor": 15,
+    "cremefraiche": 250,
+    "gulerodder": 300,
+    "agurk": 1,
+    "broccoli": 450
+   },
+   "opskrift": [
+    "Rør kyllingefarsen med æg, løgpulver, hvidløgspulver, loppefrøskaller, salt og peber, og lad den hvile.",
+    "Tænd ovnen på 210 grader. Snit porren i ringe, steg den i smør, og lad spinaten falde sammen i den.",
+    "Bred farsen ud på bagepapir, ca. 25 × 35 cm. Smør pikantosten ud på midten, og fordel porre, spinat og revet ost ovenpå.",
+    "Rul farsen om fyldet ved hjælp af bagepapiret, og læg rullen over på en bageplade.",
+    "Læg serranoskinken rundt om rullen, og bag den ca. 30 minutter.",
+    "Imens: skær gulerødder og agurk i stave og broccolien i små buketter. Rør creme fraiche med salt og peber til dip."
+   ],
+   "kilde": "https://www.madbanditten.dk/kyllingeroulade/"
   }
  ]
 }
