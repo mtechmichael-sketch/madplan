@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.28.1">
-<link rel="stylesheet" href="style.css?v=0.28.1">
+<link rel="stylesheet" href="tema.css?v=0.29.0">
+<link rel="stylesheet" href="style.css?v=0.29.0">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.28.1";
-const DATA_VERSION = 15;
+const VERSION = "0.29.0";
+const DATA_VERSION = 16;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -124,7 +124,7 @@ const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
    KETO: kun samme råvare og intet tilsat sukker/stivelse (Graasten-mayo har
    dextrose og er derfor ikke med). Tjek varedeklarationen hos Nemlig først.
    Appen vælger det billigste på lager for det, der skal bruges (se vaelgProdukt). */
-const SEED_ALT = {"serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
+const SEED_ALT = {"passata": [["5064169", 680, "680 g / Taste of Nature"]], "flanksteak": [["5071240", 800, "700-900 g øko. / frost / Angus"]], "serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
 
 const SEED_RAAVARER = [
   ["kyllingebryst","Kyllingebrystfilet","g",1100,"1,10 kg / Danpo",85.00,3,1,"Kød & fisk","5602318",0],
@@ -252,7 +252,23 @@ const SEED_RAAVARER = [
   // Til kylling i ingefærsauce (20-10). Fiskesaucen er Pandas: kun ansjoser og
   // salt. Santa Marias indeholder sukker og må ikke bruges som alternativ (keto).
   ["lime","Lime øko.","stk",1,"1 stk.",4.50,14,0,"Grønt","5004542",0],
-  ["fiskesauce","Fiskesauce","ml",150,"0,15 l / Panda Expressen",16.95,365,0,"Kolonial","5060436",0]
+  ["fiskesauce","Fiskesauce","ml",150,"0,15 l / Panda Expressen",16.95,365,0,"Kolonial","5060436",0],
+
+  // Til de otte retter 20-10. Keto-tjekket i Nemligs deklarationer: chorizo_ren er
+  // Olmedas (kun kød, spæk, krydderier) - den gamle «chorizo» har laktose og dextrose.
+  // Bouillon/fond er IKKE med: alle 14 slags hos Nemlig har sukker, stivelse eller
+  // maltodextrin, så de retter bruger vand. Mango er udeladt (keto). Grøn chili findes
+  // ikke hos Nemlig - rød bruges.
+  ["aubergine","Aubergine øko.","stk",1,"1 stk.",13.50,7,0,"Grønt","5002545",0],
+  ["passata","Tomatpassata øko.","g",500,"500 g / Taste of Nature",10.50,365,0,"Kolonial","5064168",0],
+  ["kapers","Kapers","g",60,"100 g / 60 g drænet / Taste of Nature",7.89,365,0,"Kolonial","5065559",0],
+  ["flanksteak","Flanksteak (frost)","g",500,"400-600 g / frost / Irish Nature",126.00,90,1,"Kød & fisk","5027322",0],
+  ["chorizo_ren","Chorizo til stegning (mini)","g",300,"300 g / Olmeda Origenes",59.95,30,1,"Kød & fisk","5025339",0],
+  ["gruyere","Gruyère Reserve","g",200,"200 g / Le Gourmand",95.95,30,0,"Mejeri","5030555",0],
+  ["sambal","Sambal oelek","g",200,"200 g / Santa Maria",30.45,365,0,"Krydderier","5021463",0,1],
+  ["italiensk","Italiensk krydderiblanding øko.","g",45,"45 g / Urtekram",38.95,365,0,"Krydderier","5064332",0,1],
+  ["basilikum_toerret","Tørret basilikum","g",15,"15 g (typisk)",0.00,365,0,"Krydderier","",1,1],
+  ["tequila","Tequila","ml",700,"0,70 l / Polini Silver",152.25,3650,0,"Kolonial","5062975",0,1]
 ].map(a => ({id:a[0],navn:a[1],enhed:a[2],pakke:a[3],pakkenavn:a[4],pris:a[5],
              holdbar:a[6],frys:!!a[7],kategori:a[8],nid:a[9],est:!!a[10],altid:!!a[11],
              alt:(SEED_ALT[a[0]] || []).map(([nid,pakke,pakkenavn]) => ({nid, pakke, pakkenavn}))}));
@@ -474,7 +490,87 @@ const SEED_RETTER = [
      "Lad imens marinaden småsimre 10 minutter i en kasserolle.",
      "Riv blomkålen til ris i foodprocessoren, og overhæld den evt. kort med kogende vand.",
      "Servér kyllingen med saucen og blomkålsrisen, drys med koriander, og læg limebåde ved."],
-    "https://www.madbanditten.dk/kylling-i-ingefaersauce/"]
+    "https://www.madbanditten.dk/kylling-i-ingefaersauce/"],
+
+  // Otte retter tilføjet 20-10. Portioner = kildens; appen skalerer til 4. Undtagelse:
+  // chimichurri er sat til 4 med dobbelt kylling og én portion sauce (kilden laver
+  // sauce til overs), plus samme tilbehør som kyllingerouladen. Guacamolen til fajitas
+  // er husets enkle udgave; pico de gallo er Madbandittens.
+  ["pikantkylling","Pikant kylling i fad m. blomkålsris",4,
+    {kyllingebryst:600,bacon_tern:70,hvidlog:1,rodlog:100,peberfrugt:0.5,aubergine:0.33,squash:0.5,pikantost:125,piskeflode:100,hakkede_tomater:400,tomatpure:30,roeget_paprika:1,paprika:3,timian:2,smor:15,blomkaalsris:700,persille:10},
+    ["Tænd ovnen på 200 grader. Skær kylling og bacon i tern, hak hvidløget og snit løget.",
+     "Skær peberfrugt, aubergine og squash i tern.",
+     "Steg baconen sprød, og kom den i et ovnfast fad. Steg kyllingen et par minutter i fedtet med salt, peber og paprika, og læg den over til baconen.",
+     "Sauter løg og hvidløg i lidt smør, og steg grøntsagerne med et par minutter.",
+     "Kom pikantost, fløde, hakkede tomater og tomatpuré på panden, krydr med røget paprika og timian, og lad saucen simre et par minutter.",
+     "Hæld saucen over kylling og bacon, og sæt fadet i ovnen 15–20 minutter.",
+     "Servér med blomkålsris og frisk persille."],
+    "https://www.madbanditten.dk/pikant-kylling-i-fad/"],
+
+  ["proteinpasta","Pikant proteinpasta m. tomatsovs og chorizo",3,
+    {aeg:4,pikantost:125,loppefro:12,hvidlog:0.5,persille:10,passata:750,sukrin:8,kapers:20,chorizo_ren:200},
+    ["Tænd ovnen på 150 grader. Pisk æg og pikantost sammen, og pisk loppefrøskallerne godt ud i dejen.",
+     "Bred dejen tyndt og jævnt ud på en bageplade med bagepapir, og bag den 13–15 minutter.",
+     "Løsn dejen fra papiret, lad den køle lidt, og skær den i tynde strimler.",
+     "Hak hvidløg og persille, kom det i en gryde med passata, kapers og evt. Sukrin, og lad sovsen simre ca. 20 minutter. Smag til med salt og peber.",
+     "Skær chorizoen i tern, og rist den sprød på en tør pande.",
+     "Vend pastaen i tomatsovsen, og drys chorizo på toppen."],
+    "https://www.madbanditten.dk/pikant-proteinpasta-med-tomatsovs/"],
+
+  ["hvidlogssteak","Hvidløgssteak m. bønner",2,
+    {flanksteak:300,hvidlog:0.5,soja:45,sambal:15,olivenolie:15,smor:45,italiensk:6,sukrin:8,citron:0.5,gronne_bonner:300,persille:10,chiliflager:1},
+    ["Skær steaken i strimler, og lad den marinere mindst 10 minutter i halvdelen af hvidløget, soja, sambal oelek, olivenolie og peber.",
+     "Steg kødet ca. et minut på en meget varm pande, og læg det til side.",
+     "Skru ned, sauter resten af hvidløget i halvdelen af smørret, og steg bønnerne med et øjeblik.",
+     "Tilsæt 1 dl vand, sødning, citronsaft og italiensk krydderi, og lad det koge en del ind.",
+     "Rør resten af smørret i, kom kødet og persillen tilbage, og lad det blive varmt igennem. Drys med chiliflager."],
+    "https://www.madbanditten.dk/hvidloegssteak-med-boenner/"],
+
+  ["chimichurri","Kylling m. chimichurri, dip og grønt",4,
+    {kyllingebryst:800,logpulver:8,hvidlog:1,spidskommen:4,olivenolie:210,persille:25,chili:1,log:20,eddike:45,oregano:4,cremefraiche:250,gulerodder:300,agurk:1,broccoli:450},
+    ["Bank kyllingebrysterne flade. Rør marinade af løgpulver, 2 fed hvidløg, spidskommen, 4 spsk olivenolie, salt og peber, og lad kyllingen trække mindst 30 minutter.",
+     "Chimichurri: hak persille, chili, 2 fed hvidløg og løg fint, og rør det med rødvinseddike, oregano, 1,5 dl olivenolie, salt og peber. Lad den trække.",
+     "Grill eller steg kyllingen ved høj varme, til den er gennemstegt.",
+     "Skær gulerødder og agurk i stave og broccolien i små buketter. Rør creme fraiche med salt og peber til dip.",
+     "Servér kyllingen med en skefuld chimichurri ovenpå. Resten holder sig i køleskabet."],
+    "https://www.madbanditten.dk/kylling-med-chimichurri/"],
+
+  ["paprikakylling","Kylling i paprikasauce m. broccoli",2,
+    {kyllingebryst:300,hvidlog:0.5,paprika:10,logpulver:2,piskeflode:100,oregano:2,basilikum_toerret:2,tomatpure:15,sukrin:4,eddike:10,smor:10,broccoli:400},
+    ["Krydr kyllingen med salt, peber og lidt paprika, og brun den godt på begge sider i smør. Læg den til side.",
+     "Sauter hvidløget, og rist paprikaen med et øjeblik.",
+     "Tilsæt løgpulver, oregano, basilikum, tomatpuré, 1 dl vand og fløde, og lad det koge op.",
+     "Kom kyllingen tilbage, og lad det simre ca. 10 minutter, til saucen tykner og kyllingen er gennemstegt.",
+     "Smag til med sødning og eddike, og servér med dampet broccoli."],
+    "https://www.madbanditten.dk/kylling-i-paprikasauce/"],
+
+  ["fajitas","Fajitas m. oksekød, guacamole og pico de gallo",4,
+    {flanksteak:700,soja:50,lime:5,hvidlog:1,sukrin:15,spidskommen:4,log:200,peberfrugt:4,kokosolie:15,avokado:2,tomat:300,rodlog:40,chili:1,koriander:25},
+    ["Marinér kødet i soja, saften af 3 lime, 3 fed hvidløg, Sukrin og spidskommen – gerne 5–6 timer eller natten over.",
+     "Grill eller steg kødet ved høj varme 3–4 minutter på hver side, og lad det hvile.",
+     "Snit løg og peberfrugter, steg dem møre i kokosolie, og pres en halv lime over.",
+     "Pico de gallo: hak tomater, rødløg, chili, 1 fed hvidløg og koriander, og smag til med limesaft og salt.",
+     "Guacamole: mos avokadoerne med limesaft og salt.",
+     "Skær kødet i skiver på tværs af fibrene, og læg det over grøntsagerne. Servér med guacamole og pico de gallo."],
+    "https://www.madbanditten.dk/fajitas-med-oksekoed/"],
+
+  ["tequilakylling","Tequila-lime kylling m. avokadosalsa",4,
+    {kyllingebryst:600,chili:3,koriander:25,lime:4,tequila:50,sukrin:15,olivenolie:30,hvidlog:1,avokado:3,tomat:450,log:100,tabasco:1},
+    ["Hak 2 chili (uden kerner) og halvdelen af korianderen fint, og rør marinade af det med skal og saft fra 3 lime, tequila, Sukrin, olivenolie, 4 fed hvidløg og salt.",
+     "Bank kyllingen flad, og lad den marinere – gerne natten over.",
+     "Grill eller steg kyllingen ved høj varme, til den er gennemstegt.",
+     "Salsa: skær avokado og tomater (uden kerner) i tern, hak løg, 2 fed hvidløg og 1 chili, og bland det med saften af 1 lime, tabasco, resten af korianderen, salt og peber."],
+    "https://www.madbanditten.dk/tequila-lime-kylling/"],
+
+  ["loegkylling","Kylling i løgsauce m. grønne bønner",4,
+    {kyllingebryst:600,log:200,hvidlog:1,timian:2,gruyere:140,smor:40,gronne_bonner:600},
+    ["Snit løgene, og hak hvidløget fint.",
+     "Brun kyllingebrysterne godt i smør, krydr med salt og peber, og læg dem i et ovnfast fad.",
+     "Sauter løg, hvidløg og timian i lidt mere smør 10–15 minutter, til løgene er gyldne og karamelliserede.",
+     "Hæld 2 dl vand på, lad det koge op, smag til, og hæld løgene over kyllingen.",
+     "Tænd ovnen på 180 grader. Riv osten over, og bag fadet 10–15 minutter.",
+     "Kog bønnerne 4–5 minutter i letsaltet vand, og servér dem til."],
+    "https://www.madbanditten.dk/kylling-i-loegsauce/"]
 ].map(a => ({id:a[0],navn:a[1],portioner:a[2],ing:a[3],opskrift:a[4],kilde:a[5]||null}));
 
 /* ============================================================

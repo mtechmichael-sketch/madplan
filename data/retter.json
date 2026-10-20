@@ -1,5 +1,5 @@
 {
- "version": 15,
+ "version": 16,
  "retter": [
   {
    "id": "karry",
@@ -826,6 +826,227 @@
     "Servér kyllingen med saucen og blomkålsrisen, drys med koriander, og læg limebåde ved."
    ],
    "kilde": "https://www.madbanditten.dk/kylling-i-ingefaersauce/"
+  },
+  {
+   "id": "pikantkylling",
+   "navn": "Pikant kylling i fad m. blomkålsris",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 600,
+    "bacon_tern": 70,
+    "hvidlog": 1,
+    "rodlog": 100,
+    "peberfrugt": 0.5,
+    "aubergine": 0.33,
+    "squash": 0.5,
+    "pikantost": 125,
+    "piskeflode": 100,
+    "hakkede_tomater": 400,
+    "tomatpure": 30,
+    "roeget_paprika": 1,
+    "paprika": 3,
+    "timian": 2,
+    "smor": 15,
+    "blomkaalsris": 700,
+    "persille": 10
+   },
+   "opskrift": [
+    "Tænd ovnen på 200 grader. Skær kylling og bacon i tern, hak hvidløget og snit løget.",
+    "Skær peberfrugt, aubergine og squash i tern.",
+    "Steg baconen sprød, og kom den i et ovnfast fad. Steg kyllingen et par minutter i fedtet med salt, peber og paprika, og læg den over til baconen.",
+    "Sauter løg og hvidløg i lidt smør, og steg grøntsagerne med et par minutter.",
+    "Kom pikantost, fløde, hakkede tomater og tomatpuré på panden, krydr med røget paprika og timian, og lad saucen simre et par minutter.",
+    "Hæld saucen over kylling og bacon, og sæt fadet i ovnen 15–20 minutter.",
+    "Servér med blomkålsris og frisk persille."
+   ],
+   "kilde": "https://www.madbanditten.dk/pikant-kylling-i-fad/"
+  },
+  {
+   "id": "proteinpasta",
+   "navn": "Pikant proteinpasta m. tomatsovs og chorizo",
+   "portioner": 3,
+   "ing": {
+    "aeg": 4,
+    "pikantost": 125,
+    "loppefro": 12,
+    "hvidlog": 0.5,
+    "persille": 10,
+    "passata": 750,
+    "sukrin": 8,
+    "kapers": 20,
+    "chorizo_ren": 200
+   },
+   "opskrift": [
+    "Tænd ovnen på 150 grader. Pisk æg og pikantost sammen, og pisk loppefrøskallerne godt ud i dejen.",
+    "Bred dejen tyndt og jævnt ud på en bageplade med bagepapir, og bag den 13–15 minutter.",
+    "Løsn dejen fra papiret, lad den køle lidt, og skær den i tynde strimler.",
+    "Hak hvidløg og persille, kom det i en gryde med passata, kapers og evt. Sukrin, og lad sovsen simre ca. 20 minutter. Smag til med salt og peber.",
+    "Skær chorizoen i tern, og rist den sprød på en tør pande.",
+    "Vend pastaen i tomatsovsen, og drys chorizo på toppen."
+   ],
+   "kilde": "https://www.madbanditten.dk/pikant-proteinpasta-med-tomatsovs/"
+  },
+  {
+   "id": "hvidlogssteak",
+   "navn": "Hvidløgssteak m. bønner",
+   "portioner": 2,
+   "ing": {
+    "flanksteak": 300,
+    "hvidlog": 0.5,
+    "soja": 45,
+    "sambal": 15,
+    "olivenolie": 15,
+    "smor": 45,
+    "italiensk": 6,
+    "sukrin": 8,
+    "citron": 0.5,
+    "gronne_bonner": 300,
+    "persille": 10,
+    "chiliflager": 1
+   },
+   "opskrift": [
+    "Skær steaken i strimler, og lad den marinere mindst 10 minutter i halvdelen af hvidløget, soja, sambal oelek, olivenolie og peber.",
+    "Steg kødet ca. et minut på en meget varm pande, og læg det til side.",
+    "Skru ned, sauter resten af hvidløget i halvdelen af smørret, og steg bønnerne med et øjeblik.",
+    "Tilsæt 1 dl vand, sødning, citronsaft og italiensk krydderi, og lad det koge en del ind.",
+    "Rør resten af smørret i, kom kødet og persillen tilbage, og lad det blive varmt igennem. Drys med chiliflager."
+   ],
+   "kilde": "https://www.madbanditten.dk/hvidloegssteak-med-boenner/"
+  },
+  {
+   "id": "chimichurri",
+   "navn": "Kylling m. chimichurri, dip og grønt",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 800,
+    "logpulver": 8,
+    "hvidlog": 1,
+    "spidskommen": 4,
+    "olivenolie": 210,
+    "persille": 25,
+    "chili": 1,
+    "log": 20,
+    "eddike": 45,
+    "oregano": 4,
+    "cremefraiche": 250,
+    "gulerodder": 300,
+    "agurk": 1,
+    "broccoli": 450
+   },
+   "opskrift": [
+    "Bank kyllingebrysterne flade. Rør marinade af løgpulver, 2 fed hvidløg, spidskommen, 4 spsk olivenolie, salt og peber, og lad kyllingen trække mindst 30 minutter.",
+    "Chimichurri: hak persille, chili, 2 fed hvidløg og løg fint, og rør det med rødvinseddike, oregano, 1,5 dl olivenolie, salt og peber. Lad den trække.",
+    "Grill eller steg kyllingen ved høj varme, til den er gennemstegt.",
+    "Skær gulerødder og agurk i stave og broccolien i små buketter. Rør creme fraiche med salt og peber til dip.",
+    "Servér kyllingen med en skefuld chimichurri ovenpå. Resten holder sig i køleskabet."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-med-chimichurri/"
+  },
+  {
+   "id": "paprikakylling",
+   "navn": "Kylling i paprikasauce m. broccoli",
+   "portioner": 2,
+   "ing": {
+    "kyllingebryst": 300,
+    "hvidlog": 0.5,
+    "paprika": 10,
+    "logpulver": 2,
+    "piskeflode": 100,
+    "oregano": 2,
+    "basilikum_toerret": 2,
+    "tomatpure": 15,
+    "sukrin": 4,
+    "eddike": 10,
+    "smor": 10,
+    "broccoli": 400
+   },
+   "opskrift": [
+    "Krydr kyllingen med salt, peber og lidt paprika, og brun den godt på begge sider i smør. Læg den til side.",
+    "Sauter hvidløget, og rist paprikaen med et øjeblik.",
+    "Tilsæt løgpulver, oregano, basilikum, tomatpuré, 1 dl vand og fløde, og lad det koge op.",
+    "Kom kyllingen tilbage, og lad det simre ca. 10 minutter, til saucen tykner og kyllingen er gennemstegt.",
+    "Smag til med sødning og eddike, og servér med dampet broccoli."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-paprikasauce/"
+  },
+  {
+   "id": "fajitas",
+   "navn": "Fajitas m. oksekød, guacamole og pico de gallo",
+   "portioner": 4,
+   "ing": {
+    "flanksteak": 700,
+    "soja": 50,
+    "lime": 5,
+    "hvidlog": 1,
+    "sukrin": 15,
+    "spidskommen": 4,
+    "log": 200,
+    "peberfrugt": 4,
+    "kokosolie": 15,
+    "avokado": 2,
+    "tomat": 300,
+    "rodlog": 40,
+    "chili": 1,
+    "koriander": 25
+   },
+   "opskrift": [
+    "Marinér kødet i soja, saften af 3 lime, 3 fed hvidløg, Sukrin og spidskommen – gerne 5–6 timer eller natten over.",
+    "Grill eller steg kødet ved høj varme 3–4 minutter på hver side, og lad det hvile.",
+    "Snit løg og peberfrugter, steg dem møre i kokosolie, og pres en halv lime over.",
+    "Pico de gallo: hak tomater, rødløg, chili, 1 fed hvidløg og koriander, og smag til med limesaft og salt.",
+    "Guacamole: mos avokadoerne med limesaft og salt.",
+    "Skær kødet i skiver på tværs af fibrene, og læg det over grøntsagerne. Servér med guacamole og pico de gallo."
+   ],
+   "kilde": "https://www.madbanditten.dk/fajitas-med-oksekoed/"
+  },
+  {
+   "id": "tequilakylling",
+   "navn": "Tequila-lime kylling m. avokadosalsa",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 600,
+    "chili": 3,
+    "koriander": 25,
+    "lime": 4,
+    "tequila": 50,
+    "sukrin": 15,
+    "olivenolie": 30,
+    "hvidlog": 1,
+    "avokado": 3,
+    "tomat": 450,
+    "log": 100,
+    "tabasco": 1
+   },
+   "opskrift": [
+    "Hak 2 chili (uden kerner) og halvdelen af korianderen fint, og rør marinade af det med skal og saft fra 3 lime, tequila, Sukrin, olivenolie, 4 fed hvidløg og salt.",
+    "Bank kyllingen flad, og lad den marinere – gerne natten over.",
+    "Grill eller steg kyllingen ved høj varme, til den er gennemstegt.",
+    "Salsa: skær avokado og tomater (uden kerner) i tern, hak løg, 2 fed hvidløg og 1 chili, og bland det med saften af 1 lime, tabasco, resten af korianderen, salt og peber."
+   ],
+   "kilde": "https://www.madbanditten.dk/tequila-lime-kylling/"
+  },
+  {
+   "id": "loegkylling",
+   "navn": "Kylling i løgsauce m. grønne bønner",
+   "portioner": 4,
+   "ing": {
+    "kyllingebryst": 600,
+    "log": 200,
+    "hvidlog": 1,
+    "timian": 2,
+    "gruyere": 140,
+    "smor": 40,
+    "gronne_bonner": 600
+   },
+   "opskrift": [
+    "Snit løgene, og hak hvidløget fint.",
+    "Brun kyllingebrysterne godt i smør, krydr med salt og peber, og læg dem i et ovnfast fad.",
+    "Sauter løg, hvidløg og timian i lidt mere smør 10–15 minutter, til løgene er gyldne og karamelliserede.",
+    "Hæld 2 dl vand på, lad det koge op, smag til, og hæld løgene over kyllingen.",
+    "Tænd ovnen på 180 grader. Riv osten over, og bag fadet 10–15 minutter.",
+    "Kog bønnerne 4–5 minutter i letsaltet vand, og servér dem til."
+   ],
+   "kilde": "https://www.madbanditten.dk/kylling-i-loegsauce/"
   }
  ]
 }

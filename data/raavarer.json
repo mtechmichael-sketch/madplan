@@ -1,5 +1,5 @@
 {
- "version": 15,
+ "version": 16,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -1610,6 +1610,160 @@
    "nid": "5060436",
    "est": false,
    "altid": false
+  },
+  {
+   "id": "aubergine",
+   "navn": "Aubergine øko.",
+   "enhed": "stk",
+   "pakke": 1,
+   "pakkenavn": "1 stk.",
+   "pris": 13.5,
+   "holdbar": 7,
+   "frys": false,
+   "kategori": "Grønt",
+   "nid": "5002545",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "passata",
+   "navn": "Tomatpassata øko.",
+   "enhed": "g",
+   "pakke": 500,
+   "pakkenavn": "500 g / Taste of Nature",
+   "pris": 10.5,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5064168",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5064169",
+     "pakke": 680,
+     "pakkenavn": "680 g / Taste of Nature"
+    }
+   ]
+  },
+  {
+   "id": "kapers",
+   "navn": "Kapers",
+   "enhed": "g",
+   "pakke": 60,
+   "pakkenavn": "100 g / 60 g drænet / Taste of Nature",
+   "pris": 7.89,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5065559",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "flanksteak",
+   "navn": "Flanksteak (frost)",
+   "enhed": "g",
+   "pakke": 500,
+   "pakkenavn": "400-600 g / frost / Irish Nature",
+   "pris": 126.0,
+   "holdbar": 90,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5027322",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5071240",
+     "pakke": 800,
+     "pakkenavn": "700-900 g øko. / frost / Angus"
+    }
+   ]
+  },
+  {
+   "id": "chorizo_ren",
+   "navn": "Chorizo til stegning (mini)",
+   "enhed": "g",
+   "pakke": 300,
+   "pakkenavn": "300 g / Olmeda Origenes",
+   "pris": 59.95,
+   "holdbar": 30,
+   "frys": true,
+   "kategori": "Kød & fisk",
+   "nid": "5025339",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "gruyere",
+   "navn": "Gruyère Reserve",
+   "enhed": "g",
+   "pakke": 200,
+   "pakkenavn": "200 g / Le Gourmand",
+   "pris": 95.95,
+   "holdbar": 30,
+   "frys": false,
+   "kategori": "Mejeri",
+   "nid": "5030555",
+   "est": false,
+   "altid": false
+  },
+  {
+   "id": "sambal",
+   "navn": "Sambal oelek",
+   "enhed": "g",
+   "pakke": 200,
+   "pakkenavn": "200 g / Santa Maria",
+   "pris": 30.45,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Krydderier",
+   "nid": "5021463",
+   "est": false,
+   "altid": true
+  },
+  {
+   "id": "italiensk",
+   "navn": "Italiensk krydderiblanding øko.",
+   "enhed": "g",
+   "pakke": 45,
+   "pakkenavn": "45 g / Urtekram",
+   "pris": 38.95,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Krydderier",
+   "nid": "5064332",
+   "est": false,
+   "altid": true
+  },
+  {
+   "id": "basilikum_toerret",
+   "navn": "Tørret basilikum",
+   "enhed": "g",
+   "pakke": 15,
+   "pakkenavn": "15 g (typisk)",
+   "pris": 0,
+   "holdbar": 365,
+   "frys": false,
+   "kategori": "Krydderier",
+   "nid": "",
+   "est": true,
+   "altid": true
+  },
+  {
+   "id": "tequila",
+   "navn": "Tequila",
+   "enhed": "ml",
+   "pakke": 700,
+   "pakkenavn": "0,70 l / Polini Silver",
+   "pris": 152.25,
+   "holdbar": 3650,
+   "frys": false,
+   "kategori": "Kolonial",
+   "nid": "5062975",
+   "est": false,
+   "altid": true
   }
  ]
 }
