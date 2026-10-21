@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.30.1">
-<link rel="stylesheet" href="style.css?v=0.30.1">
+<link rel="stylesheet" href="tema.css?v=0.30.2">
+<link rel="stylesheet" href="style.css?v=0.30.2">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.30.1";
+const VERSION = "0.30.2";
 const DATA_VERSION = 19;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1101,17 +1101,22 @@ function tidsrum(a, dag){
 const EL_ENT = "sensor.elpris_total";
 let EL = {priser:[], hentet:null};
 
+let elTimer = null;
+const elIgenSnart = () => { clearTimeout(elTimer); elTimer = setTimeout(hentEl, 60000); };
 async function hentEl(){
   const tok = haToken();
   if(!HOS_HA || !tok){ EL = {priser:[], hentet:null}; return; }
   try{
     const r = await fetch(location.origin + "/api/states/" + EL_ENT,
       {headers:{"Authorization":"Bearer " + tok}, cache:"no-store"});
-    if(!r.ok) return;                          // 404: sensoren er ikke sat op — ingen linje
+    if(!r.ok){ if(r.status !== 404) elIgenSnart(); return; }   // 404: sensoren er ikke sat op — ingen linje
     const st = await r.json();
     const p = ((st.attributes || {}).priser || []).map(x => ({t:new Date(x.s), p:+x.p})).filter(x => !isNaN(x.p));
+    // Tomt svar = Home Assistant er ved at starte (21-10, efter strømsvigt): behold
+    // de priser vi har, og spørg igen om et minut i stedet for et kvarter.
+    if(!p.length){ elIgenSnart(); return; }
     EL = {priser:p, hentet:new Date()};
-  }catch(e){}                                  // behold de sidste priser; de gælder stadig
+  }catch(e){ elIgenSnart(); }                  // behold de sidste priser; de gælder stadig
   if(visning === "tomgang") tegnTomgang();
 }
 
