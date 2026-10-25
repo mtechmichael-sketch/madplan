@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.31.0">
-<link rel="stylesheet" href="style.css?v=0.31.0">
+<link rel="stylesheet" href="tema.css?v=0.32.0">
+<link rel="stylesheet" href="style.css?v=0.32.0">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.31.0";
+const VERSION = "0.32.0";
 const DATA_VERSION = 19;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -2315,6 +2315,26 @@ async function hentNemligKoeb(){
   if(aendret){ if(visning !== "tomgang") tegn(); else save(); }
 }
 
+/* ---------- Basisvarer lægges selv på listen (v0.32.0, 25-10) ----------
+   Når en vare er «snart tid» (samme grænse som mærkaten på tomgangsskærmen:
+   3 dage eller mindre, eller over tid), sættes fluebenet af sig selv, så varen
+   kommer med på indkøbslisten og på Nemlig-listen.
+   Fjerner man fluebenet igen, er det et valg: S.basisAuto husker, hvilket køb
+   (b.sidst) varen blev lagt på efter, og den lægges først på igen, når den er
+   købt og næste runde starter. Varer uden rytme endnu (aldrig købt) røres ikke. */
+function basisAuto(){
+  S.basisAuto = S.basisAuto || {};
+  let n = 0;
+  S.basis.forEach(b => {
+    const d = basisTil(b);
+    if(d === null || d > 3 || S.basisValgt[b.id]) return;
+    if(S.basisAuto[b.id] === b.sidst) return;     // lagt på i denne runde og fjernet igen med vilje
+    S.basisValgt[b.id] = true;
+    S.basisAuto[b.id] = b.sidst;
+    n++;
+  });
+  return n;
+}
 function basisKoebt(id){
   const b = S.basis.find(x => x.id === id); if(!b) return;
   noterKoeb(b);
@@ -2937,6 +2957,7 @@ document.getElementById("bMere").onclick = () => vis("mere");
 addEventListener("resize", nulstilIdle);
 
 temaPaa();
+basisAuto();
 vis("plan");
 nulstilIdle();
 hentFaelles();
@@ -2948,6 +2969,8 @@ setInterval(hentEl, 15 * 60000);          // hvert kvarter, som priserne skifter
 hentKalender();
 setInterval(hentKalender, 5 * 60000);     // HA henter fra Google hvert kvarter; vi spørger HA oftere
 hentNemligKoeb();
+// Basisvarer på tur: tjek hver time - tabletten står tændt i ugevis
+setInterval(() => { if(basisAuto()){ if(visning === "tomgang") tegnTomgang(); save(); } }, 3600000);
 setInterval(hentNemligKoeb, 3 * 3600000); // Pi'en husker svaret en time; ordrer kommer et par gange om ugen
 </script>
 
