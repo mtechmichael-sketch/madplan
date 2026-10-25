@@ -88,7 +88,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .dagmaerke{font-size:11px;font-weight:700;color:var(--accent);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
 
 /* ---- forslag ---- */
-.forslag{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+/* Række der stryges sidelæns (25-10): op til 12 forslag, ca. tre ad gangen */
+.forslag{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;padding-bottom:10px;-webkit-overflow-scrolling:touch}
+.forslag .fkort{flex:0 0 clamp(260px,31%,360px);scroll-snap-align:start}
 .fkort{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:12px;padding:12px 15px;text-align:left;width:100%}
 .fkort .n{font-size:16px;font-weight:600}
 .fkort .why{font-size:13px;color:var(--muted);margin-top:3px}
