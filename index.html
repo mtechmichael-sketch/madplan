@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.33.0">
-<link rel="stylesheet" href="style.css?v=0.33.0">
+<link rel="stylesheet" href="tema.css?v=0.34.0">
+<link rel="stylesheet" href="style.css?v=0.34.0">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.33.0";
-const DATA_VERSION = 20;
+const VERSION = "0.34.0";
+const DATA_VERSION = 21;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -314,27 +314,48 @@ const SEED_BASIS = [
 ].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], nid:a[4], pakkenavn:a[5], butik:a[6] || null, sidst:null, est:true}));
 
 const SEED_RETTER = [
-  ["karry","Kylling i karry m. ris",4,{kyllingebryst:600,log:200,karrypasta:50,kokosmaelk:400,ris:300,gulerodder:200},
+  // 26-10: de syv ældste retter er lavet om til keto (ris -> blomkålsris, pasta og
+  // lasagneplader -> squash, kartofler -> blomkål, tortillas -> icebergblade, chili
+  // uden kidneybønner). migrer() skifter de gemte udgaver ud, hvis de ikke er rettet i hånden.
+  ["karry","Kylling i karry m. blomkålsris",4,{kyllingebryst:600,log:200,karrypasta:50,kokosmaelk:400,blomkaalsris:700,gulerodder:200},
     ["Skær kyllingen i tern og løget i både.",
      "Brun kyllingen i gryden ved høj varme og tag den op igen.",
      "Sveds løg og karrypasta i samme gryde til det dufter.",
      "Hæld kokosmælken i, kom kylling og gulerødder tilbage, og lad det simre 15 minutter.",
-     "Kog risene imens, og smag karryen til med salt."]],
-  ["bolognese","Spaghetti bolognese",4,{hakket_okse:500,hakkede_tomater:800,log:150,gulerodder:150,hvidlog:1,tomatpure:70,pasta:400},
+     "Varm blomkålsrisen på en pande imens, og smag karryen til med salt."]],
+  ["bolognese","Bolognese m. squashspaghetti",4,{hakket_okse:500,hakkede_tomater:800,log:150,gulerodder:150,hvidlog:1,tomatpure:70,squash:3},
     ["Hak løg, hvidløg og gulerødder fint.",
      "Brun kødet godt igennem, og tag det fra.",
      "Sveds grøntsagerne bløde, og rist tomatpuréen med et minut.",
      "Kom kød og hakkede tomater i, og lad det simre mindst 40 minutter.",
-     "Kog pastaen, og smag saucen til med salt og peber."]],
-  ["tortilla","Tortillas m. oksekød",4,{hakket_okse:400,tortillas:8,peberfrugt:2,log:100,revet_ost:100,salat:100,cremefraiche:150},null],
-  ["ovnlaks","Ovnlaks m. kartofler og broccoli",4,{laksefilet:500,kartofler:800,broccoli:400,citron:1,smor:40},
+     "Skær squashen til spaghetti med en spiralskærer eller skrælleren, og vend den 1–2 minutter på en varm pande. Smag saucen til med salt og peber."]],
+  ["tortilla","Salatwraps m. oksekød",4,{hakket_okse:400,iceberg:1,peberfrugt:2,log:100,spidskommen:2,paprika:3,revet_ost:100,cremefraiche:150},
+    ["Brun kødet med hakket løg, spidskommen, paprika, salt og peber.",
+     "Skær peberfrugterne i strimler.",
+     "Pil hele blade af icebergsalaten, skyl dem, og dup dem tørre.",
+     "Fyld bladene med kød, peberfrugt, revet ost og en klat creme fraiche, og fold dem sammen."]],
+  ["ovnlaks","Ovnlaks m. blomkål og broccoli",4,{laksefilet:500,blomkaal:1,broccoli:400,citron:1,smor:40},
     ["Tænd ovnen på 200 grader.",
-     "Skær kartoflerne i både, vend dem i olie og salt, og giv dem 20 minutter.",
+     "Del blomkålen i buketter, vend dem i olie og salt, og giv dem 15 minutter.",
      "Læg laksen ved siden af med smør og citron, og giv det 12-15 minutter mere.",
      "Damp broccolien de sidste fem minutter."]],
-  ["wok","Kyllingewok m. ris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,ris:300,hvidlog:1},null],
-  ["lasagne","Lasagne",4,{hakket_okse:500,hakkede_tomater:800,lasagneplader:250,maelk:500,smor:50,revet_ost:150,log:100},null],
-  ["chili","Chili con carne",4,{hakket_okse:500,kidneybonner:500,hakkede_tomater:400,log:150,peberfrugt:1,ris:300},null],
+  ["wok","Kyllingewok m. blomkålsris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,blomkaalsris:700,hvidlog:1,soja:45},
+    ["Skær kyllingen i strimler og grøntsagerne i tynde stave.",
+     "Steg kyllingen ved høj varme, og tag den op.",
+     "Steg hvidløg, gulerødder, peberfrugt og squash et par minutter, så de stadig har bid.",
+     "Kom kyllingen tilbage, og smag til med soja.",
+     "Varm blomkålsrisen på en pande, og servér wokken ovenpå."]],
+  ["lasagne","Squashlasagne",4,{hakket_okse:500,hakkede_tomater:800,squash:3,piskeflode:200,flodeost:150,revet_ost:150,log:100},
+    ["Tænd ovnen på 200 grader. Brun kødet med hakket løg, kom tomaterne i, og lad det simre 20 minutter. Smag til med salt og peber.",
+     "Skær squashen på langs i tynde skiver.",
+     "Rør fløde og flødeost sammen til en hvid sovs.",
+     "Læg squash, kødsovs og hvid sovs i lag i et fad, og slut med hvid sovs.",
+     "Drys revet ost over, og bag lasagnen 30–35 minutter."]],
+  ["chili","Chili con carne m. blomkålsris",4,{hakket_okse:600,hakkede_tomater:400,log:150,peberfrugt:2,spidskommen:4,paprika:4,chiliflager:1,blomkaalsris:700},
+    ["Hak løg og peberfrugt.",
+     "Brun kødet med løget, og rist spidskommen, paprika og chiliflager med et minut.",
+     "Kom peberfrugt og hakkede tomater i, og lad chilien simre 20–30 minutter. Smag til med salt.",
+     "Varm blomkålsrisen på en pande, og servér chilien ovenpå. Uden kidneybønner, som er for kulhydratrige til keto."]],
   ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,blomkaalsris:700},null],   // kartofler -> blomkålsris (keto, 25-10)
 
   /* Fra Madbanditten, august 2026. Mængderne er skaleret til 4 portioner.
@@ -765,7 +786,7 @@ function migrer(d){
   d.retter = d.retter.filter(x => !vaek.has(x.id));
   vaek.forEach(id => { delete d.valgt[id];
     Object.keys(d.uge).forEach(dag => { if(d.uge[dag] === id){ delete d.uge[dag]; delete d.koebt[dag]; } }); });
-  const ret2 = {karry:{karrypasta:50}, chili:{kidneybonner:500}, wok:{squash:1},
+  const ret2 = {karry:{karrypasta:50}, wok:{squash:1},   // chili-bønnerne er taget ud (keto, 26-10)
                };
   const opsk = Object.fromEntries(SEED_RETTER.filter(x => x.opskrift).map(x => [x.id, x.opskrift]));
   // Kødboller i svampesauce laves til 8 (05-10): skift den gemte 4-personers udgave
@@ -785,6 +806,13 @@ function migrer(d){
   // 25-10: kyllingegryden får blomkålsris i stedet for kartofler (keto). Kun hvis den ikke er rettet i hånden.
   const gr = d.retter.find(x => x.id === "gryde"), grNy = SEED_RETTER.find(x => x.id === "gryde");
   if(gr && grNy && gr.ing && gr.ing.kartofler === 600){ gr.ing = {...grNy.ing}; }
+  // 26-10: syv ældre retter lavet om til keto. Kun hvis retten ikke er rettet i hånden
+  // (kendes på den gamle kulhydrat-ingrediens i den oprindelige mængde).
+  [["karry","ris",300],["bolognese","pasta",400],["tortilla","tortillas",8],["ovnlaks","kartofler",800],
+   ["wok","ris",300],["lasagne","lasagneplader",250],["chili","kidneybonner",500]].forEach(([id, v, m]) => {
+    const x = d.retter.find(r => r.id === id), nyR = SEED_RETTER.find(r => r.id === id);
+    if(x && nyR && x.ing && x.ing[v] === m){ x.navn = nyR.navn; x.ing = {...nyR.ing}; x.opskrift = [...nyR.opskrift]; }
+  });
   const kb2 = d.retter.find(x => x.id === "ketoburger2");
   if(kb2 && kb2.ing && kb2.ing.chorizo === 100 && kb2.ing.chorizo_ren == null){ kb2.ing.chorizo_ren = 100; delete kb2.ing.chorizo; }
   const lk = d.retter.find(x => x.id === "loegkylling"), lkNy = SEED_RETTER.find(x => x.id === "loegkylling");
