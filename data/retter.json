@@ -1,5 +1,5 @@
 {
- "version": 19,
+ "version": 20,
  "retter": [
   {
    "id": "karry",
@@ -135,7 +135,7 @@
     "champignon": 250,
     "piskeflode": 250,
     "porre": 1,
-    "kartofler": 600
+    "blomkaalsris": 700
    },
    "opskrift": null,
    "kilde": null

@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.32.0">
-<link rel="stylesheet" href="style.css?v=0.32.0">
+<link rel="stylesheet" href="tema.css?v=0.33.0">
+<link rel="stylesheet" href="style.css?v=0.33.0">
 </head>
 <body>
 
@@ -105,8 +105,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.32.0";
-const DATA_VERSION = 19;
+const VERSION = "0.33.0";
+const DATA_VERSION = 20;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -335,7 +335,7 @@ const SEED_RETTER = [
   ["wok","Kyllingewok m. ris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,ris:300,hvidlog:1},null],
   ["lasagne","Lasagne",4,{hakket_okse:500,hakkede_tomater:800,lasagneplader:250,maelk:500,smor:50,revet_ost:150,log:100},null],
   ["chili","Chili con carne",4,{hakket_okse:500,kidneybonner:500,hakkede_tomater:400,log:150,peberfrugt:1,ris:300},null],
-  ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,kartofler:600},null],
+  ["gryde","Kyllingegryde m. bacon",4,{kyllingebryst:600,bacon_tern:150,champignon:250,piskeflode:250,porre:1,blomkaalsris:700},null],   // kartofler -> blomkålsris (keto, 25-10)
 
   /* Fra Madbanditten, august 2026. Mængderne er skaleret til 4 portioner.
      Trinnene er skrevet kort i egne ord — den fulde opskrift står hos kilden. */
@@ -782,6 +782,9 @@ function migrer(d){
   }
   // 20-10 (valgt i køkkenet): chorizo uden dextrose og laktose i burgeren, og mozzarella
   // i stedet for gruyère i løgkyllingen. Kun hvis retten ikke er rettet i hånden.
+  // 25-10: kyllingegryden får blomkålsris i stedet for kartofler (keto). Kun hvis den ikke er rettet i hånden.
+  const gr = d.retter.find(x => x.id === "gryde"), grNy = SEED_RETTER.find(x => x.id === "gryde");
+  if(gr && grNy && gr.ing && gr.ing.kartofler === 600){ gr.ing = {...grNy.ing}; }
   const kb2 = d.retter.find(x => x.id === "ketoburger2");
   if(kb2 && kb2.ing && kb2.ing.chorizo === 100 && kb2.ing.chorizo_ren == null){ kb2.ing.chorizo_ren = 100; delete kb2.ing.chorizo; }
   const lk = d.retter.find(x => x.id === "loegkylling"), lkNy = SEED_RETTER.find(x => x.id === "loegkylling");
