@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.34.0">
-<link rel="stylesheet" href="style.css?v=0.34.0">
+<link rel="stylesheet" href="tema.css?v=0.34.1">
+<link rel="stylesheet" href="style.css?v=0.34.1">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.34.0";
+const VERSION = "0.34.1";
 const DATA_VERSION = 21;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -360,7 +360,9 @@ const SEED_RETTER = [
 
   /* Fra Madbanditten, august 2026. Mængderne er skaleret til 4 portioner.
      Trinnene er skrevet kort i egne ord — den fulde opskrift står hos kilden. */
-  ["sliders","Parmesan sliders",4,
+  // 2, ikke 4 (30-10): mængderne giver 4 sliders - én pr. person. Familien spiser
+  // 2 hver, så appen fordobler det hele, når retten laves til 4.
+  ["sliders","Parmesan sliders",2,
     {parmesan:60,hakket_okse:600,avokado:2,rodlog:150,cornichoner:50,mayonnaise:60,persille:20,smor:20,eddike:2,hvidlogspulver:2},
     ["Rist parmesanen i små bunker på bagepapir til sprøde chips, og lad dem køle.",
      "Form kødet til små bøffer og steg dem i smør.",
@@ -797,6 +799,9 @@ function migrer(d){
   }
   // Big Mac tacos (17-10): kildens "4" er 4 tacos, ikke 4 personer - mængderne
   // rækker til 2. Skift den gemte udgave ud, kun hvis den ikke er rettet i hånden.
+  // Parmesan sliders (30-10): 2 sliders pr. person i stedet for 1. Kun hvis den ikke er rettet i hånden.
+  const sl = d.retter.find(x => x.id === "sliders");
+  if(sl && sl.portioner === 4 && sl.ing && sl.ing.hakket_okse === 600) sl.portioner = 2;
   const bm = d.retter.find(x => x.id === "bigmac"), bmNy = SEED_RETTER.find(x => x.id === "bigmac");
   if(bm && bmNy && bm.portioner === 4 && bm.ing && bm.ing.hakket_okse === 200){
     bm.portioner = bmNy.portioner; bm.ing = {...bmNy.ing};
