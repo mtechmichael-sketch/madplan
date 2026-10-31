@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.34.1">
-<link rel="stylesheet" href="style.css?v=0.34.1">
+<link rel="stylesheet" href="tema.css?v=0.35.0">
+<link rel="stylesheet" href="style.css?v=0.35.0">
 </head>
 <body>
 
@@ -105,7 +105,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.34.1";
+const VERSION = "0.35.0";
 const DATA_VERSION = 21;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -1777,7 +1777,8 @@ function sKoeleskab(){
   const hd = el("div","hint"); hd.style.marginBottom = "16px";
   const nv = el("span",null,"Køleskab"); nv.style.fontSize = "20px"; nv.style.fontWeight = "700";
   hd.append(tilbage, nv, el("span","sub", poster.length + (poster.length === 1 ? " ret" : " retter") + " bestilt · " +
-    rester.length + (rester.length === 1 ? " rest" : " rester")));
+    rester.length + (rester.length === 1 ? " rest" : " rester") +
+    (S.autoBestilt && poster.some(p => p.dato >= S.autoBestilt) ? " · flyttet hertil af sig selv, da Nemlig-ordren kom " + dagKort(S.autoBestilt) : "")));
   V.append(hd);
 
   if(!poster.length && !rester.length){
@@ -2233,6 +2234,9 @@ async function sendNemlig(e){
       headers: {"Authorization": "Bearer " + haToken(), "Content-Type": "application/json"}});
     const s = await r.json().catch(() => ({}));
     if(r.ok){
+      // Ankeret for automatisk «Bestilt» (v0.35.0): kun ordrer leveret fra i dag
+      // og frem kan flytte kurven til køleskabet.
+      S.nemligSendt = iso(new Date()); save();
       linjer = [s.pakker + " pakker (" + s.varer + " varer) ligger nu på listen «" + s.liste + "» hos Nemlig."];
       if(s.fjernet) linjer.push(s.fjernet + (s.fjernet === 1 ? " gammel vare" : " gamle varer") + " er fjernet fra listen.");
       if(s.erstattet && s.erstattet.length) linjer.push(punktum("Udsolgt – lagt på i stedet: " + s.erstattet.join(", ")));
@@ -2345,6 +2349,29 @@ async function hentNemligKoeb(){
     delete S.basisValgt[b.id];
     aendret = true;
   });
+  /* Automatisk «Bestilt» (v0.35.0, 31-10): familien glemte at trykke «Bestilt»
+     efter ordren, så kurven blev liggende, og «Lavet» kom aldrig frem. Når en
+     Nemlig-ordre er LEVERET efter sidste «Send til Nemlig», og den indeholder
+     mindst 60 % af kurvens varer (varenummer eller en af reserverne), flyttes
+     kurven til køleskabet, præcis som ved et tryk på «Bestilt». Uden et «Send
+     til Nemlig» gør den intet - så kan en gammel ordre aldrig tømme en ny kurv. */
+  if(S.nemligSendt && Object.values(S.valgt).some(n => n)){
+    const kraev = indkoeb(behov(S.valgt))
+      .map(x => [x.produkt.nid, ...(x.reserver || []).map(c => c.nid)].filter(Boolean))
+      .filter(a => a.length);
+    if(kraev.length){
+      const perDag = {};
+      s.koeb.forEach(k => { const m = perDag[k.dato] = perDag[k.dato] || new Set(); m.add(k.nid); if(k.org) m.add(k.org); });
+      const dag = Object.keys(perDag).filter(d => d >= S.nemligSendt).sort().find(d =>
+        kraev.filter(a => a.some(n => perDag[d].has(n))).length / kraev.length >= 0.6);
+      if(dag){
+        bestilt();
+        S.autoBestilt = dag;                 // vises på Køleskab-siden
+        delete S.nemligSendt;
+        aendret = true;
+      }
+    }
+  }
   // glem nøgler, der er ældre end 120 dage - Pi'en sender kun de seneste 60
   const graense = iso(new Date(Date.now() - 120 * DAG));
   Object.keys(S.nemligSet).forEach(n => { if(S.nemligSet[n] < graense) delete S.nemligSet[n]; });
