@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.35.0">
-<link rel="stylesheet" href="style.css?v=0.35.0">
+<link rel="stylesheet" href="tema.css?v=0.36.0">
+<link rel="stylesheet" href="style.css?v=0.36.0">
 </head>
 <body>
 
@@ -68,12 +68,13 @@
     <label class="f">Navn<input id="bNavn" required></label>
     <label class="f">Kategori<input id="bKat" list="bkats"></label>
     <label class="f">Interval (dage)<input id="bInterval" type="number" min="1" step="1" required></label>
+    <label class="f">Antal pr. gang<input id="bAntal" type="number" min="1" max="20" step="1"></label>
     <label class="f">Sidst købt<input id="bSidst" type="date"></label>
   </div>
   <p class="note">Intervallet er hvor mange dage der typisk går, før varen skal købes igen. Lad «sidst købt» stå tom, hvis den skal med på næste indkøb.</p></div>
   <footer><button class="btn ghost" value="cancel">Annullér</button><button class="btn" value="ok">Gem</button></footer>
 </form></dialog>
-<datalist id="bkats"><option value="Husholdning"><option value="Personlig pleje"></datalist>
+<datalist id="bkats"><option value="Husholdning"><option value="Personlig pleje"><option value="Morgenmad og madpakker"></datalist>
 
 <dialog id="dlgRyd"><form method="dialog">
   <header>Er maden bestilt?</header>
@@ -105,7 +106,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.35.0";
+const VERSION = "0.36.0";
 const DATA_VERSION = 21;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -311,7 +312,20 @@ const SEED_BASIS = [
   ["haandsaebe","Håndsæbe","Personlig pleje",30,"5070634","0,50 l / Grøn Balance"],
   ["badesaebe","Bad og sæbe","Personlig pleje",30,"5043017","Palmolive showergel 0,75 l"],
   ["deodorant","Deodorant","Personlig pleje",60,"5070806","Deospray 0,15 l"],
-].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], nid:a[4], pakkenavn:a[5], butik:a[6] || null, sidst:null, est:true}));
+
+  // Morgenmad og madpakker (01-11). Varerne familien plejer at købe ifølge
+  // Nemlig-ordrerne, ellers den billigste. 8. felt = antal pakker pr. gang.
+  // Ikke keto - det er madpakker og morgenmad, valgt af familien.
+  ["b_aeg","Æg","Morgenmad og madpakker",14,"5003310","10 stk. / Danæg",null,1],
+  ["b_maelk","Minimælk 0,4 % øko.","Morgenmad og madpakker",7,"103368","1 l / Arla ØKO",null,2],
+  ["b_toast","Toastbrød","Morgenmad og madpakker",14,"5000604","Fuldkornstoast 600 g / Møllens Brød",null,1],
+  ["b_rugbroed","Rugbrød","Morgenmad og madpakker",7,"5071138","Solsikkerugbrød øko. 600 g / Grøn Balance",null,1],
+  ["b_rugbroedschips","Rugbrødschips","Morgenmad og madpakker",14,"5036855","Rugbrødssnacks m. havsalt 190 g / Nordthy",null,1],
+  ["b_frikadeller","Frikadeller","Morgenmad og madpakker",14,"5601117","Frikadeller m. grønt 420 g / frost / Tulip",null,1],
+  ["b_nuggets","Kyllingenuggets","Morgenmad og madpakker",21,"5605418","1 kg / frost",null,2],
+  ["b_broccoli","Broccoli","Morgenmad og madpakker",7,"5002549","1 stk.",null,1],
+  ["b_skinke","Skinkestrimler","Morgenmad og madpakker",7,"5006473","200 g / First Price",null,1],
+].map(a => ({id:a[0], navn:a[1], kategori:a[2], interval:a[3], nid:a[4], pakkenavn:a[5], butik:a[6] || null, antal:a[7] || 1, sidst:null, est:true}));
 
 const SEED_RETTER = [
   // 26-10: de syv ældste retter er lavet om til keto (ris -> blomkålsris, pasta og
@@ -774,6 +788,11 @@ function migrer(d){
            if(b.nid || b.butik || !s.nid) return;
            b.nid = s.nid; b.pakkenavn = s.pakkenavn;
            if(b.id === "opvasketabs" && b.navn === "Opvasketabs") b.navn = s.navn; }); }
+  if(!d.migr.morgen1 && Array.isArray(d.basis)){
+    ["b_aeg","b_maelk","b_toast","b_rugbroed","b_rugbroedschips","b_frikadeller","b_nuggets","b_broccoli","b_skinke"]
+      .forEach(id => { if(d.basis.some(b => b.id === id)) d.basisValgt[id] = true; });
+    d.migr.morgen1 = true;
+  }
   d.haUrl = d.haUrl || "";
   d.tema = d.tema || "auto";
   if(d.tomgangMin == null) d.tomgangMin = 3;
@@ -864,7 +883,7 @@ function listeTilPi(){
       pakkenavn: x.produkt.pakkenavn || null,
       reserver: x.reserver.filter(c => c.nid).map(c => ({nid: c.nid, pakke: c.pakke, pakkenavn: c.pakkenavn || null})), pakker: x.pakker, kraevet: x.kraevet, koebt: x.koebt,
       enhed: x.r.enhed, pris: x.pris, kategori: x.r.kategori || ""})),
-    basis: basisValgte().map(b => ({id: b.id, navn: b.navn, kategori: b.kategori || "", nid: b.nid || null, pakkenavn: b.pakkenavn || null, butik: b.butik || null}))
+    basis: basisValgte().map(b => ({id: b.id, navn: b.navn, kategori: b.kategori || "", nid: b.nid || null, pakkenavn: b.pakkenavn || null, butik: b.butik || null, antal: b.antal || 1}))
   };
 }
 function sendListeSnart(){
@@ -2196,7 +2215,7 @@ function sListe(){
         if(b.kategori !== bkat){ bkat = b.kategori; bbox.append(el("div","eyebrow", bkat)); }
         const row = el("div","raekke");
         const [cls, txt] = basisMrk(b);
-        row.append(el("span","n", b.navn), el("span", cls ? "mrk " + cls : "d", txt));
+        row.append(el("span","n", basisNavn(b)), el("span", cls ? "mrk " + cls : "d", txt));
         const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); row.append(k);
         bbox.append(row);
       });
@@ -2264,7 +2283,7 @@ async function kopier(e){
   const rows = indkoeb(behov(S.valgt));
   let txt = rows.map(x => x.pakker + " × " + (x.produkt.pakkenavn || maengde(x.produkt.pakke, x.r.enhed)) + " " + x.r.navn).join("\n");
   const bv = basisValgte();
-  if(bv.length) txt += "\n\nBasisvarer\n" + bv.map(b => "· " + b.navn).join("\n");
+  if(bv.length) txt += "\n\nBasisvarer\n" + bv.map(b => "· " + basisNavn(b)).join("\n");
   const b = e.currentTarget;
   try{ await navigator.clipboard.writeText(txt); b.lastChild.textContent = "Kopieret"; }
   catch(err){ b.lastChild.textContent = "Kunne ikke kopiere"; }
@@ -2292,6 +2311,7 @@ function basisMrk(b){
 }
 const basisPaaTur = () => S.basis.filter(b => { const d = basisTil(b); return d !== null && d <= 3; }).length;
 const basisValgte = () => S.basis.filter(b => S.basisValgt[b.id]);
+const basisNavn = b => (b.antal > 1 ? b.antal + " × " : "") + b.navn;      // «2 × Minimælk» (01-11)
 
 /* Rytmen lærer af «Købt» (v0.19.2, 03-10). Hver vare husker de sidste
    KOEB_HUSK købsdatoer i `koeb`. Fra andet køb bliver intervallet midten
@@ -2428,7 +2448,7 @@ function sBasis(){
     lab.style.cssText = "display:flex;gap:10px;align-items:center;cursor:pointer";
     const c = el("input"); c.type = "checkbox"; c.checked = !!S.basisValgt[b.id];
     c.onchange = () => { if(c.checked) S.basisValgt[b.id] = true; else delete S.basisValgt[b.id]; tegn(); };
-    lab.append(c, el("span",null,b.navn));
+    lab.append(c, el("span",null,basisNavn(b)));
     const [cls, txt] = basisMrk(b);
     row.append(lab, el("span", cls ? "mrk " + cls : "d", txt),
       el("span","d", b.kategori + " · hver " + b.interval + ". dag" + (b.laert ? " (lært af " + b.laert + " køb)" : "") +
@@ -2464,6 +2484,7 @@ function editBasis(b){
   bNavn.value = b ? b.navn : "";
   bKat.value = b ? b.kategori : "Husholdning";
   bInterval.value = b ? b.interval : 30;
+  bAntal.value = b && b.antal ? b.antal : 1;
   bSidst.value = b && b.sidst ? b.sidst : "";
   dlgBasis.showModal();
 }
@@ -2940,7 +2961,8 @@ dlgBasis.addEventListener("close", () => {
   if(dlgBasis.returnValue !== "ok" || !bNavn.value.trim() || !(+bInterval.value > 0)) return;
   const o = {id: basisEdit ? basisEdit.id : "b" + Date.now().toString(36),
     navn: bNavn.value.trim(), kategori: bKat.value.trim() || "Husholdning",
-    interval: +bInterval.value, sidst: bSidst.value || null, est: false};
+    interval: +bInterval.value, sidst: bSidst.value || null, est: false,
+    antal: Math.max(1, Math.min(20, Math.round(+bAntal.value) || 1))};
   if(basisEdit) Object.assign(basisEdit, o); else S.basis.push(o);
   tegn();
 });
