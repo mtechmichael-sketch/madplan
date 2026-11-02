@@ -1,5 +1,5 @@
 {
- "version": 22,
+ "version": 23,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -584,6 +584,32 @@
    "nid": "5043661",
    "est": false,
    "altid": false
+  },
+  {
+   "id": "cheddar_blok",
+   "navn": "Cheddar i blok",
+   "enhed": "g",
+   "pakke": 200,
+   "pakkenavn": "200 g / ekstra modnet / Wyke Farms",
+   "pris": 24.95,
+   "holdbar": 30,
+   "frys": true,
+   "kategori": "Mejeri",
+   "nid": "5034431",
+   "est": false,
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5009657",
+     "pakke": 200,
+     "pakkenavn": "200 g rød / Glen Ryan"
+    },
+    {
+     "nid": "5500761",
+     "pakke": 200,
+     "pakkenavn": "200 g rød / Kerrygold"
+    }
+   ]
   },
   {
    "id": "graesk_yoghurt",

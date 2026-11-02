@@ -1,5 +1,5 @@
 {
- "version": 22,
+ "version": 23,
  "retter": [
   {
    "id": "karry",
@@ -263,7 +263,7 @@
     "log": 50,
     "tomat": 200,
     "salat": 100,
-    "cheddar": 40,
+    "cheddar_blok": 40,
     "mayonnaise": 90,
     "tomatpure": 20,
     "worcestershire": 4,
@@ -445,7 +445,7 @@
    "ing": {
     "hakket_okse": 600,
     "chorizo_ren": 100,
-    "cheddar": 80,
+    "cheddar_blok": 80,
     "avokado": 2,
     "rodlog": 50,
     "salat": 100,
@@ -469,7 +469,7 @@
    "portioner": 4,
    "ing": {
     "hakket_okse": 600,
-    "cheddar": 50,
+    "cheddar_blok": 50,
     "bacon_skiver": 60,
     "agurkesalat": 20,
     "salat": 80,
