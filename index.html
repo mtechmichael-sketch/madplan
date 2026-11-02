@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.36.0">
-<link rel="stylesheet" href="style.css?v=0.36.0">
+<link rel="stylesheet" href="tema.css?v=0.37.0">
+<link rel="stylesheet" href="style.css?v=0.37.0">
 </head>
 <body>
 
@@ -106,7 +106,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.36.0";
+const VERSION = "0.37.0";
 const DATA_VERSION = 21;
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -2215,8 +2215,9 @@ function sListe(){
         if(b.kategori !== bkat){ bkat = b.kategori; bbox.append(el("div","eyebrow", bkat)); }
         const row = el("div","raekke");
         const [cls, txt] = basisMrk(b);
-        row.append(el("span","n", basisNavn(b)), el("span", cls ? "mrk " + cls : "d", txt));
-        const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); row.append(k);
+        row.append(el("span","n", basisNavn(b)), el("span", cls ? "mrk " + cls : "d", txt), basisStedVaelger(b));
+        // Står varen til Nemlig, men er den købt i en butik, fjerner et tryk den fra Nemlig-listen
+        const k = el("button","btn ghost", b.butik ? "Købt" : "Købt andet sted"); k.onclick = () => basisKoebt(b.id); row.append(k);
         bbox.append(row);
       });
     V.append(bbox);
@@ -2312,6 +2313,27 @@ function basisMrk(b){
 const basisPaaTur = () => S.basis.filter(b => { const d = basisTil(b); return d !== null && d <= 3; }).length;
 const basisValgte = () => S.basis.filter(b => S.basisValgt[b.id]);
 const basisNavn = b => (b.antal > 1 ? b.antal + " × " : "") + b.navn;      // «2 × Minimælk» (01-11)
+/* Hvor købes basisvaren? (v0.37.0, 02-11). «Andet sted» = b.butik er sat: varen
+   bliver på listen, men sendes ikke til Nemlig (Pi'en nævner den under «Købes et
+   andet sted»). Nemlig-nummeret beholdes, så man kan skifte tilbage. En vare uden
+   nummer (toiletpapir) kan ikke sættes til Nemlig. En særlig butik som «Harald
+   Nyborg / jem & fix» bliver ikke overskrevet af «Andet sted». */
+function basisStedVaelger(b){
+  const w = el("div","seg sted");
+  [["Nemlig", false], ["Andet sted", true]].forEach(([t, andet]) => {
+    const k = el("button", null, t);
+    k.setAttribute("aria-current", String(!!b.butik === andet));
+    if(!andet && !b.nid){ k.disabled = true; k.title = "Varen har intet Nemlig-nummer"; }
+    k.onclick = e => {
+      e.preventDefault(); e.stopPropagation();
+      if(andet){ if(!b.butik) b.butik = "Andet sted"; }
+      else if(b.nid) delete b.butik;
+      tegn();
+    };
+    w.append(k);
+  });
+  return w;
+}
 
 /* Rytmen lærer af «Købt» (v0.19.2, 03-10). Hver vare husker de sidste
    KOEB_HUSK købsdatoer i `koeb`. Fra andet køb bliver intervallet midten
@@ -2454,7 +2476,8 @@ function sBasis(){
       el("span","d", b.kategori + " · hver " + b.interval + ". dag" + (b.laert ? " (lært af " + b.laert + " køb)" : "") +
         (b.sidst ? " · sidst " + new Date(b.sidst + "T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"short"}) +
                    (b.nemlig === b.sidst ? " (Nemlig)" : "") : " · aldrig købt")));
-    const kn2 = el("div"); kn2.style.cssText = "display:flex;gap:8px;flex:none";
+    const kn2 = el("div"); kn2.style.cssText = "display:flex;gap:8px;flex:none;align-items:center";
+    kn2.append(basisStedVaelger(b));
     const k = el("button","btn ghost","Købt"); k.onclick = () => basisKoebt(b.id); kn2.append(k);
     const e2 = el("button","btn ghost","Ret"); e2.onclick = () => editBasis(b); kn2.append(e2);
     row.append(kn2);
