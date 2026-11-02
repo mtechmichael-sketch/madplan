@@ -1,5 +1,5 @@
 {
- "version": 21,
+ "version": 22,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -202,12 +202,12 @@
    "navn": "Kartofler vaskede",
    "enhed": "g",
    "pakke": 1000,
-   "pakkenavn": "1 kg / Danmark",
+   "pakkenavn": "1 kg",
    "pris": 12,
    "holdbar": 25,
    "frys": false,
    "kategori": "Grønt",
-   "nid": "5037675",
+   "nid": "5059016",
    "est": true,
    "altid": false,
    "alt": [
@@ -270,12 +270,12 @@
    "navn": "Courgette / squash øko.",
    "enhed": "stk",
    "pakke": 1,
-   "pakkenavn": "1 stk. / Danmark",
-   "pris": 9,
+   "pakkenavn": "1 stk.",
+   "pris": 8.5,
    "holdbar": 8,
    "frys": false,
    "kategori": "Grønt",
-   "nid": "5002546",
+   "nid": "5029778",
    "est": true,
    "altid": false
   },
@@ -1061,29 +1061,41 @@
   },
   {
    "id": "gronne_bonner",
-   "navn": "Bønner grønne øko.",
+   "navn": "Haricots verts (frost)",
    "enhed": "g",
-   "pakke": 300,
-   "pakkenavn": "300 g / Danmark",
-   "pris": 25,
-   "holdbar": 6,
+   "pakke": 700,
+   "pakkenavn": "700 g / frost / First Price",
+   "pris": 10.47,
+   "holdbar": 90,
    "frys": true,
    "kategori": "Grønt",
-   "nid": "5007512",
+   "nid": "923155",
    "est": true,
-   "altid": false
+   "altid": false,
+   "alt": [
+    {
+     "nid": "5501753",
+     "pakke": 500,
+     "pakkenavn": "500 g øko. / frost / Frigodan"
+    },
+    {
+     "nid": "102729",
+     "pakke": 150,
+     "pakkenavn": "150 g frisk"
+    }
+   ]
   },
   {
    "id": "iceberg",
    "navn": "Iceberg salat",
    "enhed": "stk",
    "pakke": 1,
-   "pakkenavn": "1 stk. / ca. 400 g",
+   "pakkenavn": "1 stk. / Spanien",
    "pris": 12,
    "holdbar": 7,
    "frys": false,
    "kategori": "Grønt",
-   "nid": "2301084",
+   "nid": "5004705",
    "est": true,
    "altid": false
   },
@@ -1115,11 +1127,6 @@
    "est": true,
    "altid": false,
    "alt": [
-    {
-     "nid": "5053303",
-     "pakke": 330,
-     "pakkenavn": "330 g Snackmix"
-    },
     {
      "nid": "5014547",
      "pakke": 200,
@@ -1739,22 +1746,22 @@
   },
   {
    "id": "oksestrimler",
-   "navn": "Oksestrimler (stroganoff)",
+   "navn": "Oksestrimler øko.",
    "enhed": "g",
-   "pakke": 500,
-   "pakkenavn": "475-500 g / Irish Nature",
-   "pris": 114.5,
+   "pakke": 400,
+   "pakkenavn": "400 g / Jyske gårde",
+   "pris": 108.75,
    "holdbar": 3,
    "frys": true,
    "kategori": "Kød & fisk",
-   "nid": "5029215",
+   "nid": "5063670",
    "est": false,
    "altid": false,
    "alt": [
     {
-     "nid": "5063670",
-     "pakke": 400,
-     "pakkenavn": "400 g øko. / Jyske gårde"
+     "nid": "5071250",
+     "pakke": 375,
+     "pakkenavn": "350-400 g øko. / Angus"
     }
    ]
   },

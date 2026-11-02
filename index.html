@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.37.0">
-<link rel="stylesheet" href="style.css?v=0.37.0">
+<link rel="stylesheet" href="tema.css?v=0.37.1">
+<link rel="stylesheet" href="style.css?v=0.37.1">
 </head>
 <body>
 
@@ -106,8 +106,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.37.0";
-const DATA_VERSION = 21;
+const VERSION = "0.37.1";
+const DATA_VERSION = 22;   // 22: seks Nemlig-numre skiftet (02-11)
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -125,7 +125,7 @@ const RETTER_V4 = ["karry","bolognese","tortilla","ovnlaks","frikadeller","wok",
    KETO: kun samme råvare og intet tilsat sukker/stivelse (Graasten-mayo har
    dextrose og er derfor ikke med). Tjek varedeklarationen hos Nemlig først.
    Appen vælger det billigste på lager for det, der skal bruges (se vaelgProdukt). */
-const SEED_ALT = {"oksestrimler": [["5063670", 400, "400 g øko. / Jyske gårde"]], "hakket_gris": [["5058405", 400, "400 g / Danske Egnsgårde"]], "kyllingelaar": [["5068833", 1000, "1 kg / Danske Familiegårde"]], "passata": [["5064169", 680, "680 g / Taste of Nature"]], "flanksteak": [["5071240", 800, "700-900 g øko. / frost / Angus"]], "serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5053303", 330, "330 g Snackmix"], ["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
+const SEED_ALT = {"oksestrimler": [["5071250", 375, "350-400 g øko. / Angus"]], "gronne_bonner": [["5501753", 500, "500 g øko. / frost / Frigodan"], ["102729", 150, "150 g frisk"]], "hakket_gris": [["5058405", 400, "400 g / Danske Egnsgårde"]], "kyllingelaar": [["5068833", 1000, "1 kg / Danske Familiegårde"]], "passata": [["5064169", 680, "680 g / Taste of Nature"]], "flanksteak": [["5071240", 800, "700-900 g øko. / frost / Angus"]], "serrano": [["5044878", 70, "70 g / Valent Reserva"]], "jalapenos": [["5021643", 215, "215 g / 110 g drænet / Santa Maria (røde)"], ["5500850", 215, "215 g glas / Santa Maria"]], "dijon": [["5071674", 370, "370 g øko. / Chatel"], ["101491", 250, "250 g / Bähncke"], ["105322", 380, "380 g / Maille"]], "mayonnaise": [["5003502", 375, "375 g / K-Salat"], ["5606181", 250, "0,25 l / K-Salat (ægte)"]], "cherrytomat": [["5014547", 200, "200 g Snackmix"]], "lasagneplader": [["5065117", 500, "500 g / Garofalo"], ["5009449", 500, "500 g / De Cecco"]], "kartofler": [["5006090", 2000, "2 kg"], ["5014541", 1000, "1 kg øko."]]};
 
 const SEED_RAAVARER = [
   ["kyllingebryst","Kyllingebrystfilet","g",1100,"1,10 kg / Danpo",85.00,3,1,"Kød & fisk","5602318",0],
@@ -146,11 +146,11 @@ const SEED_RAAVARER = [
   ["log","Løg Zittauer","g",1000,"1 kg / Danmark",12.00,45,0,"Grønt","2301096",1],
   ["hvidlog","Hvidløg øko.","stk",1,"1 stk. / ca. 50 g",5.50,40,0,"Grønt","100160",1],
   ["gulerodder","Gulerødder øko.","g",1000,"1 kg / Danmark",18.00,21,0,"Grønt","5016873",1],
-  ["kartofler","Kartofler vaskede","g",1000,"1 kg / Danmark",12.00,25,0,"Grønt","5037675",1],
+  ["kartofler","Kartofler vaskede","g",1000,"1 kg",12.00,25,0,"Grønt","5059016",1],
   ["broccoli","Broccoli","g",450,"1 stk. / min. 450 g",15.00,6,1,"Grønt","5002549",1],
   ["champignon","Champignon","g",500,"500 g / Polen",23.75,5,0,"Grønt","5010800",1],
   ["svampemix","Svampemix","g",200,"200 g / Polen",28.00,5,0,"Grønt","5018690",1],
-  ["squash","Courgette / squash øko.","stk",1,"1 stk. / Danmark",9.00,8,0,"Grønt","5002546",1],
+  ["squash","Courgette / squash øko.","stk",1,"1 stk.",8.50,8,0,"Grønt","5029778",1],
   ["peberfrugt","Peberfrugt orange","stk",1,"1 stk. / Holland",9.00,9,0,"Grønt","5001713",1],
   ["porre","Porrer","stk",3,"1 bdt. / 3 stk.",19.50,10,0,"Grønt","5012283",1],
   ["salat","Baby salatmix øko.","g",100,"100 g / skyllet",18.00,2,0,"Grønt","5021832",0],
@@ -215,8 +215,8 @@ const SEED_RAAVARER = [
   ["blomkaal","Blomkål øko.","stk",1,"1 stk. / ca. 800 g",20.00,8,0,"Grønt","5002551",1],
   ["hvidkaal","Hvidkål","stk",1,"1 stk. / ca. 1–2 kg",18.00,21,0,"Grønt","5012293",1],
   ["spinat","Babyspinat øko.","g",100,"100 g / skyllet",18.00,2,0,"Grønt","5021833",0],
-  ["gronne_bonner","Bønner grønne øko.","g",300,"300 g / Danmark",25.00,6,1,"Grønt","5007512",1],
-  ["iceberg","Iceberg salat","stk",1,"1 stk. / ca. 400 g",12.00,7,0,"Grønt","2301084",1],
+  ["gronne_bonner","Haricots verts (frost)","g",700,"700 g / frost / First Price",10.47,90,1,"Grønt","923155",1],
+  ["iceberg","Iceberg salat","stk",1,"1 stk. / Spanien",12.00,7,0,"Grønt","5004705",1],
   ["agurk","Agurk øko.","stk",1,"1 stk. / Spanien",13.00,8,0,"Grønt","106593",1],
   ["cherrytomat","Cherrytomater øko.","g",250,"250 g / Spanien",15.00,7,0,"Grønt","106499",1],
   ["aeble","Æbler Gala øko.","g",1000,"1 kg / Italien",22.00,21,0,"Grønt","5012282",1],
@@ -273,7 +273,7 @@ const SEED_RAAVARER = [
   // Til retterne fra ChatGPT-listen (21-10). Keto-tjekket i Nemligs deklarationer:
   // AL kogt skinke har dextrose/glukosesirup, så tærte og æggemuffins bruger
   // pancetta (kun svinebryst, salt, krydderier). Peanutbutter: kun jordnødder og salt.
-  ["oksestrimler","Oksestrimler (stroganoff)","g",500,"475-500 g / Irish Nature",114.50,3,1,"Kød & fisk","5029215",0],
+  ["oksestrimler","Oksestrimler øko.","g",400,"400 g / Jyske gårde",108.75,3,1,"Kød & fisk","5063670",0],
   ["hakket_gris","Hakket grisekød 8-12%","g",1000,"1 kg / Danish Crown",50.03,3,1,"Kød & fisk","5026540",0],
   ["moerbrad","Mørbrad af gris øko.","g",650,"500-700 g / Friland",119.82,4,1,"Kød & fisk","5042206",0],
   ["pancetta","Pancetta i tern øko.","g",100,"100 g / Pedrazzoli",44.95,21,1,"Kød & fisk","5070111",0],
