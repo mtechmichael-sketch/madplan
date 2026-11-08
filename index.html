@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.37.2">
-<link rel="stylesheet" href="style.css?v=0.37.2">
+<link rel="stylesheet" href="tema.css?v=0.37.3">
+<link rel="stylesheet" href="style.css?v=0.37.3">
 </head>
 <body>
 
@@ -106,7 +106,7 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.37.2";
+const VERSION = "0.37.3";
 const DATA_VERSION = 23;   // 22: seks Nemlig-numre skiftet, 23: cheddar i blok (02-11)
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
@@ -2094,6 +2094,18 @@ async function hentKilde(d){
   }
   if(visning === "kilde" && aabenRet === d.id) tegn();
 }
+/* Kildens mængder regnet om til det antal personer, retten står til i appen (08-11).
+   Madbandittens opskrifter er ofte til 2, appens til 4 - og køkkenet troede to gange,
+   at retten kun var til 2. Kun tallet forrest i linjen ganges («250 g» -> «500 g»,
+   «1-2 tsk» -> «2-4 tsk»); linjer uden tal forrest («frisk basilikum») står urørt. */
+function skalerIng(t, f){
+  if(f === 1) return t;
+  const brok = {"½":0.5, "¼":0.25, "¾":0.75, "⅓":1/3, "⅔":2/3};
+  const tal = x => brok[x] != null ? brok[x] : parseFloat(x.replace(",", "."));
+  const fmt = v => String(Math.round(v * 10) / 10).replace(".", ",");
+  return t.replace(/^(\s*)(\d+(?:[.,]\d+)?|[½¼¾⅓⅔])(\s*[-–]\s*(\d+(?:[.,]\d+)?))?/,
+    (m, sp, a, b, c) => sp + fmt(tal(a) * f) + (c ? "–" + fmt(tal(c) * f) : ""));
+}
 function sKilde(){
   const d = ret(aabenRet); if(!d || !d.kilde) return vis("plan");
   let vaert = "kilden"; try{ vaert = new URL(d.kilde).hostname.replace(/^www\./,""); }catch(e){}
@@ -2118,7 +2130,10 @@ function sKilde(){
   const top = el("div","kilde-top");
   top.append(el("div","kilde-navn", s.navn || d.navn));
   const meta = [];
-  if(s.portioner) meta.push(/^\d+$/.test(s.portioner) ? s.portioner + " personer" : s.portioner);
+  const kildeP = /^\d+$/.test(s.portioner || "") ? +s.portioner : 0;
+  const f = kildeP ? personer(d) / kildeP : 1;
+  if(kildeP && f !== 1) meta.push(personer(d) + " personer (omregnet fra " + kildeP + ")");
+  else if(s.portioner) meta.push(kildeP ? kildeP + " personer" : s.portioner);
   if(s.minutter) meta.push(s.minutter + " min");
   if(meta.length) top.append(el("div","kilde-meta", meta.join(" · ")));
   if(s.beskrivelse) top.append(el("p","kilde-beskriv", s.beskrivelse));
@@ -2127,7 +2142,9 @@ function sKilde(){
   const sp = el("div","spalter");
   const ic = el("div");
   ic.append(el("div","eyebrow","Ingredienser"));
-  (s.ingredienser || []).forEach(t => { const r = el("div","ing"); r.append(el("span","n", t)); ic.append(r); });
+  if(f !== 1) ic.append(el("p","note","Mængderne er regnet om fra " + kildeP + " til " + personer(d) +
+    " personer. Tal i fremgangsmåden er kildens egne."));
+  (s.ingredienser || []).forEach(t => { const r = el("div","ing"); r.append(el("span","n", skalerIng(t, f))); ic.append(r); });
   const oc = el("div");
   oc.append(el("div","eyebrow","Sådan gør du"));
   let afsnit = null, nr = 0;
