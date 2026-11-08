@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.37.3">
-<link rel="stylesheet" href="style.css?v=0.37.3">
+<link rel="stylesheet" href="tema.css?v=0.38.0">
+<link rel="stylesheet" href="style.css?v=0.38.0">
 </head>
 <body>
 
@@ -50,7 +50,7 @@
   <div class="krop"><div class="g2">
     <label class="f">Navn<input id="rNavn" required></label>
     <label class="f">Kategori<input id="rKat" list="kats"></label>
-    <label class="f">Enhed<select id="rEnhed"><option value="g">g</option><option value="ml">ml</option><option value="stk">stk</option></select></label>
+    <label class="f">Enhed<select id="rEnhed"><option value="g">g</option><option value="ml">ml</option><option value="stk">stk</option><option value="fed">fed</option></select></label>
     <label class="f">Pakkestørrelse<input id="rPakke" type="number" min="1" step="any" required></label>
     <label class="f">Pakkens navn<input id="rPakkenavn" placeholder="fx 500 g bakke"></label>
     <label class="f">Pris pr. pakke (kr)<input id="rPris" type="number" min="0" step="any"></label>
@@ -106,8 +106,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.37.3";
-const DATA_VERSION = 23;   // 22: seks Nemlig-numre skiftet, 23: cheddar i blok (02-11)
+const VERSION = "0.38.0";
+const DATA_VERSION = 24;   // 22: seks Nemlig-numre skiftet, 23: cheddar i blok (02-11), 24: hvidløg i fed (08-11)
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -144,7 +144,7 @@ const SEED_RAAVARER = [
   ["smor","Smør øko.","g",200,"200 g / Arla ØKO",14.95,14,1,"Mejeri","702004",0],
 
   ["log","Løg Zittauer","g",1000,"1 kg / Danmark",12.00,45,0,"Grønt","2301096",1],
-  ["hvidlog","Hvidløg øko.","stk",1,"1 stk. / ca. 50 g",5.50,40,0,"Grønt","100160",1],
+  ["hvidlog","Hvidløg øko.","fed",10,"1 løg ≈ 10 fed / ca. 50 g",5.50,40,0,"Grønt","100160",1],   // fed fra 08-11
   ["gulerodder","Gulerødder øko.","g",1000,"1 kg / Danmark",18.00,21,0,"Grønt","5016873",1],
   ["kartofler","Kartofler vaskede","g",1000,"1 kg",12.00,25,0,"Grønt","5059016",1],
   ["broccoli","Broccoli","g",450,"1 stk. / min. 450 g",15.00,6,1,"Grønt","5002549",1],
@@ -338,7 +338,7 @@ const SEED_RETTER = [
      "Sveds løg og karrypasta i samme gryde til det dufter.",
      "Hæld kokosmælken i, kom kylling og gulerødder tilbage, og lad det simre 15 minutter.",
      "Varm blomkålsrisen på en pande imens, og smag karryen til med salt."]],
-  ["bolognese","Bolognese m. squashspaghetti",4,{hakket_okse:500,hakkede_tomater:800,log:150,gulerodder:150,hvidlog:1,tomatpure:70,squash:3},
+  ["bolognese","Bolognese m. squashspaghetti",4,{hakket_okse:500,hakkede_tomater:800,log:150,gulerodder:150,hvidlog:2,tomatpure:70,squash:3},
     ["Hak løg, hvidløg og gulerødder fint.",
      "Brun kødet godt igennem, og tag det fra.",
      "Sveds grøntsagerne bløde, og rist tomatpuréen med et minut.",
@@ -354,7 +354,7 @@ const SEED_RETTER = [
      "Del blomkålen i buketter, vend dem i olie og salt, og giv dem 15 minutter.",
      "Læg laksen ved siden af med smør og citron, og giv det 12-15 minutter mere.",
      "Damp broccolien de sidste fem minutter."]],
-  ["wok","Kyllingewok m. blomkålsris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,blomkaalsris:700,hvidlog:1,soja:45},
+  ["wok","Kyllingewok m. blomkålsris",4,{kyllingebryst:500,squash:1,peberfrugt:2,gulerodder:200,blomkaalsris:700,hvidlog:2,soja:45},
     ["Skær kyllingen i strimler og grøntsagerne i tynde stave.",
      "Steg kyllingen ved høj varme, og tag den op.",
      "Steg hvidløg, gulerødder, peberfrugt og squash et par minutter, så de stadig har bid.",
@@ -387,7 +387,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/sproede-parmesan-sliders/"],
 
   ["koedboller","Kødboller i svampesauce",8,     // laves til 8 (05-10) - dobbelt op ift. kilden
-    {hakket_blandet:1000,log:150,hvidlog:2,aeg:2,loppefro:6,champignon:1000,svampemix:400,piskeflode:500,bouillon:2,parmesan:20,persille:20,timian:4,rosmarin:4,soja:30,eddike:30},
+    {hakket_blandet:1000,log:150,hvidlog:6,aeg:2,loppefro:6,champignon:1000,svampemix:400,piskeflode:500,bouillon:2,parmesan:20,persille:20,timian:4,rosmarin:4,soja:30,eddike:30},
     ["Rør farsen med revet løg, hvidløg, æg, loppefrøskaller og krydderier, og lad den hvile.",
      "Form kødboller og brun dem hele vejen rundt.",
      "Steg svampene gyldne i samme pande sammen med løg og hvidløg.",
@@ -396,7 +396,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/koedboller-i-svampesauce/"],
 
   ["butterchicken","Nem butter chicken",4,
-    {hakket_kylling:600,smor:50,log:100,hvidlog:1,ingefaer:20,tomatpure:15,bouillon:2,graesk_yoghurt:200,citron:1,blomkaalsris:600,persille:10,garam_masala:8,gurkemeje:4,paprika:4,spidskommen:2,chiliflager:1},
+    {hakket_kylling:600,smor:50,log:100,hvidlog:2,ingefaer:20,tomatpure:15,bouillon:2,graesk_yoghurt:200,citron:1,blomkaalsris:600,persille:10,garam_masala:8,gurkemeje:4,paprika:4,spidskommen:2,chiliflager:1},
     ["Sveds løg, hvidløg og ingefær i smørret.",
      "Kom krydderierne i og rist dem med et halvt minut, til de dufter.",
      "Brun kyllingefarsen med, og rist tomatpuréen med til sidst.",
@@ -416,7 +416,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/keto-burger-med-loegringe/"],
 
   ["hakkeboeffer","Hakkebøffer i fad",4,
-    {hakket_okse:500,bacon_tern:100,log:100,champignon:200,porre:2,hvidlog:1,peberfrugt:1,pikantost:100,piskeflode:100,hakkede_tomater:400,smor:25,paprika:8,timian:2},
+    {hakket_okse:500,bacon_tern:100,log:100,champignon:200,porre:2,hvidlog:2,peberfrugt:1,pikantost:100,piskeflode:100,hakkede_tomater:400,smor:25,paprika:8,timian:2},
     ["Brun bøfferne og læg dem i et fad.","Steg bacon, løg, porre og champignon møre.","Rør tomater, fløde og pikantost i, og smag til.","Hæld saucen over bøfferne og bag ca. 20 minutter."],
     "https://www.madbanditten.dk/hakkeboeffer-i-fad/"],
 
@@ -426,7 +426,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/boller-i-karry/"],
 
   ["vikingegryde","Vikingegryde",4,
-    {grisekod_tern:400,bacon_tern:100,champignon:200,porre:1,log:50,hvidlog:1,tomatpure:40,piskeflode:250,cremefraiche:100,smor:10,blomkaal:1,karrykrydderi:8,paprika:8},
+    {grisekod_tern:400,bacon_tern:100,champignon:200,porre:1,log:50,hvidlog:2,tomatpure:40,piskeflode:250,cremefraiche:100,smor:10,blomkaal:1,karrykrydderi:8,paprika:8},
     ["Brun kødtern og bacon i gryden.","Sveds løg, porre, hvidløg og champignon med.","Rist karry, paprika og tomatpuré med et minut.","Kom fløde i og lad det simre til det tykner.","Rør cremefraiche i til sidst og servér med blomkålsris."],
     "https://www.madbanditten.dk/vikingegryde/"],
 
@@ -441,7 +441,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/shepherds-pie/"],
 
   ["hvidloegssovs","Kylling i hvidløgssovs",4,
-    {kyllingebryst:600,hvidlog:1,log:100,piskeflode:200,parmesan:100,citron:1,dijon:10,gr_bouillon:2,spinat:200,gronne_bonner:800,persille:10},
+    {kyllingebryst:600,hvidlog:6,log:100,piskeflode:200,parmesan:100,citron:1,dijon:10,gr_bouillon:2,spinat:200,gronne_bonner:800,persille:10},
     ["Steg kyllingen gylden og tag den op.","Sveds hvidløg og løg i panden.","Spæd med bouillon og fløde, og rør parmesan og dijon i.","Vend spinaten i saucen og læg kyllingen tilbage.","Servér med dampede grønne bønner."],
     "https://www.madbanditten.dk/kylling-i-hvidloegssovs/"],
 
@@ -491,7 +491,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/fyldte-peberfrugter/"],
 
   ["chili_mb","Chili con carne (keto)",4,
-    {hakket_okse:560,log:80,hvidlog:1,hakkede_tomater:640,gr_bouillon:3,chokolade:25,smor:20,chiliflager:1,spidskommen:6,oregano:3,roeget_paprika:3},
+    {hakket_okse:560,log:80,hvidlog:3,hakkede_tomater:640,gr_bouillon:3,chokolade:25,smor:20,chiliflager:1,spidskommen:6,oregano:3,roeget_paprika:3},
     ["Brun kødet grundigt i smørret.","Sveds løg og hvidløg med, og rist krydderierne til de dufter.","Kom tomater og bouillon i, og lad det simre mindst en time.","Rør den mørke chokolade i til sidst og smag til."],
     "https://www.madbanditten.dk/chili-con-carne/"],
 
@@ -501,7 +501,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/kylling-i-pikant-ostesovs/"],
 
   ["tomatsovs","Kylling i tomatsovs",4,
-    {kyllingebryst:600,log:200,chili:1,hvidlog:1,hakkede_tomater:800,tomatpure:30,basilikum:10,mascarpone:250,smor:20,timian:3,rosmarin:2,sukrin:10},
+    {kyllingebryst:600,log:200,chili:1,hvidlog:4,hakkede_tomater:800,tomatpure:30,basilikum:10,mascarpone:250,smor:20,timian:3,rosmarin:2,sukrin:10},
     ["Brun kyllingen og tag den op.","Sveds løg, hvidløg og chili, og rist tomatpuréen med.","Kom tomater og krydderurter i, og lad saucen koge ind.","Rør mascarpone i og læg kyllingen tilbage.","Top med frisk basilikum."],
     "https://www.madbanditten.dk/kylling-i-tomatsovs/"],
 
@@ -546,7 +546,7 @@ const SEED_RETTER = [
   // sauce til overs), plus samme tilbehør som kyllingerouladen. Guacamolen til fajitas
   // er husets enkle udgave; pico de gallo er Madbandittens.
   ["pikantkylling","Pikant kylling i fad m. blomkålsris",4,
-    {kyllingebryst:600,bacon_tern:70,hvidlog:1,rodlog:100,peberfrugt:0.5,aubergine:0.33,squash:0.5,pikantost:125,piskeflode:100,hakkede_tomater:400,tomatpure:30,roeget_paprika:1,paprika:3,timian:2,smor:15,blomkaalsris:700,persille:10},
+    {kyllingebryst:600,bacon_tern:70,hvidlog:2,rodlog:100,peberfrugt:0.5,aubergine:0.33,squash:0.5,pikantost:125,piskeflode:100,hakkede_tomater:400,tomatpure:30,roeget_paprika:1,paprika:3,timian:2,smor:15,blomkaalsris:700,persille:10},
     ["Tænd ovnen på 200 grader. Skær kylling og bacon i tern, hak hvidløget og snit løget.",
      "Skær peberfrugt, aubergine og squash i tern.",
      "Steg baconen sprød, og kom den i et ovnfast fad. Steg kyllingen et par minutter i fedtet med salt, peber og paprika, og læg den over til baconen.",
@@ -557,7 +557,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/pikant-kylling-i-fad/"],
 
   ["proteinpasta","Pikant proteinpasta m. tomatsovs og chorizo",3,
-    {aeg:4,pikantost:125,loppefro:12,hvidlog:0.5,persille:10,passata:750,sukrin:8,kapers:20,chorizo_ren:200},
+    {aeg:4,pikantost:125,loppefro:12,hvidlog:2,persille:10,passata:750,sukrin:8,kapers:20,chorizo_ren:200},
     ["Tænd ovnen på 150 grader. Pisk æg og pikantost sammen, og pisk loppefrøskallerne godt ud i dejen.",
      "Bred dejen tyndt og jævnt ud på en bageplade med bagepapir, og bag den 13–15 minutter.",
      "Løsn dejen fra papiret, lad den køle lidt, og skær den i tynde strimler.",
@@ -567,7 +567,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/pikant-proteinpasta-med-tomatsovs/"],
 
   ["hvidlogssteak","Hvidløgssteak m. bønner",2,
-    {flanksteak:300,hvidlog:0.5,soja:45,sambal:15,olivenolie:15,smor:45,italiensk:6,sukrin:8,citron:0.5,gronne_bonner:300,persille:10,chiliflager:1},
+    {flanksteak:300,hvidlog:4,soja:45,sambal:15,olivenolie:15,smor:45,italiensk:6,sukrin:8,citron:0.5,gronne_bonner:300,persille:10,chiliflager:1},
     ["Skær steaken i strimler, og lad den marinere mindst 10 minutter i halvdelen af hvidløget, soja, sambal oelek, olivenolie og peber.",
      "Steg kødet ca. et minut på en meget varm pande, og læg det til side.",
      "Skru ned, sauter resten af hvidløget i halvdelen af smørret, og steg bønnerne med et øjeblik.",
@@ -576,7 +576,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/hvidloegssteak-med-boenner/"],
 
   ["chimichurri","Kylling m. chimichurri, dip og grønt",4,
-    {kyllingebryst:800,logpulver:8,hvidlog:1,spidskommen:4,olivenolie:210,persille:25,chili:1,log:20,eddike:45,oregano:4,cremefraiche:250,gulerodder:300,agurk:1,broccoli:450},
+    {kyllingebryst:800,logpulver:8,hvidlog:8,spidskommen:4,olivenolie:210,persille:25,chili:1,log:20,eddike:45,oregano:4,cremefraiche:250,gulerodder:300,agurk:1,broccoli:450},
     ["Bank kyllingebrysterne flade. Rør marinade af løgpulver, 2 fed hvidløg, spidskommen, 4 spsk olivenolie, salt og peber, og lad kyllingen trække mindst 30 minutter.",
      "Chimichurri: hak persille, chili, 2 fed hvidløg og løg fint, og rør det med rødvinseddike, oregano, 1,5 dl olivenolie, salt og peber. Lad den trække.",
      "Grill eller steg kyllingen ved høj varme, til den er gennemstegt.",
@@ -585,7 +585,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/kylling-med-chimichurri/"],
 
   ["paprikakylling","Kylling i paprikasauce m. broccoli",2,
-    {kyllingebryst:300,hvidlog:0.5,paprika:10,logpulver:2,piskeflode:100,oregano:2,basilikum_toerret:2,tomatpure:15,sukrin:4,eddike:10,smor:10,broccoli:400},
+    {kyllingebryst:300,hvidlog:1,paprika:10,logpulver:2,piskeflode:100,oregano:2,basilikum_toerret:2,tomatpure:15,sukrin:4,eddike:10,smor:10,broccoli:400},
     ["Krydr kyllingen med salt, peber og lidt paprika, og brun den godt på begge sider i smør. Læg den til side.",
      "Sauter hvidløget, og rist paprikaen med et øjeblik.",
      "Tilsæt løgpulver, oregano, basilikum, tomatpuré, 1 dl vand og fløde, og lad det koge op.",
@@ -594,7 +594,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/kylling-i-paprikasauce/"],
 
   ["fajitas","Fajitas m. oksekød, guacamole og pico de gallo",4,
-    {flanksteak:700,soja:50,lime:5,hvidlog:1,sukrin:15,spidskommen:4,log:200,peberfrugt:4,kokosolie:15,avokado:2,tomat:300,rodlog:40,chili:1,koriander:25},
+    {flanksteak:700,soja:50,lime:5,hvidlog:3,sukrin:15,spidskommen:4,log:200,peberfrugt:4,kokosolie:15,avokado:2,tomat:300,rodlog:40,chili:1,koriander:25},
     ["Marinér kødet i soja, saften af 3 lime, 3 fed hvidløg, Sukrin og spidskommen – gerne 5–6 timer eller natten over.",
      "Grill eller steg kødet ved høj varme 3–4 minutter på hver side, og lad det hvile.",
      "Snit løg og peberfrugter, steg dem møre i kokosolie, og pres en halv lime over.",
@@ -604,7 +604,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/fajitas-med-oksekoed/"],
 
   ["tequilakylling","Tequila-lime kylling m. avokadosalsa",4,
-    {kyllingebryst:600,chili:3,koriander:25,lime:4,tequila:50,sukrin:15,olivenolie:30,hvidlog:1,avokado:3,tomat:450,log:100,tabasco:1},
+    {kyllingebryst:600,chili:3,koriander:25,lime:4,tequila:50,sukrin:15,olivenolie:30,hvidlog:6,avokado:3,tomat:450,log:100,tabasco:1},
     ["Hak 2 chili (uden kerner) og halvdelen af korianderen fint, og rør marinade af det med skal og saft fra 3 lime, tequila, Sukrin, olivenolie, 4 fed hvidløg og salt.",
      "Bank kyllingen flad, og lad den marinere – gerne natten over.",
      "Grill eller steg kyllingen ved høj varme, til den er gennemstegt.",
@@ -612,7 +612,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/tequila-lime-kylling/"],
 
   ["loegkylling","Kylling i løgsauce m. grønne bønner",4,
-    {kyllingebryst:600,log:200,hvidlog:1,timian:2,revet_ost:140,smor:40,gronne_bonner:600},
+    {kyllingebryst:600,log:200,hvidlog:3,timian:2,revet_ost:140,smor:40,gronne_bonner:600},
     ["Snit løgene, og hak hvidløget fint.",
      "Brun kyllingebrysterne godt i smør, krydr med salt og peber, og læg dem i et ovnfast fad.",
      "Sauter løg, hvidløg og timian i lidt mere smør 10–15 minutter, til løgene er gyldne og karamelliserede.",
@@ -625,7 +625,7 @@ const SEED_RETTER = [
   // fotoenes filnavne, så klargoer-fotos.ps1 finder dem. 11 af de 25 er sprunget
   // over, fordi de ligner retter vi har; medister venter (al medister har stivelse).
   ["oksegryde_squash","Cremet oksekødsgryde med squash og flødeost",4,
-    {hakket_okse:600,squash:2,champignon:250,log:100,hvidlog:1,flodeost:150,bouillon:1,paprika:4,olivenolie:5},
+    {hakket_okse:600,squash:2,champignon:250,log:100,hvidlog:2,flodeost:150,bouillon:1,paprika:4,olivenolie:5},
     ["Brun kødet i olien.",
      "Steg hakket løg, hvidløg og champignon med.",
      "Tilsæt squash i halve skiver og paprika.",
@@ -633,7 +633,7 @@ const SEED_RETTER = [
      "Servér med blomkålsris eller grøn salat. Til familien: ris."]],
 
   ["gyroskylling","Gyros-kylling med græsk salat og tzatziki",4,
-    {kyllingebryst:650,oregano:2,paprika:2,spidskommen:1,olivenolie:15,agurk:1,tomat:400,rodlog:100,feta:100,graesk_yoghurt:200,hvidlog:0.5,citron:0.5},
+    {kyllingebryst:650,oregano:2,paprika:2,spidskommen:1,olivenolie:15,agurk:1,tomat:400,rodlog:100,feta:100,graesk_yoghurt:200,hvidlog:2,citron:0.5},
     ["Vend kyllingestrimler med oregano, paprika, spidskommen og olie, og steg dem gennem.",
      "Skær tomater, rødløg og halvdelen af agurken til salat, og smuldr feta over.",
      "Tzatziki: riv resten af agurken, pres væden ud, og bland med yoghurt, hvidløg og citronsaft.",
@@ -648,7 +648,7 @@ const SEED_RETTER = [
      "Servér med kogte grønne bønner. Til familien: kartoffelmos."]],
 
   ["asiatisk_gris","Asiatisk svinekød med spidskål",4,
-    {hakket_gris:600,spidskaal:500,gulerodder:160,log:100,hvidlog:1,ingefaer:10,soja:45,lime:0.5,olivenolie:5},
+    {hakket_gris:600,spidskaal:500,gulerodder:160,log:100,hvidlog:2,ingefaer:10,soja:45,lime:0.5,olivenolie:5},
     ["Brun kødet i olien.",
      "Tilsæt løg, hvidløg og revet ingefær.",
      "Snit kålen og riv gulerødderne, og steg dem med 4–5 minutter.",
@@ -664,7 +664,7 @@ const SEED_RETTER = [
      "Servér med kogte grønne bønner. Til familien: kartofler."]],
 
   ["moussaka","Moussaka-inspireret auberginefad",4,
-    {aubergine:2,hakket_okse:600,log:100,hvidlog:1,hakkede_tomater:400,oregano:2,graesk_yoghurt:150,aeg:2,feta:80},
+    {aubergine:2,hakket_okse:600,log:100,hvidlog:2,hakkede_tomater:400,oregano:2,graesk_yoghurt:150,aeg:2,feta:80},
     ["Skær auberginerne i skiver, og forbag dem 10 minutter ved 200 grader varmluft.",
      "Brun kødet med løg og hvidløg, og tilsæt tomater og oregano.",
      "Læg kødsauce og aubergine i lag i et fad.",
@@ -694,7 +694,7 @@ const SEED_RETTER = [
      "Steg squash i skiver og kog bønnerne som tilbehør. Til familien: kartofler."]],
 
   ["paprikafrikadeller","Paprikafrikadeller i tomatsauce med mozzarella",4,
-    {hakket_gris:600,aeg:1,log:100,paprika:4,hakkede_tomater:400,squash:1,revet_ost:125,hvidlog:0.5,oregano:1},
+    {hakket_gris:600,aeg:1,log:100,paprika:4,hakkede_tomater:400,squash:1,revet_ost:125,hvidlog:2,oregano:1},
     ["Rør kødet med æg, revet løg og paprika, og form små frikadeller.",
      "Brun dem på en pande.",
      "Tilsæt tomater, hvidløg, oregano og squash i tern, og lad det simre, til frikadellerne er gennemstegte.",
@@ -716,7 +716,7 @@ const SEED_RETTER = [
      "Bag ved 190 grader varmluft 15–20 minutter, til æggene er faste. Servér med en stor grøn salat. Til familien: rugbrød."]],
 
   ["ovnkyllingelaar","Ovnbagte kyllingelår med citron og rosmarin",4,
-    {kyllingelaar:1200,squash:2,rodlog:200,peberfrugt:1,citron:1,hvidlog:1,rosmarin:2,olivenolie:15,graesk_yoghurt:150},
+    {kyllingelaar:1200,squash:2,rodlog:200,peberfrugt:1,citron:1,hvidlog:4,rosmarin:2,olivenolie:15,graesk_yoghurt:150},
     ["Vend kyllingelårene med olie, rosmarin, hvidløg, citron, salt og peber.",
      "Bag dem på en plade ved 200 grader varmluft 30–40 minutter, til de er gennemstegte.",
      "Læg grøntsagerne i grove stykker på pladen efter de første 15 minutter.",
@@ -846,6 +846,20 @@ function migrer(d){
     const x = d.retter.find(r => r.id === id);
     if(x && x.ing && x.ing.cheddar === m && x.ing.cheddar_blok == null){ x.ing.cheddar_blok = m; delete x.ing.cheddar; }
   });
+  // 08-11: hvidløg i fed (1 løg ≈ 10 fed). Før regnede hver ret et helt løg, og der lå
+  // 8 hele hvidløg i køkkenet. Retter med den oprindelige mængde får kildens antal fed;
+  // andre (rettet i hånden / egne retter) ganges med 10, så mængden er den samme.
+  if(!d.migr.hvidlogFed){
+    const gl = {"bolognese":1,"wok":1,"koedboller":2,"butterchicken":1,"hakkeboeffer":1,"vikingegryde":1,"shepherds":1,"hvidloegssovs":1,"cheeseburgersalat":1,"chili_mb":1,"pikant_ostesovs":1,"tomatsovs":1,"mexiburgerfad":1,"pikantkylling":1,"proteinpasta":0.5,"hvidlogssteak":0.5,"chimichurri":1,"paprikakylling":0.5,"fajitas":1,"tequilakylling":1,"loegkylling":1,"oksegryde_squash":1,"gyroskylling":0.5,"asiatisk_gris":1,"moussaka":1,"paprikafrikadeller":0.5,"ovnkyllingelaar":1}, fed = {"koedboller":6,"butterchicken":2,"hakkeboeffer":2,"vikingegryde":2,"shepherds":1,"hvidloegssovs":6,"cheeseburgersalat":1,"chili_mb":3,"pikant_ostesovs":1,"tomatsovs":4,"mexiburgerfad":1,"pikantkylling":2,"proteinpasta":2,"hvidlogssteak":4,"chimichurri":8,"paprikakylling":1,"fajitas":3,"tequilakylling":6,"loegkylling":3,"bolognese":2,"wok":2,"oksegryde_squash":2,"gyroskylling":2,"asiatisk_gris":2,"moussaka":2,"paprikafrikadeller":2,"ovnkyllingelaar":4};
+    d.retter.forEach(x => {
+      if(!x.ing || x.ing.hvidlog == null || x.ing.hvidlog === fed[x.id]) return;   // allerede i fed
+      x.ing.hvidlog = (gl[x.id] === x.ing.hvidlog && fed[x.id]) ? fed[x.id] : Math.round(x.ing.hvidlog * 10);
+    });
+    (d.rester || []).forEach(x => { if(x.v === "hvidlog") x.m = Math.round(x.m * 10); });
+    const hv = (d.raavarer || []).find(x => x.id === "hvidlog");
+    if(hv && hv.enhed === "stk"){ hv.enhed = "fed"; hv.pakke = 10; hv.pakkenavn = "1 løg ≈ 10 fed / ca. 50 g"; }
+    d.migr.hvidlogFed = true;
+  }
   const lk = d.retter.find(x => x.id === "loegkylling"), lkNy = SEED_RETTER.find(x => x.id === "loegkylling");
   if(lk && lkNy && lk.ing && lk.ing.gruyere === 140){ lk.ing = {...lkNy.ing}; lk.opskrift = [...lkNy.opskrift]; }
   d.retter.forEach(x => {

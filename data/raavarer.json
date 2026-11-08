@@ -1,5 +1,5 @@
 {
- "version": 23,
+ "version": 24,
  "raavarer": [
   {
    "id": "kyllingebryst",
@@ -172,9 +172,9 @@
   {
    "id": "hvidlog",
    "navn": "Hvidløg øko.",
-   "enhed": "stk",
-   "pakke": 1,
-   "pakkenavn": "1 stk. / ca. 50 g",
+   "enhed": "fed",
+   "pakke": 10,
+   "pakkenavn": "1 løg ≈ 10 fed / ca. 50 g",
    "pris": 5.5,
    "holdbar": 40,
    "frys": false,

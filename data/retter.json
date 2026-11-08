@@ -1,5 +1,5 @@
 {
- "version": 23,
+ "version": 24,
  "retter": [
   {
    "id": "karry",
@@ -31,7 +31,7 @@
     "hakkede_tomater": 800,
     "log": 150,
     "gulerodder": 150,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "tomatpure": 70,
     "squash": 3
    },
@@ -95,7 +95,7 @@
     "peberfrugt": 2,
     "gulerodder": 200,
     "blomkaalsris": 700,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "soja": 45
    },
    "opskrift": [
@@ -198,7 +198,7 @@
    "ing": {
     "hakket_blandet": 1000,
     "log": 150,
-    "hvidlog": 2,
+    "hvidlog": 6,
     "aeg": 2,
     "loppefro": 6,
     "champignon": 1000,
@@ -229,7 +229,7 @@
     "hakket_kylling": 600,
     "smor": 50,
     "log": 100,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "ingefaer": 20,
     "tomatpure": 15,
     "bouillon": 2,
@@ -290,7 +290,7 @@
     "log": 100,
     "champignon": 200,
     "porre": 2,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "peberfrugt": 1,
     "pikantost": 100,
     "piskeflode": 100,
@@ -344,7 +344,7 @@
     "champignon": 200,
     "porre": 1,
     "log": 50,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "tomatpure": 40,
     "piskeflode": 250,
     "cremefraiche": 100,
@@ -418,7 +418,7 @@
    "portioner": 4,
    "ing": {
     "kyllingebryst": 600,
-    "hvidlog": 1,
+    "hvidlog": 6,
     "log": 100,
     "piskeflode": 200,
     "parmesan": 100,
@@ -673,7 +673,7 @@
    "ing": {
     "hakket_okse": 560,
     "log": 80,
-    "hvidlog": 1,
+    "hvidlog": 3,
     "hakkede_tomater": 640,
     "gr_bouillon": 3,
     "chokolade": 25,
@@ -723,7 +723,7 @@
     "kyllingebryst": 600,
     "log": 200,
     "chili": 1,
-    "hvidlog": 1,
+    "hvidlog": 4,
     "hakkede_tomater": 800,
     "tomatpure": 30,
     "basilikum": 10,
@@ -860,7 +860,7 @@
    "ing": {
     "kyllingebryst": 600,
     "bacon_tern": 70,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "rodlog": 100,
     "peberfrugt": 0.5,
     "aubergine": 0.33,
@@ -895,7 +895,7 @@
     "aeg": 4,
     "pikantost": 125,
     "loppefro": 12,
-    "hvidlog": 0.5,
+    "hvidlog": 2,
     "persille": 10,
     "passata": 750,
     "sukrin": 8,
@@ -918,7 +918,7 @@
    "portioner": 2,
    "ing": {
     "flanksteak": 300,
-    "hvidlog": 0.5,
+    "hvidlog": 4,
     "soja": 45,
     "sambal": 15,
     "olivenolie": 15,
@@ -946,7 +946,7 @@
    "ing": {
     "kyllingebryst": 800,
     "logpulver": 8,
-    "hvidlog": 1,
+    "hvidlog": 8,
     "spidskommen": 4,
     "olivenolie": 210,
     "persille": 25,
@@ -974,7 +974,7 @@
    "portioner": 2,
    "ing": {
     "kyllingebryst": 300,
-    "hvidlog": 0.5,
+    "hvidlog": 1,
     "paprika": 10,
     "logpulver": 2,
     "piskeflode": 100,
@@ -1003,7 +1003,7 @@
     "flanksteak": 700,
     "soja": 50,
     "lime": 5,
-    "hvidlog": 1,
+    "hvidlog": 3,
     "sukrin": 15,
     "spidskommen": 4,
     "log": 200,
@@ -1037,7 +1037,7 @@
     "tequila": 50,
     "sukrin": 15,
     "olivenolie": 30,
-    "hvidlog": 1,
+    "hvidlog": 6,
     "avokado": 3,
     "tomat": 450,
     "log": 100,
@@ -1058,7 +1058,7 @@
    "ing": {
     "kyllingebryst": 600,
     "log": 200,
-    "hvidlog": 1,
+    "hvidlog": 3,
     "timian": 2,
     "revet_ost": 140,
     "smor": 40,
@@ -1083,7 +1083,7 @@
     "squash": 2,
     "champignon": 250,
     "log": 100,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "flodeost": 150,
     "bouillon": 1,
     "paprika": 4,
@@ -1113,7 +1113,7 @@
     "rodlog": 100,
     "feta": 100,
     "graesk_yoghurt": 200,
-    "hvidlog": 0.5,
+    "hvidlog": 2,
     "citron": 0.5
    },
    "opskrift": [
@@ -1158,7 +1158,7 @@
     "spidskaal": 500,
     "gulerodder": 160,
     "log": 100,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "ingefaer": 10,
     "soja": 45,
     "lime": 0.5,
@@ -1204,7 +1204,7 @@
     "aubergine": 2,
     "hakket_okse": 600,
     "log": 100,
-    "hvidlog": 1,
+    "hvidlog": 2,
     "hakkede_tomater": 400,
     "oregano": 2,
     "graesk_yoghurt": 150,
@@ -1301,7 +1301,7 @@
     "hakkede_tomater": 400,
     "squash": 1,
     "revet_ost": 125,
-    "hvidlog": 0.5,
+    "hvidlog": 2,
     "oregano": 1
    },
    "opskrift": [
@@ -1366,7 +1366,7 @@
     "rodlog": 200,
     "peberfrugt": 1,
     "citron": 1,
-    "hvidlog": 1,
+    "hvidlog": 4,
     "rosmarin": 2,
     "olivenolie": 15,
     "graesk_yoghurt": 150
