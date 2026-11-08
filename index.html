@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="tema.css?v=0.38.0">
-<link rel="stylesheet" href="style.css?v=0.38.0">
+<link rel="stylesheet" href="tema.css?v=0.38.1">
+<link rel="stylesheet" href="style.css?v=0.38.1">
 </head>
 <body>
 
@@ -106,8 +106,8 @@
 <script>
 "use strict";
 const KEY = "mtech_madplan_v1";
-const VERSION = "0.38.0";
-const DATA_VERSION = 24;   // 22: seks Nemlig-numre skiftet, 23: cheddar i blok (02-11), 24: hvidløg i fed (08-11)
+const VERSION = "0.38.1";
+const DATA_VERSION = 25;   // 22: seks Nemlig-numre skiftet, 23: cheddar i blok (02-11), 24: hvidløg i fed, 25: styk-varer efter kilden (08-11)
 /* Retter der fandtes i v0.4.0. Alt nyere lægges ind ved opdatering —
    men kun én gang, så en ret du selv har slettet ikke dukker op igen. */
 /* Retter taget ud af kataloget igen. Fjernes ved opdatering, også hvis de
@@ -378,7 +378,7 @@ const SEED_RETTER = [
   // 2, ikke 4 (30-10): mængderne giver 4 sliders - én pr. person. Familien spiser
   // 2 hver, så appen fordobler det hele, når retten laves til 4.
   ["sliders","Parmesan sliders",2,
-    {parmesan:60,hakket_okse:600,avokado:2,rodlog:150,cornichoner:50,mayonnaise:60,persille:20,smor:20,eddike:2,hvidlogspulver:2},
+    {parmesan:60,hakket_okse:600,avokado:1,rodlog:150,cornichoner:50,mayonnaise:60,persille:20,smor:20,eddike:2,hvidlogspulver:2},
     ["Rist parmesanen i små bunker på bagepapir til sprøde chips, og lad dem køle.",
      "Form kødet til små bøffer og steg dem i smør.",
      "Mos avokado med mayonnaise, eddike og hvidløgspulver til en dressing.",
@@ -396,7 +396,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/koedboller-i-svampesauce/"],
 
   ["butterchicken","Nem butter chicken",4,
-    {hakket_kylling:600,smor:50,log:100,hvidlog:2,ingefaer:20,tomatpure:15,bouillon:2,graesk_yoghurt:200,citron:1,blomkaalsris:600,persille:10,garam_masala:8,gurkemeje:4,paprika:4,spidskommen:2,chiliflager:1},
+    {hakket_kylling:600,smor:50,log:100,hvidlog:2,ingefaer:20,tomatpure:15,bouillon:2,graesk_yoghurt:200,citron:0.33,blomkaalsris:600,persille:10,garam_masala:8,gurkemeje:4,paprika:4,spidskommen:2,chiliflager:1},
     ["Sveds løg, hvidløg og ingefær i smørret.",
      "Kom krydderierne i og rist dem med et halvt minut, til de dufter.",
      "Brun kyllingefarsen med, og rist tomatpuréen med til sidst.",
@@ -416,17 +416,17 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/keto-burger-med-loegringe/"],
 
   ["hakkeboeffer","Hakkebøffer i fad",4,
-    {hakket_okse:500,bacon_tern:100,log:100,champignon:200,porre:2,hvidlog:2,peberfrugt:1,pikantost:100,piskeflode:100,hakkede_tomater:400,smor:25,paprika:8,timian:2},
+    {hakket_okse:500,bacon_tern:100,log:100,champignon:200,porre:2,hvidlog:2,peberfrugt:0.5,pikantost:100,piskeflode:100,hakkede_tomater:400,smor:25,paprika:8,timian:2},
     ["Brun bøfferne og læg dem i et fad.","Steg bacon, løg, porre og champignon møre.","Rør tomater, fløde og pikantost i, og smag til.","Hæld saucen over bøfferne og bag ca. 20 minutter."],
     "https://www.madbanditten.dk/hakkeboeffer-i-fad/"],
 
   ["boller_karry","Boller i karry (keto)",4,
-    {hakket_blandet:530,log:65,squash:1,aeg:1,gr_bouillon:3,aeble:55,piskeflode:330,flodeost:65,blomkaal:1,broccoli:170,loppefro:4,karrykrydderi:8},
+    {hakket_blandet:530,log:65,squash:0.33,aeg:1,gr_bouillon:3,aeble:55,piskeflode:330,flodeost:65,blomkaal:0.25,broccoli:170,loppefro:4,karrykrydderi:8},
     ["Rør farsen med revet løg, squash, æg og loppefrøskaller, og lad den hvile.","Form boller og pocher dem i bouillonen.","Sveds løg, æble og karry, og spæd med kogelagen og fløde.","Rør flødeost i saucen og læg bollerne tilbage.","Servér med blomkålsris og dampet broccoli."],
     "https://www.madbanditten.dk/boller-i-karry/"],
 
   ["vikingegryde","Vikingegryde",4,
-    {grisekod_tern:400,bacon_tern:100,champignon:200,porre:1,log:50,hvidlog:2,tomatpure:40,piskeflode:250,cremefraiche:100,smor:10,blomkaal:1,karrykrydderi:8,paprika:8},
+    {grisekod_tern:400,bacon_tern:100,champignon:200,porre:1,log:50,hvidlog:2,tomatpure:40,piskeflode:250,cremefraiche:100,smor:10,blomkaal:0.6,karrykrydderi:8,paprika:8},
     ["Brun kødtern og bacon i gryden.","Sveds løg, porre, hvidløg og champignon med.","Rist karry, paprika og tomatpuré med et minut.","Kom fløde i og lad det simre til det tykner.","Rør cremefraiche i til sidst og servér med blomkålsris."],
     "https://www.madbanditten.dk/vikingegryde/"],
 
@@ -436,12 +436,12 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/frikadellefad/"],
 
   ["shepherds","Shepherd's pie (keto)",4,
-    {hakket_okse:640,log:80,hvidlog:1,gr_bouillon:2,tomatpure:30,blomkaal:2,smor:40,flodeost:40,revet_ost:80,worcestershire:25,timian:3},
+    {hakket_okse:640,log:80,hvidlog:1,gr_bouillon:2,tomatpure:30,blomkaal:0.8,smor:40,flodeost:40,revet_ost:80,worcestershire:25,timian:3},
     ["Brun kødet og sveds løg og hvidløg med.","Kom tomatpuré, bouillon, worcestershire og timian i, og lad det koge ind.","Kog blomkålen mør og mos den med smør og flødeost.","Fordel mosen over kødet, drys med revet ost og bag til gyldent."],
     "https://www.madbanditten.dk/shepherds-pie/"],
 
   ["hvidloegssovs","Kylling i hvidløgssovs",4,
-    {kyllingebryst:600,hvidlog:6,log:100,piskeflode:200,parmesan:100,citron:1,dijon:10,gr_bouillon:2,spinat:200,gronne_bonner:800,persille:10},
+    {kyllingebryst:600,hvidlog:6,log:100,piskeflode:200,parmesan:100,citron:0.67,dijon:10,gr_bouillon:2,spinat:200,gronne_bonner:800,persille:10},
     ["Steg kyllingen gylden og tag den op.","Sveds hvidløg og løg i panden.","Spæd med bouillon og fløde, og rør parmesan og dijon i.","Vend spinaten i saucen og læg kyllingen tilbage.","Servér med dampede grønne bønner."],
     "https://www.madbanditten.dk/kylling-i-hvidloegssovs/"],
 
@@ -461,12 +461,12 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/graeske-burgere/"],
 
   ["bigmac","Big Mac tacos",2,
-    {blomkaal:0.5,revet_ost:50,aeg:1,hakket_okse:200,cheddar:80,iceberg:0.5,cornichoner:50,mayonnaise:45,ketchup:30,dijon:5,smor:20,pofiber:8,worcestershire:5,hvidlogspulver:2,eddike:10,paprika:2},
+    {blomkaal:0.25,revet_ost:50,aeg:1,hakket_okse:200,cheddar:80,iceberg:0.25,cornichoner:50,mayonnaise:45,ketchup:30,dijon:5,smor:20,pofiber:8,worcestershire:5,hvidlogspulver:2,eddike:10,paprika:2},
     ["Riv blomkålen, damp den og pres alt vandet fra.","Bland den med revet ost, æg og pofiber, og bag små taco-skaller sprøde.","Brun kødet og smelt cheddar over.","Rør dressing af mayonnaise, ketchup, dijon, eddike og krydderier.","Fyld skallerne med kød, salat, cornichoner og dressing."],
     "https://www.madbanditten.dk/big-mac-tacos/"],
 
   ["cheeseburgersalat","Cheeseburgersalat",4,
-    {hakket_okse:500,bacon_tern:100,log:50,iceberg:1,agurk:1,cherrytomat:150,cheddar:130,agurkesalat:30,cremefraiche:120,mayonnaise:30,tomatpure:40,hvidlog:1,dijon:10,sukrin:8,paprika:2,eddike:10},
+    {hakket_okse:500,bacon_tern:100,log:50,iceberg:1,agurk:0.5,cherrytomat:150,cheddar:130,agurkesalat:30,cremefraiche:120,mayonnaise:30,tomatpure:40,hvidlog:1,dijon:10,sukrin:8,paprika:2,eddike:10},
     ["Brun kødet med løg og krydr det godt.","Steg baconet sprødt.","Snit salat, agurk og tomater og fordel dem i en stor skål.","Rør dressing af cremefraiche, mayonnaise, tomatpuré, dijon, hvidløg og eddike.","Top med kød, bacon, revet cheddar og dressing."],
     "https://www.madbanditten.dk/cheeseburgersalat-laekker-lchf-salat-med-smag-af-burger/"],
 
@@ -486,7 +486,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/kyllingepizza/"],
 
   ["fyldte_peber","Fyldte peberfrugter",4,
-    {hakket_okse:400,log:50,tomatpure:15,ketchup:15,dijon:10,bacon_tern:60,cheddar:120,peberfrugt:4,iceberg:1,tomat:200,rodlog:25,agurkesalat:60,smor:20,hvidlogspulver:2},
+    {hakket_okse:400,log:50,tomatpure:15,ketchup:15,dijon:10,bacon_tern:60,cheddar:120,peberfrugt:4,iceberg:0.25,tomat:200,rodlog:25,agurkesalat:60,smor:20,hvidlogspulver:2},
     ["Halvér peberfrugterne og fjern kernerne.","Brun kødet med løg, bacon, tomatpuré, ketchup og dijon.","Fyld halvdelene og drys cheddar over.","Bag ca. 20 minutter, og servér med salat, tomat og rødløg."],
     "https://www.madbanditten.dk/fyldte-peberfrugter/"],
 
@@ -496,7 +496,7 @@ const SEED_RETTER = [
     "https://www.madbanditten.dk/chili-con-carne/"],
 
   ["pikant_ostesovs","Kylling i pikant ostesovs",4,
-    {kyllingebryst:400,log:25,hvidlog:1,cherrytomat:150,spinat:150,pikantost:200,piskeflode:150,citron:1,revet_ost:150,smor:20},
+    {kyllingebryst:400,log:25,hvidlog:1,cherrytomat:150,spinat:150,pikantost:200,piskeflode:150,citron:0.25,revet_ost:150,smor:20},
     ["Steg kyllingen gylden i smørret.","Sveds løg og hvidløg, og kom cherrytomaterne i.","Rør pikantost og fløde i til en sauce.","Vend spinaten i, drys revet ost over og bag det færdigt."],
     "https://www.madbanditten.dk/kylling-i-pikant-ostesovs/"],
 
@@ -860,6 +860,12 @@ function migrer(d){
     if(hv && hv.enhed === "stk"){ hv.enhed = "fed"; hv.pakke = 10; hv.pakkenavn = "1 løg ≈ 10 fed / ca. 50 g"; }
     d.migr.hvidlogFed = true;
   }
+  // 08-11: styk-varer, der var regnet som hele, sat til kildens mængde (citron, blomkål,
+  // iceberg, agurk, peberfrugt, squash, avokado). Kun hvis mængden ikke er rettet i hånden.
+  [["butterchicken","citron",1,0.33],["hvidloegssovs","citron",1,0.67],["pikant_ostesovs","citron",1,0.25],["cheeseburgersalat","agurk",1,0.5],["sliders","avokado",2,1],["bigmac","blomkaal",0.5,0.25],["boller_karry","blomkaal",1,0.25],["shepherds","blomkaal",2,0.8],["vikingegryde","blomkaal",1,0.6],["bigmac","iceberg",0.5,0.25],["fyldte_peber","iceberg",1,0.25],["hakkeboeffer","peberfrugt",1,0.5],["boller_karry","squash",1,0.33]].forEach(([id, v, gl, ny]) => {
+    const x = d.retter.find(r => r.id === id);
+    if(x && x.ing && x.ing[v] === gl) x.ing[v] = ny;
+  });
   const lk = d.retter.find(x => x.id === "loegkylling"), lkNy = SEED_RETTER.find(x => x.id === "loegkylling");
   if(lk && lkNy && lk.ing && lk.ing.gruyere === 140){ lk.ing = {...lkNy.ing}; lk.opskrift = [...lkNy.opskrift]; }
   d.retter.forEach(x => {
